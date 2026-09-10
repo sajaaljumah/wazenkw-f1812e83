@@ -54,7 +54,7 @@ export function AdultDashboard({
           amount={all.net}
           currency={currency}
           tone={all.net >= 0 ? "neutral" : "negative"}
-          hint="After expenses and savings transfers"
+          hint={t("afterExpensesHint")}
           className="col-span-2 lg:col-span-1"
           icon={<Wallet className="size-4" strokeWidth={1.5} />}
         />
@@ -69,7 +69,7 @@ export function AdultDashboard({
           label={t("expensesMonth")}
           amount={month.expenses}
           currency={currency}
-          hint="Refunds already deducted"
+          hint={t("refundsHint")}
           icon={<TrendingDown className="size-4" strokeWidth={1.5} />}
         />
         <StatCard
@@ -77,7 +77,7 @@ export function AdultDashboard({
           amount={savedTotal}
           currency={currency}
           tone="gold"
-          hint="Goals and emergency fund"
+          hint={t("goalsHint")}
           icon={<PiggyBank className="size-4" strokeWidth={1.5} />}
         />
       </div>
@@ -100,7 +100,7 @@ export function AdultDashboard({
       <RecentTransactionsCard transactions={transactions} currency={currency} limit={8} />
 
       {focus === "student" ? (
-        <Panel title="Study-life money tip">
+        <Panel title={t("studyTip")}>
           <p className="text-sm text-muted-foreground">
             Support from family and part-time income both count towards your own budget — your
             account stays entirely private to you.
@@ -126,14 +126,14 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
         userId={userId}
         currency={currency}
         goals={goals}
-        labels={{ income: "Add money in", expense: "Add spending" }}
+        labels={{ income: t("addMoneyIn"), expense: t("addSpending") }}
       />
 
       <div className="grid grid-cols-2 gap-y-6 border-b border-border pb-7 lg:grid-cols-4">
-        <StatCard label="Money available" amount={all.net} currency={currency} icon={<Wallet className="size-4" strokeWidth={1.5} />} />
-        <StatCard label="Allowance this month" amount={allowance} currency={currency} tone="positive" icon={<Coins className="size-4" strokeWidth={1.5} />} />
-        <StatCard label="Spent this month" amount={month.expenses} currency={currency} icon={<TrendingDown className="size-4" strokeWidth={1.5} />} />
-        <StatCard label="Saved so far" amount={all.savings} currency={currency} tone="gold" icon={<PiggyBank className="size-4" strokeWidth={1.5} />} />
+        <StatCard label={t("moneyAvailable")} amount={all.net} currency={currency} icon={<Wallet className="size-4" strokeWidth={1.5} />} />
+        <StatCard label={t("allowanceMonth")} amount={allowance} currency={currency} tone="positive" icon={<Coins className="size-4" strokeWidth={1.5} />} />
+        <StatCard label={t("spentMonth")} amount={month.expenses} currency={currency} icon={<TrendingDown className="size-4" strokeWidth={1.5} />} />
+        <StatCard label={t("savedSoFar")} amount={all.savings} currency={currency} tone="gold" icon={<PiggyBank className="size-4" strokeWidth={1.5} />} />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
@@ -141,23 +141,23 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
           budget={budget ? Number(budget.amount) : null}
           spent={month.expenses}
           currency={currency}
-          title="Your spending limit"
+          title={t("spendingLimit")}
         />
-        <GoalsCard goals={goals} transactions={transactions} currency={currency} title="What you're saving for" />
+        <GoalsCard goals={goals} transactions={transactions} currency={currency} title={t("savingFor")} />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <SpendingByCategoryCard transactions={monthTransactions} currency={currency} title="Where your money went" />
-        <UpcomingCashFlowCard items={recurring} currency={currency} title="Coming up" />
+        <SpendingByCategoryCard transactions={monthTransactions} currency={currency} title={t("whereMoneyWent")} />
+        <UpcomingCashFlowCard items={recurring} currency={currency} title={t("comingUp")} />
       </div>
 
-      <RecentTransactionsCard transactions={transactions} currency={currency} title="Latest activity" />
+      <RecentTransactionsCard transactions={transactions} currency={currency} title={t("latestActivity")} />
 
-      <Panel title="Financial learning">
+      <Panel title={t("financialLearning")}>
         <EmptyState
           icon={<GraduationCap className="size-5" strokeWidth={1.5} />}
-          title="Lessons are on the way"
-          description="Your learning progress will appear here once the Wazen lessons are released."
+          title={t("lessonsSoon")}
+          description={t("lessonsSoonBody")}
         />
       </Panel>
     </>
@@ -214,7 +214,7 @@ export function FamilySummaryCard({
                     </div>
                   </div>
                    <span className="border border-border bg-background px-2.5 py-1 text-[0.7rem] text-muted-foreground">
-                    {canFund ? "Allowance" : canMonitor ? "Monitoring" : "Linked"}
+                    {canFund ? t("allowanceTag") : canMonitor ? t("monitoringTag") : t("linkedTag")}
                   </span>
                 </div>
                 <dl className="mt-4 space-y-1.5 text-sm">

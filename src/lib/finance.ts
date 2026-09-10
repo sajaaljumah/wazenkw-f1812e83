@@ -72,8 +72,8 @@ export function formatDate(value: string | Date): string {
   return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" }).format(date);
 }
 
-export function formatToday(date = new Date()): string {
-  return new Intl.DateTimeFormat(undefined, {
+export function formatToday(date = new Date(), locale?: string): string {
+  return new Intl.DateTimeFormat(locale, {
     weekday: "long",
     day: "numeric",
     month: "long",
