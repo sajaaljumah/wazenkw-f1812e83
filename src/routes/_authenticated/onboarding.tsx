@@ -13,6 +13,7 @@ import {
   LIFE_STAGE_LABELS,
   accountTypeFor,
   calculateAge,
+  firstNameOf,
   lifeStageForAge,
   welcomeMessage,
   type LifeStage,
