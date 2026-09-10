@@ -90,7 +90,7 @@ function Dashboard() {
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <div className="space-y-8 wazen-enter">
         {profile.life_stage === "child" ? null : (
           <DashboardHeader
             name={firstName}
@@ -100,7 +100,7 @@ function Dashboard() {
             avatar={
               <Link
                 to="/profile"
-                className="wazen-interactive block rounded-full outline-none hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
+                className="wazen-interactive block rounded-full outline-hidden hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
                 title="View your profile"
               >
                 <WazenAvatar

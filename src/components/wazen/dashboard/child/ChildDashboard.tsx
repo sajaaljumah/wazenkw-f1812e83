@@ -103,7 +103,7 @@ function ChoiceTile({
     <button
       type="button"
       onClick={onClick}
-      className="kid-panel kid-press flex flex-col items-center gap-3 bg-kid-tint p-6 text-center focus-visible:ring-2 focus-visible:ring-kid-mid focus-visible:outline-none"
+      className="kid-panel kid-press flex flex-col items-center gap-3 bg-kid-tint p-6 text-center focus-visible:ring-2 focus-visible:ring-kid-mid focus-visible:outline-hidden"
     >
       <span className="size-20">{illustration}</span>
       <span className="text-lg">{title}</span>
@@ -209,7 +209,7 @@ export function ChildDashboard({
           <button
             type="button"
             onClick={() => setAction("saving")}
-            className="kid-press ml-auto flex items-center gap-2 rounded-full bg-kid-deep px-6 py-3 text-sm text-kid-ivory"
+               className="kid-press sm:ms-auto flex items-center gap-2 rounded-xl bg-kid-deep px-6 py-3 text-sm text-kid-ivory"
           >
             <Plus className="size-4" strokeWidth={2} />
             Save money
@@ -282,7 +282,7 @@ export function ChildDashboard({
             <button
               type="button"
               onClick={() => setAction("goal")}
-              className="kid-press rounded-full bg-kid-deep px-6 py-3 text-sm text-kid-ivory"
+               className="kid-press rounded-xl bg-kid-deep px-6 py-3 text-sm text-kid-ivory"
             >
               Make a goal
             </button>

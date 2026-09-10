@@ -24,6 +24,7 @@ import {
   formatPlanDate,
 } from "@/lib/subscription";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/subscription")({
   component: SubscriptionPage,
@@ -113,15 +114,15 @@ function SubscriptionPage() {
 
   return (
     <AppShell>
-      <div className="space-y-8">
-        <section className="wazen-panel p-7 sm:p-10">
+      <div className="space-y-10 wazen-enter">
+        <section className="border-b border-border pb-9">
           <p className="wazen-label">Your plan</p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <h1 className="text-3xl sm:text-4xl">{PLAN_LABELS[entitlements.plan]}</h1>
             {isPremium ? <PremiumBadge /> : null}
             <span
               className={cn(
-                "rounded-full px-3 py-1 text-xs",
+                "rounded-md px-2.5 py-1 text-xs font-medium",
                 entitlements.needsAttention
                   ? "bg-destructive/10 text-destructive"
                   : "bg-secondary text-muted-foreground",
@@ -130,7 +131,7 @@ function SubscriptionPage() {
               {STATUS_LABELS[entitlements.status]}
             </span>
             {entitlements.subscriptionKind ? (
-              <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
+              <span className="rounded-md bg-secondary px-2.5 py-1 text-xs text-muted-foreground">
                 {KIND_LABELS[entitlements.subscriptionKind]}
               </span>
             ) : null}
@@ -164,19 +165,18 @@ function SubscriptionPage() {
             <div className="mt-8 flex flex-wrap gap-3">
               {isPremium ? (
                 canManageBilling ? (
-                  <button
+                  <Button
                     onClick={handleManage}
                     disabled={busy === "manage"}
-                    className="rounded-full border border-border px-6 py-3 text-sm transition-colors hover:bg-secondary disabled:opacity-60"
+                    variant="outline"
                   >
                     {busy === "manage" ? "Opening…" : "Manage subscription"}
-                  </button>
+                  </Button>
                 ) : null
               ) : (
-                <button
+                <Button
                   onClick={handleUpgrade}
                   disabled={busy === "upgrade"}
-                  className="flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
                 >
                   <Sparkles className="size-4" strokeWidth={1.5} />
                   {busy === "upgrade"
@@ -185,14 +185,14 @@ function SubscriptionPage() {
                         isFamily ? familyMoney.total : (individualPrice?.amount ?? 0),
                         isFamily ? familyMoney.currency : (individualPrice?.currency ?? "KWD"),
                       )}/${PERIOD_LABELS[entitlements.billingPeriod ?? "monthly"]}`}
-                </button>
+                </Button>
               )}
             </div>
           ) : null}
         </section>
 
         {family ? (
-          <section className="wazen-panel p-7">
+          <section className="border-y border-border py-7">
             <div className="flex items-center gap-3">
               <Users className="size-4 text-muted-foreground" strokeWidth={1.5} />
               <p className="wazen-label">Family subscription</p>
@@ -239,8 +239,8 @@ function SubscriptionPage() {
           </section>
         ) : null}
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <section className="wazen-panel p-7">
+        <div className="grid border-y border-border lg:grid-cols-2">
+          <section className="border-b border-border py-7 lg:border-b-0 lg:border-e lg:pe-8">
             <p className="wazen-label">Free</p>
             <h2 className="mt-3 text-xl">Everything you use today</h2>
             <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
@@ -253,7 +253,7 @@ function SubscriptionPage() {
             </ul>
           </section>
 
-          <section className="wazen-panel bg-secondary/40 p-7">
+          <section className="py-7 lg:ps-8">
             <div className="flex items-center justify-between gap-3">
               <p className="wazen-label">Premium</p>
               <PremiumBadge />
@@ -276,8 +276,8 @@ function SubscriptionPage() {
         </div>
 
         {canSubscribe ? (
-          <div className="grid gap-6 lg:grid-cols-2">
-            <section className="wazen-panel p-7">
+          <div className="grid border-y border-border lg:grid-cols-2">
+            <section className="border-b border-border py-7 lg:border-b-0 lg:border-e lg:pe-8">
               <p className="wazen-label">Individual</p>
               <h2 className="mt-3 text-xl">
                 {formatMoney(individualPrice?.amount ?? 0, individualPrice?.currency ?? "KWD")}
@@ -292,7 +292,7 @@ function SubscriptionPage() {
                 ))}
               </ul>
             </section>
-            <section className="wazen-panel p-7">
+            <section className="py-7 lg:ps-8">
               <p className="wazen-label">Family</p>
               <h2 className="mt-3 text-xl">
                 {formatMoney(familyPrice?.amount ?? 0, familyPrice?.currency ?? "KWD")}

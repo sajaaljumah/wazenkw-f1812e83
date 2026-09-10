@@ -9,7 +9,7 @@ export function PremiumBadge({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-xs text-gold",
+        "inline-flex items-center gap-1.5 rounded-md border border-gold/25 bg-gold/10 px-2.5 py-1 text-xs text-gold",
         className,
       )}
     >
@@ -34,7 +34,7 @@ export function UpgradePrompt({
   return (
     <div
       className={cn(
-        "wazen-panel flex flex-col gap-4 bg-secondary/40 text-center",
+        "flex flex-col gap-4 border border-dashed border-border bg-secondary/30 text-center",
         compact ? "p-6" : "p-8",
       )}
     >

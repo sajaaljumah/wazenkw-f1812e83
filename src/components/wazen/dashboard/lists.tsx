@@ -10,6 +10,8 @@ import {
 } from "@/lib/finance";
 import type { Goal, RecurringItem, Transaction } from "@/lib/finance";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 
 const FILTERS = [
   { value: "all", label: "All" },
@@ -38,28 +40,26 @@ export function RecentTransactionsCard({
   limit?: number;
   title?: string;
 }) {
+  const { t } = useWazenLocale();
   const [filter, setFilter] = useState<TransactionFilter>("all");
   const recent = transactions.filter((t) => matchesFilter(t.kind, filter)).slice(0, limit);
   return (
     <Panel
       title={title}
       action={
-        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter transactions">
+        <div className="flex flex-wrap gap-1" role="group" aria-label="Filter transactions">
           {FILTERS.map((option) => (
-            <button
+            <Button
               key={option.value}
               type="button"
               aria-pressed={filter === option.value}
               onClick={() => setFilter(option.value)}
-              className={cn(
-                "rounded-full px-3 py-1.5 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:outline-none",
-                filter === option.value
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-              )}
+              variant={filter === option.value ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 px-2.5"
             >
-              {option.label}
-            </button>
+              {t(option.value === "all" ? "all" : option.value === "in" ? "moneyIn" : option.value === "out" ? "spending" : "saving")}
+            </Button>
           ))}
         </div>
       }
@@ -67,10 +67,10 @@ export function RecentTransactionsCard({
       {recent.length === 0 ? (
         <EmptyState
           icon={<Receipt className="size-5" strokeWidth={1.5} />}
-          title={filter === "all" ? "No transactions yet" : "Nothing here yet"}
+          title={filter === "all" ? t("noTransactions") : t("nothingHere")}
           description={
             filter === "all"
-              ? "Use the quick actions above to record your first income or expense."
+              ? t("noTransactionsDescription")
               : "Try another filter, or add a new entry with the quick actions above."
           }
         />
@@ -90,7 +90,7 @@ export function RecentTransactionsCard({
               <li key={t.id} className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0">
                 <span
                   className={cn(
-                    "flex size-10 shrink-0 items-center justify-center rounded-2xl",
+                    "flex size-9 shrink-0 items-center justify-center rounded-md",
                     isPositive ? "bg-chart-2/12 text-chart-2" : "bg-secondary text-muted-foreground",
                   )}
                 >
@@ -129,21 +129,22 @@ export function UpcomingCashFlowCard({
   currency: string;
   title?: string;
 }) {
+  const { t } = useWazenLocale();
   const upcoming = upcomingCashFlow(items).slice(0, 6);
   return (
     <Panel title={title}>
       {upcoming.length === 0 ? (
         <EmptyState
           icon={<CalendarClock className="size-5" strokeWidth={1.5} />}
-          title="Nothing scheduled"
-          description="Recurring income, bills and saving transfers will be listed here."
+          title={t("noScheduled")}
+          description={t("noScheduledDescription")}
         />
       ) : (
-        <ul className="space-y-3">
+        <ul className="wazen-rule-list border-y border-border">
           {upcoming.map((entry) => (
             <li
               key={entry.id}
-              className="flex items-center justify-between gap-4 rounded-2xl bg-secondary/50 px-4 py-3"
+              className="flex items-center justify-between gap-4 py-3.5"
             >
               <div className="min-w-0">
                 <p className="truncate text-sm">{entry.name}</p>
@@ -182,14 +183,15 @@ export function GoalsCard({
   title?: string;
   playful?: boolean;
 }) {
+  const { t } = useWazenLocale();
   const list = goals.filter((goal) => goal.kind === "goal");
   return (
     <Panel title={title}>
       {list.length === 0 ? (
         <EmptyState
           icon={<Target className="size-5" strokeWidth={1.5} />}
-          title="No goals yet"
-          description="Create a goal and every saving transfer will move the bar forward."
+          title={t("noGoals")}
+          description={t("noGoalsDescription")}
         />
       ) : (
         <ul className="space-y-6">
@@ -234,14 +236,15 @@ export function EmergencyFundCard({
   transactions: Transaction[];
   currency: string;
 }) {
+  const { t } = useWazenLocale();
   const fund = goals.find((goal) => goal.kind === "emergency_fund");
   return (
-    <Panel title="Emergency fund">
+    <Panel title={t("emergencyFund")}>
       {!fund ? (
         <EmptyState
           icon={<PiggyBank className="size-5" strokeWidth={1.5} />}
-          title="No emergency fund yet"
-          description="Add a goal named for your emergency fund to start tracking your safety net."
+          title={t("noEmergency")}
+          description={t("emergencyDescription")}
         />
       ) : (
         <>
@@ -274,13 +277,14 @@ export function BudgetCard({
   currency: string;
   title?: string;
 }) {
+  const { t } = useWazenLocale();
   return (
     <Panel title={title}>
       {budget === null ? (
         <EmptyState
           icon={<Receipt className="size-5" strokeWidth={1.5} />}
-          title="No budget set for this month"
-          description="Once a monthly budget exists, your remaining amount appears here."
+          title={t("noBudget")}
+          description={t("budgetDescription")}
         />
       ) : (
         <>
