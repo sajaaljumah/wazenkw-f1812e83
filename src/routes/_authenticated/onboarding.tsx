@@ -19,13 +19,14 @@ import {
   type LifeStage,
 } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   component: Onboarding,
 });
 
 const inputClass =
-  "w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring/50";
+  "wazen-field";
 
 const STEPS = ["Basics", "Life stage", "Preferences"];
 
@@ -105,7 +106,7 @@ function Onboarding() {
               <div key={label} className="flex flex-1 items-center gap-2">
                 <span
                   className={cn(
-                    "flex size-7 items-center justify-center rounded-full text-xs",
+                    "flex size-7 items-center justify-center rounded-md text-xs",
                     index <= step
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary text-muted-foreground",
@@ -120,7 +121,7 @@ function Onboarding() {
           </div>
         ) : null}
 
-        <section className="wazen-panel p-6 sm:p-10">
+        <section className="border-y border-border py-8 sm:py-10">
           {step === 0 ? (
             <>
               <h1 className="text-3xl">Basic information</h1>
@@ -164,7 +165,7 @@ function Onboarding() {
               </p>
               <div className="mt-7">
                 {autoStage ? (
-                  <div className="rounded-2xl border border-input bg-secondary/60 p-5 text-sm">
+                   <div className="rounded-lg border border-input bg-secondary/60 p-5 text-sm">
                     <strong className="font-normal">{LIFE_STAGE_LABELS[autoStage]}</strong> — chosen
                     automatically from your age.
                     <span className="mt-2 block text-xs text-muted-foreground">
@@ -175,19 +176,15 @@ function Onboarding() {
                 ) : (
                   <div className="grid gap-3 sm:grid-cols-2">
                     {ADULT_LIFE_STAGES.map((stage) => (
-                      <button
+                       <Button
                         key={stage}
                         type="button"
                         onClick={() => setLifeStage(stage)}
-                        className={cn(
-                          "rounded-2xl border p-5 text-left text-sm transition-colors",
-                          lifeStage === stage
-                            ? "border-transparent bg-primary text-primary-foreground"
-                            : "border-input hover:bg-secondary",
-                        )}
+                         variant={lifeStage === stage ? "default" : "outline"}
+                         className="h-auto justify-start p-5 text-start"
                       >
                         {LIFE_STAGE_LABELS[stage]}
-                      </button>
+                       </Button>
                     ))}
                   </div>
                 )}
@@ -255,13 +252,13 @@ function Onboarding() {
               <p className="mx-auto mt-4 max-w-md text-muted-foreground">
                 {welcomeMessage(effectiveStage)}
               </p>
-              <button
+              <Button
                 onClick={() => navigate({ to: "/dashboard" })}
-                className="mt-9 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90"
+                className="mt-9"
               >
                 Go to Dashboard
                 <ArrowRight className="size-4" strokeWidth={1.5} />
-              </button>
+              </Button>
             </div>
           ) : null}
         </section>
@@ -284,7 +281,7 @@ function ReadOnlyRow({
       <span className="wazen-label">{label}</span>
       <div
         className={cn(
-          "mt-2 rounded-2xl border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground",
+          "mt-2 rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground",
           capitalize && "capitalize",
         )}
       >
@@ -306,30 +303,27 @@ function NextButton({
   inline?: boolean;
 }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       disabled={busy}
-      className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60",
-        inline ? "flex-1" : "mt-8 w-full sm:w-auto",
-      )}
+      className={cn(inline ? "flex-1" : "mt-8 w-full sm:w-auto")}
     >
       {busy ? <Loader2 className="size-4 animate-spin" /> : null}
       {children}
-    </button>
+    </Button>
   );
 }
 
 function BackButton({ onClick }: { onClick: () => void }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
-      className="rounded-full border border-border px-6 py-3 text-sm text-muted-foreground transition-colors hover:bg-secondary"
+      variant="outline"
     >
       Back
-    </button>
+    </Button>
   );
 }
 
