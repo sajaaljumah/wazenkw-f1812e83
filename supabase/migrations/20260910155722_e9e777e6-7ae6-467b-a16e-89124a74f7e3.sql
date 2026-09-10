@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.calculate_age(DATE) TO PUBLIC;
