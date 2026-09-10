@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
  * female / male pastel theme automatically.
  */
 
-type IllustrationProps = { className?: string };
+type IllustrationProps = { className?: string | undefined };
 
 const soft = "var(--color-kid-soft)";
 const mid = "var(--color-kid-mid)";
@@ -15,7 +15,7 @@ const deep = "var(--color-kid-deep)";
 const champagne = "var(--color-kid-champagne)";
 const ivory = "var(--color-kid-ivory)";
 
-function Frame({ children, className }: { children: React.ReactNode; className?: string }) {
+function Frame({ children, className }: { children: React.ReactNode; className?: string | undefined }) {
   return (
     <svg viewBox="0 0 120 120" className={cn("size-full", className)} role="presentation" aria-hidden="true">
       {children}
