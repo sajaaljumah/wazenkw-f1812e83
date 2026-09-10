@@ -44,7 +44,7 @@ const signInSchema = z.object({
 });
 
 const signUpSchema = z.object({
-  full_name: z.string().trim().min(2, "Enter your full name").max(80),
+  full_name: z.string().trim().min(2, "Enter your first name").max(80),
   email: z.string().trim().email("Enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   date_of_birth: z.string().min(1, "Select your date of birth"),
@@ -229,12 +229,12 @@ function AuthPage() {
             </form>
           ) : (
             <form onSubmit={handleSignUp} className="mt-8 space-y-5">
-              <Field label="Full name" error={errors['full_name']}>
+              <Field label="First name" error={errors['full_name']}>
                 <input
                   className={inputClass}
                   value={form.full_name}
                   onChange={(e) => set("full_name", e.target.value)}
-                  placeholder="Mariam Al-Sabah"
+                  placeholder="Mariam"
                 />
               </Field>
               <div className="grid gap-5 sm:grid-cols-2">

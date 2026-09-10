@@ -69,7 +69,7 @@ function SettingsPage() {
 
   async function save() {
     if (fullName.trim().length < 2) {
-      toast.error("Enter your full name");
+      toast.error("Enter your first name");
       return;
     }
     const stage = (stageLocked ? profile!.life_stage : lifeStage) as LifeStage;
