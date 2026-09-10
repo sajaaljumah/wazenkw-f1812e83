@@ -14,6 +14,7 @@ import {
   LIFE_STAGE_LABELS,
   accountTypeFor,
   calculateAge,
+  firstNameOf,
   lifeStageForAge,
   type LifeStage,
 } from "@/lib/wazen";
