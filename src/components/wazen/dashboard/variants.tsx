@@ -14,6 +14,7 @@ import type { Budget, Goal, RecurringItem, Transaction } from "@/lib/finance";
 import type { FamilyMemberSummary } from "@/hooks/use-wazen-finance";
 import { LIFE_STAGE_LABELS, calculateAge, firstNameOf } from "@/lib/wazen";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 
 export type DashboardData = {
   userId: string;
@@ -41,36 +42,38 @@ export function AdultDashboard({
   const { currency, transactions, goals, budget, recurring, userId } = data;
   const { monthTransactions, month, all } = useMonthTotals(transactions);
   const savedTotal = all.savings;
+  const { t } = useWazenLocale();
 
   return (
     <>
       <QuickActions userId={userId} currency={currency} goals={goals} />
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-y-6 border-b border-border pb-7 lg:grid-cols-4">
         <StatCard
-          label="Available money"
+          label={t("availableMoney")}
           amount={all.net}
           currency={currency}
           tone={all.net >= 0 ? "neutral" : "negative"}
           hint="After expenses and savings transfers"
+          className="col-span-2 lg:col-span-1"
           icon={<Wallet className="size-4" strokeWidth={1.5} />}
         />
         <StatCard
-          label="Income this month"
+          label={t("incomeMonth")}
           amount={month.income}
           currency={currency}
           tone="positive"
           icon={<TrendingUp className="size-4" strokeWidth={1.5} />}
         />
         <StatCard
-          label="Expenses this month"
+          label={t("expensesMonth")}
           amount={month.expenses}
           currency={currency}
           hint="Refunds already deducted"
           icon={<TrendingDown className="size-4" strokeWidth={1.5} />}
         />
         <StatCard
-          label="Total savings"
+          label={t("totalSavings")}
           amount={savedTotal}
           currency={currency}
           tone="gold"
@@ -115,6 +118,7 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
   const allowance = monthTransactions
     .filter((t) => t.kind === "income" && /allowance/i.test(t.category))
     .reduce((sum, t) => sum + Number(t.amount), 0);
+  const { t } = useWazenLocale();
 
   return (
     <>
@@ -125,7 +129,7 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
         labels={{ income: "Add money in", expense: "Add spending" }}
       />
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-y-6 border-b border-border pb-7 lg:grid-cols-4">
         <StatCard label="Money available" amount={all.net} currency={currency} icon={<Wallet className="size-4" strokeWidth={1.5} />} />
         <StatCard label="Allowance this month" amount={allowance} currency={currency} tone="positive" icon={<Coins className="size-4" strokeWidth={1.5} />} />
         <StatCard label="Spent this month" amount={month.expenses} currency={currency} icon={<TrendingDown className="size-4" strokeWidth={1.5} />} />
@@ -171,15 +175,16 @@ export function FamilySummaryCard({
   members: FamilyMemberSummary[];
   isLoading: boolean;
 }) {
+  const { t } = useWazenLocale();
   return (
-    <Panel title="Family summary">
+    <Panel title={t("familySummary")}>
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading your family…</p>
+        <p className="text-sm text-muted-foreground">{t("loadingFamily")}</p>
       ) : members.length === 0 ? (
         <EmptyState
           icon={<Users className="size-5" strokeWidth={1.5} />}
-          title="No linked family members"
-          description="Children and teenagers linked to your account will be summarised here."
+          title={t("noFamily")}
+          description={t("noFamilyDescription")}
         />
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
@@ -190,7 +195,7 @@ export function FamilySummaryCard({
             return (
               <li
                 key={profile.id}
-                className="wazen-interactive rounded-3xl bg-secondary/50 p-5 hover:bg-secondary/80 hover:wazen-interactive-hover"
+                className="wazen-interactive border border-border bg-secondary/35 p-5 hover:bg-secondary/70 hover:wazen-interactive-hover"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
@@ -208,14 +213,14 @@ export function FamilySummaryCard({
                       </p>
                     </div>
                   </div>
-                  <span className="rounded-full bg-background px-3 py-1 text-[0.7rem] text-muted-foreground">
+                   <span className="border border-border bg-background px-2.5 py-1 text-[0.7rem] text-muted-foreground">
                     {canFund ? "Allowance" : canMonitor ? "Monitoring" : "Linked"}
                   </span>
                 </div>
                 <dl className="mt-4 space-y-1.5 text-sm">
-                  <Row label="Available" value={formatMoney(totals.net, profile.base_currency)} />
-                  <Row label="Saved" value={formatMoney(totals.savings, profile.base_currency)} />
-                  <Row label="Spent (all time)" value={formatMoney(totals.expenses, profile.base_currency)} />
+                  <Row label={t("available")} value={formatMoney(totals.net, profile.base_currency)} />
+                  <Row label={t("saved")} value={formatMoney(totals.savings, profile.base_currency)} />
+                  <Row label={t("spent")} value={formatMoney(totals.expenses, profile.base_currency)} />
                 </dl>
                 {goal ? (
                   <>

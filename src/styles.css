@@ -166,6 +166,24 @@
   --sidebar-ring: oklch(0.7 0.07 72);
 }
 
+.stage-teen {
+  --accent: oklch(0.91 0.035 338);
+  --gold: oklch(0.66 0.06 25);
+  --sage: oklch(0.66 0.035 285);
+  --chart-1: oklch(0.62 0.07 340);
+  --chart-2: oklch(0.58 0.055 245);
+  --chart-3: oklch(0.69 0.065 48);
+}
+
+.stage-university {
+  --accent: oklch(0.91 0.03 148);
+  --gold: oklch(0.65 0.055 105);
+  --sage: oklch(0.61 0.055 154);
+  --chart-1: oklch(0.61 0.055 154);
+  --chart-2: oklch(0.55 0.055 205);
+  --chart-3: oklch(0.62 0.035 76);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);

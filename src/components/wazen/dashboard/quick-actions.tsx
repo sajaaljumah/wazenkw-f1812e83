@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { Goal } from "@/lib/finance";
 import { Button } from "@/components/ui/button";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 
 type ActionKind = "income" | "expense" | "saving" | "goal";
 
@@ -57,13 +58,14 @@ export function QuickActions({
   goals: Goal[];
   labels?: Partial<Record<ActionKind, string>>;
 }) {
+  const { t } = useWazenLocale();
   const [open, setOpen] = useState<ActionKind | null>(null);
   const order: ActionKind[] = ["income", "expense", "saving", "goal"];
 
   return (
     <>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-3 border-b border-border pb-6">
-        <span className="wazen-label me-2">Quick entry</span>
+        <span className="wazen-label me-2">{t("quickEntry")}</span>
         {order.map((kind) => {
           const meta = ACTION_META[kind];
           const Icon = meta.icon;
@@ -77,7 +79,7 @@ export function QuickActions({
               <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
                 <Icon className="size-4" strokeWidth={1.6} />
               </span>
-              <span className="leading-tight">{labels?.[kind] ?? meta.label}</span>
+              <span className="leading-tight">{labels?.[kind] ?? t(kind === "income" ? "addIncome" : kind === "expense" ? "addExpense" : kind === "saving" ? "addSaving" : "addGoal")}</span>
             </Button>
           );
         })}

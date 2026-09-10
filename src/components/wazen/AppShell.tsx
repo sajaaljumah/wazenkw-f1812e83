@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { Button } from "@/components/ui/button";
+import { WazenLocaleProvider } from "@/components/wazen/WazenLocale";
 import { firstNameOf } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
 
@@ -97,7 +98,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 pb-28 pt-7 sm:px-6 sm:pb-14 sm:pt-10 lg:px-8">{children}</main>
+      <WazenLocaleProvider language={profile?.language}>
+        <main className="mx-auto max-w-6xl px-4 pb-28 pt-7 sm:px-6 sm:pb-14 sm:pt-10 lg:px-8">{children}</main>
+      </WazenLocaleProvider>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/96 pb-[env(safe-area-inset-bottom)] backdrop-blur-md sm:hidden" aria-label="Mobile navigation">
         <div className="mx-auto flex max-w-md items-stretch justify-around">
