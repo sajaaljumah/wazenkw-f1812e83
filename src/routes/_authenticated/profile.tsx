@@ -59,7 +59,7 @@ function ProfilePage() {
     const { error } = await supabase
       .from("profiles")
       .update({
-        full_name: fullName.trim(),
+        full_name: firstNameOf(fullName),
         avatar_url: avatarUrl.trim() || null,
         language,
         base_currency: currency,

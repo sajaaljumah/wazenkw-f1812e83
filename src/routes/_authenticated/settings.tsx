@@ -77,7 +77,7 @@ function SettingsPage() {
     const { error } = await supabase
       .from("profiles")
       .update({
-        full_name: fullName.trim(),
+        full_name: firstNameOf(fullName),
         life_stage: stage,
         account_type: accountTypeFor(stage),
         language,

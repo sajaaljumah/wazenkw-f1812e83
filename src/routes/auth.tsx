@@ -152,7 +152,7 @@ function AuthPage() {
     const stage = lifeStage as LifeStage;
     const { error: profileError } = await supabase.from("profiles").insert({
       id: data.user!.id,
-      full_name: parsed.data.full_name,
+      full_name: firstNameOf(parsed.data.full_name),
       date_of_birth: parsed.data.date_of_birth,
       gender: parsed.data.gender,
       life_stage: stage,

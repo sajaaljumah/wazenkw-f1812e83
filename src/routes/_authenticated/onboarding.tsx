@@ -75,7 +75,7 @@ function Onboarding() {
     const { error } = await supabase
       .from("profiles")
       .update({
-        full_name: fullName.trim(),
+        full_name: firstNameOf(fullName),
         life_stage: effectiveStage,
         account_type: accountTypeFor(effectiveStage),
         language,
