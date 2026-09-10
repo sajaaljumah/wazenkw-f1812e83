@@ -19,7 +19,7 @@ import {
 import type { DashboardData } from "@/components/wazen/dashboard/variants";
 import { DashboardHeader } from "@/components/wazen/dashboard/primitives";
 import { formatToday } from "@/lib/finance";
-import { LIFE_STAGE_LABELS, welcomeMessage } from "@/lib/wazen";
+import { LIFE_STAGE_LABELS, firstNameOf, welcomeMessage } from "@/lib/wazen";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -85,7 +85,7 @@ function Dashboard() {
     recurring: recurring.data ?? [],
   };
 
-  const firstName = profile.full_name.split(" ")[0] ?? profile.full_name;
+  const firstName = firstNameOf(profile.full_name);
 
   return (
     <AppShell>

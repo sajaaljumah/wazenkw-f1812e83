@@ -123,7 +123,7 @@ function SettingsPage() {
         <h2 className="text-xl">Account</h2>
         <div className="mt-6 space-y-5">
           <label className="block">
-            <span className="wazen-label">Name</span>
+            <span className="wazen-label">First name</span>
             <input
               className={cn(inputClass, "mt-2")}
               value={fullName}
