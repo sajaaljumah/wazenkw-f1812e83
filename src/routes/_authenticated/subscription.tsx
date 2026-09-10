@@ -1,20 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, Sparkles } from "lucide-react";
+import { Check, Loader2, Sparkles, Users } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/wazen/AppShell";
 import { PremiumBadge } from "@/components/wazen/subscription/PremiumGate";
 import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { openBillingPortal, startPremiumUpgrade } from "@/lib/subscription.functions";
 import {
+  FAMILY_PLAN_HIGHLIGHTS,
   FEATURE_DESCRIPTIONS,
   FEATURE_LABELS,
   FREE_PLAN_HIGHLIGHTS,
+  INDIVIDUAL_PLAN_HIGHLIGHTS,
+  KIND_LABELS,
+  PERIOD_LABELS,
   PLAN_LABELS,
   PREMIUM_FEATURES,
-  PREMIUM_PRICE,
   STATUS_LABELS,
+  computeFamilyTotal,
+  findPrice,
+  formatMoney,
   formatPlanDate,
 } from "@/lib/subscription";
 import { cn } from "@/lib/utils";
@@ -23,16 +29,16 @@ export const Route = createFileRoute("/_authenticated/subscription")({
   component: SubscriptionPage,
   head: () => ({
     meta: [
-      { title: "Your Wazen plan — Free & Premium" },
+      { title: "Your Wazen plan — Individual & Family" },
       {
         name: "description",
         content:
-          "Review your Wazen plan, subscription status and renewal date, and see what Premium unlocks.",
+          "Review your Wazen plan, subscription status and renewal date, and see what the Individual and Family subscriptions include.",
       },
-      { property: "og:title", content: "Your Wazen plan — Free & Premium" },
+      { property: "og:title", content: "Your Wazen plan — Individual & Family" },
       {
         property: "og:description",
-        content: "Manage your Wazen subscription and premium feature access.",
+        content: "Manage your Wazen subscription, family seats and premium access.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -41,20 +47,36 @@ export const Route = createFileRoute("/_authenticated/subscription")({
 });
 
 function SubscriptionPage() {
-  const { entitlements, isPremium, isLoading, refetch } = useSubscriptionAccess();
+  const { entitlements, isPremium, isLoading, refetch, canSubscribe, canManageBilling, family } =
+    useSubscriptionAccess();
   const upgrade = useServerFn(startPremiumUpgrade);
   const manage = useServerFn(openBillingPortal);
   const [busy, setBusy] = useState<"upgrade" | "manage" | null>(null);
 
+  const isFamily = entitlements.subscriptionKind === "family" || !!family;
+  const individualPrice = findPrice(entitlements.prices, "individual", "monthly");
+  const familyPrice = findPrice(entitlements.prices, "family", "monthly");
+  const additionalChildren = Math.max(
+    0,
+    (family?.childCount ?? 0) - (family?.includedChildCount ?? 0),
+  );
+  const familyMoney = computeFamilyTotal(familyPrice, additionalChildren);
+
   async function handleUpgrade() {
     setBusy("upgrade");
     try {
-      const result = await upgrade({ data: { interval: "month" } });
+      const result = await upgrade({
+        data: {
+          kind: isFamily ? "family" : "individual",
+          billingPeriod: "monthly",
+          additionalChildren,
+        },
+      });
       if (result.status === "redirect" && result.url) {
         window.location.assign(result.url);
         return;
       }
-      toast.info("Premium checkout is coming soon", {
+      toast.info("Checkout is coming soon", {
         description: "Payments aren't connected yet — your plan is unchanged.",
       });
     } catch {
@@ -107,13 +129,22 @@ function SubscriptionPage() {
             >
               {STATUS_LABELS[entitlements.status]}
             </span>
+            {entitlements.subscriptionKind ? (
+              <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
+                {KIND_LABELS[entitlements.subscriptionKind]}
+              </span>
+            ) : null}
           </div>
           <p className="mt-3 max-w-xl text-muted-foreground">
-            {isPremium
-              ? entitlements.isCancelling
-                ? "Premium stays available until the end of your current period."
-                : "You have full access to every Wazen premium feature."
-              : "You're on the free plan. Premium unlocks Wazen's deeper financial tools."}
+            {!canSubscribe
+              ? isPremium
+                ? "Your access is included in your family's subscription — nothing to pay and nothing to manage."
+                : "Your access is managed by your parent or guardian."
+              : isPremium
+                ? entitlements.isCancelling
+                  ? "Premium stays available until the end of your current period."
+                  : "You have full access to every Wazen premium feature."
+                : "You're on the free plan. Premium unlocks Wazen's deeper financial tools."}
           </p>
           <dl className="mt-7 grid gap-5 sm:grid-cols-3">
             <div>
@@ -122,36 +153,91 @@ function SubscriptionPage() {
             </div>
             <div>
               <dt className="wazen-label">Renews</dt>
-              <dd className="mt-2 text-sm">{formatPlanDate(entitlements.currentPeriodEnd)}</dd>
+              <dd className="mt-2 text-sm">{formatPlanDate(entitlements.renewalAt)}</dd>
             </div>
             <div>
               <dt className="wazen-label">Trial ends</dt>
               <dd className="mt-2 text-sm">{formatPlanDate(entitlements.trialEndsAt)}</dd>
             </div>
           </dl>
-          <div className="mt-8 flex flex-wrap gap-3">
-            {isPremium ? (
-              <button
-                onClick={handleManage}
-                disabled={busy === "manage"}
-                className="rounded-full border border-border px-6 py-3 text-sm transition-colors hover:bg-secondary disabled:opacity-60"
-              >
-                {busy === "manage" ? "Opening…" : "Manage subscription"}
-              </button>
-            ) : (
-              <button
-                onClick={handleUpgrade}
-                disabled={busy === "upgrade"}
-                className="flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
-              >
-                <Sparkles className="size-4" strokeWidth={1.5} />
-                {busy === "upgrade"
-                  ? "Preparing…"
-                  : `Upgrade — ${PREMIUM_PRICE.amount.toFixed(3)} ${PREMIUM_PRICE.currency}/${PREMIUM_PRICE.interval}`}
-              </button>
-            )}
-          </div>
+          {canSubscribe ? (
+            <div className="mt-8 flex flex-wrap gap-3">
+              {isPremium ? (
+                canManageBilling ? (
+                  <button
+                    onClick={handleManage}
+                    disabled={busy === "manage"}
+                    className="rounded-full border border-border px-6 py-3 text-sm transition-colors hover:bg-secondary disabled:opacity-60"
+                  >
+                    {busy === "manage" ? "Opening…" : "Manage subscription"}
+                  </button>
+                ) : null
+              ) : (
+                <button
+                  onClick={handleUpgrade}
+                  disabled={busy === "upgrade"}
+                  className="flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+                >
+                  <Sparkles className="size-4" strokeWidth={1.5} />
+                  {busy === "upgrade"
+                    ? "Preparing…"
+                    : `Upgrade — ${formatMoney(
+                        isFamily ? familyMoney.total : (individualPrice?.amount ?? 0),
+                        isFamily ? familyMoney.currency : (individualPrice?.currency ?? "KWD"),
+                      )}/${PERIOD_LABELS[entitlements.billingPeriod ?? "monthly"]}`}
+                </button>
+              )}
+            </div>
+          ) : null}
         </section>
+
+        {family ? (
+          <section className="wazen-panel p-7">
+            <div className="flex items-center gap-3">
+              <Users className="size-4 text-muted-foreground" strokeWidth={1.5} />
+              <p className="wazen-label">Family subscription</p>
+            </div>
+            <dl className="mt-6 grid gap-5 sm:grid-cols-4">
+              <div>
+                <dt className="wazen-label">Parents</dt>
+                <dd className="mt-2 text-sm">
+                  {family.parentCount} of {family.includedParentCount} included
+                </dd>
+              </div>
+              <div>
+                <dt className="wazen-label">Children & teens</dt>
+                <dd className="mt-2 text-sm">
+                  {family.childCount} of {family.includedChildCount} included
+                </dd>
+              </div>
+              <div>
+                <dt className="wazen-label">Extra children</dt>
+                <dd className="mt-2 text-sm">{family.additionalChildCount}</dd>
+              </div>
+              <div>
+                <dt className="wazen-label">Free places left</dt>
+                <dd className="mt-2 text-sm">{family.remainingIncludedChildSeats}</dd>
+              </div>
+            </dl>
+            {canManageBilling ? (
+              <div className="mt-6 space-y-1 border-t border-border pt-6 text-sm text-muted-foreground">
+                <p>
+                  Base family subscription —{" "}
+                  {formatMoney(familyMoney.base, familyMoney.currency)}/month
+                </p>
+                <p>
+                  {additionalChildren} extra{" "}
+                  {additionalChildren === 1 ? "child" : "children"} ×{" "}
+                  {formatMoney(familyPrice?.additional_child_amount ?? 0, familyMoney.currency)} —{" "}
+                  {formatMoney(familyMoney.additional, familyMoney.currency)}/month
+                </p>
+                <p className="text-foreground">
+                  Total — {formatMoney(familyMoney.total, familyMoney.currency)}/month
+                </p>
+              </div>
+            ) : null}
+          </section>
+        ) : null}
 
         <div className="grid gap-6 lg:grid-cols-2">
           <section className="wazen-panel p-7">
@@ -188,6 +274,50 @@ function SubscriptionPage() {
             </ul>
           </section>
         </div>
+
+        {canSubscribe ? (
+          <div className="grid gap-6 lg:grid-cols-2">
+            <section className="wazen-panel p-7">
+              <p className="wazen-label">Individual</p>
+              <h2 className="mt-3 text-xl">
+                {formatMoney(individualPrice?.amount ?? 0, individualPrice?.currency ?? "KWD")}
+                <span className="text-muted-foreground"> /month</span>
+              </h2>
+              <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
+                {INDIVIDUAL_PLAN_HIGHLIGHTS.map((item) => (
+                  <li key={item} className="flex gap-3">
+                    <Check className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={1.5} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </section>
+            <section className="wazen-panel p-7">
+              <p className="wazen-label">Family</p>
+              <h2 className="mt-3 text-xl">
+                {formatMoney(familyPrice?.amount ?? 0, familyPrice?.currency ?? "KWD")}
+                <span className="text-muted-foreground"> /month</span>
+              </h2>
+              <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
+                {FAMILY_PLAN_HIGHLIGHTS.map((item) => (
+                  <li key={item} className="flex gap-3">
+                    <Check className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={1.5} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-5 text-xs text-muted-foreground">
+                Each child or teenager beyond{" "}
+                {familyPrice?.included_child_count ?? 4} costs{" "}
+                {formatMoney(
+                  familyPrice?.additional_child_amount ?? 0,
+                  familyPrice?.currency ?? "KWD",
+                )}
+                /month.
+              </p>
+            </section>
+          </div>
+        ) : null}
       </div>
     </AppShell>
   );

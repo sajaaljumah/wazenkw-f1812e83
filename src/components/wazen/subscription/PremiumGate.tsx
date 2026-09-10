@@ -23,10 +23,13 @@ export function UpgradePrompt({
   title,
   description,
   compact,
+  /** Children/teenagers never see checkout or upgrade calls to action. */
+  hideCta,
 }: {
   title: string;
   description: string;
   compact?: boolean | undefined;
+  hideCta?: boolean | undefined;
 }) {
   return (
     <div
@@ -42,12 +45,14 @@ export function UpgradePrompt({
         <p className="text-lg">{title}</p>
         <p className="mt-2 text-sm text-muted-foreground">{description}</p>
       </div>
-      <Link
-        to="/subscription"
-        className="mx-auto rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90"
-      >
-        See Premium
-      </Link>
+      {hideCta ? null : (
+        <Link
+          to="/subscription"
+          className="mx-auto rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90"
+        >
+          See Premium
+        </Link>
+      )}
     </div>
   );
 }
@@ -68,7 +73,7 @@ export function PremiumGate({
   fallback?: ReactNode;
   compact?: boolean | undefined;
 }) {
-  const { can, isLoading } = useSubscriptionAccess();
+  const { can, isLoading, canSubscribe } = useSubscriptionAccess();
 
   if (isLoading) {
     return <div className="wazen-panel h-32 animate-pulse bg-secondary/40" />;
@@ -79,8 +84,13 @@ export function PremiumGate({
   return (
     <UpgradePrompt
       title={`${FEATURE_LABELS[feature]} is a Premium feature`}
-      description={FEATURE_DESCRIPTIONS[feature]}
+      description={
+        canSubscribe
+          ? FEATURE_DESCRIPTIONS[feature]
+          : "Ask your parent or guardian — this comes with the family subscription."
+      }
       compact={compact}
+      hideCta={!canSubscribe}
     />
   );
 }

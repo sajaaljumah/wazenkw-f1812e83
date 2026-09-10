@@ -44,6 +44,69 @@ export type Database = {
         }
         Relationships: []
       }
+      families: {
+        Row: {
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      family_members: {
+        Row: {
+          created_at: string
+          family_id: string
+          id: string
+          member_role: string
+          seat_kind: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          family_id: string
+          id?: string
+          member_role: string
+          seat_kind?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          family_id?: string
+          id?: string
+          member_role?: string
+          seat_kind?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_relationships: {
         Row: {
           child_user_id: string
@@ -218,59 +281,146 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_prices: {
+        Row: {
+          active: boolean
+          additional_child_amount: number
+          amount: number
+          billing_period: Database["public"]["Enums"]["billing_period"]
+          created_at: string
+          currency: string
+          included_child_count: number
+          included_parent_count: number
+          key: string
+          stripe_additional_child_price_id: string | null
+          stripe_price_id: string | null
+          subscription_type: Database["public"]["Enums"]["subscription_type"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          additional_child_amount?: number
+          amount: number
+          billing_period: Database["public"]["Enums"]["billing_period"]
+          created_at?: string
+          currency?: string
+          included_child_count?: number
+          included_parent_count?: number
+          key: string
+          stripe_additional_child_price_id?: string | null
+          stripe_price_id?: string | null
+          subscription_type: Database["public"]["Enums"]["subscription_type"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          additional_child_amount?: number
+          amount?: number
+          billing_period?: Database["public"]["Enums"]["billing_period"]
+          created_at?: string
+          currency?: string
+          included_child_count?: number
+          included_parent_count?: number
+          key?: string
+          stripe_additional_child_price_id?: string | null
+          stripe_price_id?: string | null
+          subscription_type?: Database["public"]["Enums"]["subscription_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
+          additional_child_count: number
+          billing_period: Database["public"]["Enums"]["billing_period"]
           cancel_at_period_end: boolean
           cancelled_at: string | null
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
+          family_id: string | null
           id: string
+          included_child_count: number
+          included_parent_count: number
           plan: Database["public"]["Enums"]["subscription_plan"]
+          price_key: string | null
+          renewal_at: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id: string | null
           stripe_price_id: string | null
           stripe_subscription_id: string | null
+          subscription_type: Database["public"]["Enums"]["subscription_type"]
           trial_ends_at: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          additional_child_count?: number
+          billing_period?: Database["public"]["Enums"]["billing_period"]
           cancel_at_period_end?: boolean
           cancelled_at?: string | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          family_id?: string | null
           id?: string
+          included_child_count?: number
+          included_parent_count?: number
           plan?: Database["public"]["Enums"]["subscription_plan"]
+          price_key?: string | null
+          renewal_at?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id?: string | null
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null
+          subscription_type?: Database["public"]["Enums"]["subscription_type"]
           trial_ends_at?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          additional_child_count?: number
+          billing_period?: Database["public"]["Enums"]["billing_period"]
           cancel_at_period_end?: boolean
           cancelled_at?: string | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          family_id?: string | null
           id?: string
+          included_child_count?: number
+          included_parent_count?: number
           plan?: Database["public"]["Enums"]["subscription_plan"]
+          price_key?: string | null
+          renewal_at?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id?: string | null
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null
+          subscription_type?: Database["public"]["Enums"]["subscription_type"]
           trial_ends_at?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_price_key_fkey"
+            columns: ["price_key"]
+            isOneToOne: false
+            referencedRelation: "subscription_prices"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       transactions: {
         Row: {
@@ -340,6 +490,7 @@ export type Database = {
     }
     Enums: {
       account_type: "independent" | "dependent" | "parent"
+      billing_period: "monthly" | "yearly"
       gender_type: "female" | "male"
       life_stage_type:
         | "child"
@@ -355,6 +506,7 @@ export type Database = {
         | "cancelled"
         | "past_due"
         | "trialing"
+      subscription_type: "individual" | "family"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -483,6 +635,7 @@ export const Constants = {
   public: {
     Enums: {
       account_type: ["independent", "dependent", "parent"],
+      billing_period: ["monthly", "yearly"],
       gender_type: ["female", "male"],
       life_stage_type: [
         "child",
@@ -500,6 +653,7 @@ export const Constants = {
         "past_due",
         "trialing",
       ],
+      subscription_type: ["individual", "family"],
     },
   },
 } as const

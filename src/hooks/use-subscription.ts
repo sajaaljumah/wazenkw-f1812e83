@@ -34,6 +34,12 @@ export function useSubscriptionAccess() {
     isError,
     refetch,
     isPremium: entitlements.isPremium,
+    /** Family subscription seat role, when the user belongs to a family. */
+    seatRole: entitlements.seatRole,
+    /** False for children/teenagers: they never see checkout or payment. */
+    canSubscribe: entitlements.canSubscribe,
+    canManageBilling: entitlements.canManageBilling,
+    family: entitlements.family,
     can: (feature: PremiumFeature) => hasFeature(entitlements, feature),
   };
 }
