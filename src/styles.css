@@ -42,6 +42,13 @@
   --color-ring-offset-background: var(--background);
   --color-gold: var(--gold);
   --color-sand: var(--sand);
+  /* Child ("Playful Luxury") palette — switched per gender by .kid-female / .kid-male */
+  --color-kid-tint: var(--kid-tint);
+  --color-kid-soft: var(--kid-soft);
+  --color-kid-mid: var(--kid-mid);
+  --color-kid-deep: var(--kid-deep);
+  --color-kid-ivory: var(--kid-ivory);
+  --color-kid-champagne: var(--kid-champagne);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
