@@ -142,7 +142,7 @@ function SubscriptionPage() {
         <section className="border-b border-border pb-9">
           <p className="wazen-label">{t("yourPlan")}</p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl sm:text-4xl">{entitlements.plan === "premium" ? t("premium") : t("free")}</h1>
+            <h1 className="text-3xl sm:text-4xl">{isPremium ? t("premium") : t("free")}</h1>
             {isPremium ? <PremiumBadge /> : null}
             <span
               className={cn(
