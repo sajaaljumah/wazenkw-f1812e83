@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import type { Goal } from "@/lib/finance";
+import { Button } from "@/components/ui/button";
 
 type ActionKind = "income" | "expense" | "saving" | "goal";
 
 const inputClass =
-  "w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring/50";
+  "wazen-field";
 
 const ACTION_META: Record<ActionKind, { label: string; title: string; description: string; icon: typeof ArrowDownLeft }> = {
   income: {
@@ -61,21 +62,23 @@ export function QuickActions({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-3 border-b border-border pb-6">
+        <span className="wazen-label me-2">Quick entry</span>
         {order.map((kind) => {
           const meta = ACTION_META[kind];
           const Icon = meta.icon;
           return (
-            <button
+            <Button
               key={kind}
+              variant="ghost"
               onClick={() => setOpen(kind)}
-              className="wazen-panel flex items-center gap-3 px-4 py-4 text-left text-sm transition-shadow hover:shadow-lifted"
+              className="h-auto justify-start px-3 py-2 text-start font-medium"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
                 <Icon className="size-4" strokeWidth={1.6} />
               </span>
               <span className="leading-tight">{labels?.[kind] ?? meta.label}</span>
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -180,11 +183,11 @@ export function ActionDialog({
 
   return (
     <Dialog open={kind !== null} onOpenChange={(next) => (!next ? close() : undefined)}>
-      <DialogContent className="rounded-3xl sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
         {meta ? (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl">{meta.title}</DialogTitle>
+              <DialogTitle>{meta.title}</DialogTitle>
               <DialogDescription>{meta.description}</DialogDescription>
             </DialogHeader>
 
@@ -268,23 +271,19 @@ export function ActionDialog({
             </div>
 
             <div className="mt-2 flex flex-wrap gap-3">
-              <button
+              <Button
                 onClick={submit}
                 disabled={busy}
-                className={cn(
-                  "inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-3 text-sm text-primary-foreground",
-                  "transition-opacity hover:opacity-90 disabled:opacity-60",
-                )}
               >
                 {busy ? <Loader2 className="size-4 animate-spin" /> : null}
                 Save
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={close}
-                className="rounded-full border border-border px-7 py-3 text-sm text-muted-foreground transition-colors hover:bg-secondary"
+                variant="outline"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </>
         ) : null}
