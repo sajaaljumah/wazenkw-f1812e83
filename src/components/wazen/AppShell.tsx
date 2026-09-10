@@ -1,7 +1,9 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { LayoutDashboard, LogOut, Settings, User } from "lucide-react";
 import type { ReactNode } from "react";
-import { useSignOut } from "@/hooks/use-wazen-auth";
+import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
+import { WazenAvatar } from "@/components/wazen/WazenAvatar";
+import { firstNameOf } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
 
 const NAV = [
