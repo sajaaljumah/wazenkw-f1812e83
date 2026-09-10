@@ -14,6 +14,7 @@ import {
   LIFE_STAGE_LABELS,
   accountTypeFor,
   calculateAge,
+  firstNameOf,
   lifeStageForAge,
   type LifeStage,
 } from "@/lib/wazen";
@@ -69,7 +70,7 @@ function SettingsPage() {
 
   async function save() {
     if (fullName.trim().length < 2) {
-      toast.error("Enter your full name");
+      toast.error("Enter your first name");
       return;
     }
     const stage = (stageLocked ? profile!.life_stage : lifeStage) as LifeStage;
@@ -77,7 +78,7 @@ function SettingsPage() {
     const { error } = await supabase
       .from("profiles")
       .update({
-        full_name: fullName.trim(),
+        full_name: firstNameOf(fullName),
         life_stage: stage,
         account_type: accountTypeFor(stage),
         language,
@@ -122,7 +123,7 @@ function SettingsPage() {
         <h2 className="text-xl">Account</h2>
         <div className="mt-6 space-y-5">
           <label className="block">
-            <span className="wazen-label">Name</span>
+            <span className="wazen-label">First name</span>
             <input
               className={cn(inputClass, "mt-2")}
               value={fullName}

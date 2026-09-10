@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Loader2, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/wazen/AppShell";
+import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { useProfile } from "@/hooks/use-wazen-auth";
 import {
   ACCOUNT_TYPE_LABELS,
@@ -13,6 +14,7 @@ import {
   LANGUAGES,
   LIFE_STAGE_LABELS,
   calculateAge,
+  firstNameOf,
 } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
 
@@ -49,15 +51,15 @@ function ProfilePage() {
   }
 
   async function save() {
-    if (fullName.trim().length < 2) {
-      toast.error("Enter your full name");
+    if (firstNameOf(fullName).length < 2) {
+      toast.error("Enter your first name");
       return;
     }
     setBusy(true);
     const { error } = await supabase
       .from("profiles")
       .update({
-        full_name: fullName.trim(),
+        full_name: firstNameOf(fullName),
         avatar_url: avatarUrl.trim() || null,
         language,
         base_currency: currency,
@@ -72,31 +74,20 @@ function ProfilePage() {
     toast.success("Profile saved");
   }
 
-  const initials = profile.full_name
-    .split(" ")
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-
   return (
     <AppShell>
       <h1 className="text-3xl sm:text-4xl">Profile</h1>
 
       <section className="mt-6 wazen-panel flex flex-col items-center gap-5 p-7 sm:flex-row sm:p-9">
-        {profile.avatar_url ? (
-          <img
-            src={profile.avatar_url}
-            alt={`${profile.full_name}'s profile photo`}
-            className="size-20 rounded-full border border-border object-cover"
-          />
-        ) : (
-          <div className="flex size-20 items-center justify-center rounded-full bg-accent text-xl text-accent-foreground">
-            {initials}
-          </div>
-        )}
+        <WazenAvatar
+          fullName={profile.full_name}
+          gender={profile.gender}
+          lifeStage={profile.life_stage}
+          avatarUrl={profile.avatar_url}
+          size={80}
+        />
         <div className="text-center sm:text-left">
-          <p className="text-2xl">{profile.full_name}</p>
+          <p className="text-2xl">{firstNameOf(profile.full_name)}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {LIFE_STAGE_LABELS[profile.life_stage]} · {ACCOUNT_TYPE_LABELS[profile.account_type]}
           </p>
@@ -114,12 +105,16 @@ function ProfilePage() {
         <h2 className="text-xl">Editable details</h2>
         <div className="mt-6 space-y-5">
           <label className="block">
-            <span className="wazen-label">Full name</span>
+            <span className="wazen-label">First name</span>
             <input
               className={cn(inputClass, "mt-2")}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
+              placeholder="Mariam"
             />
+            <span className="mt-1.5 block text-xs text-muted-foreground">
+              Wazen only shows first names — no family name is needed.
+            </span>
           </label>
           <label className="block">
             <span className="wazen-label">Profile photo URL (optional)</span>

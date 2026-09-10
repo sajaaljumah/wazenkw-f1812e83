@@ -12,7 +12,8 @@ import {
 } from "@/lib/finance";
 import type { Budget, Goal, RecurringItem, Transaction } from "@/lib/finance";
 import type { FamilyMemberSummary } from "@/hooks/use-wazen-finance";
-import { LIFE_STAGE_LABELS, calculateAge } from "@/lib/wazen";
+import { LIFE_STAGE_LABELS, calculateAge, firstNameOf } from "@/lib/wazen";
+import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 
 export type DashboardData = {
   userId: string;
@@ -248,13 +249,25 @@ export function FamilySummaryCard({
             const goal = goals.find((g) => g.kind === "goal");
             const saved = goal ? savedForGoal(transactions, goal.id) : 0;
             return (
-              <li key={profile.id} className="rounded-3xl bg-secondary/50 p-5">
+              <li
+                key={profile.id}
+                className="wazen-interactive rounded-3xl bg-secondary/50 p-5 hover:bg-secondary/80 hover:wazen-interactive-hover"
+              >
                 <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-base">{profile.full_name}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {LIFE_STAGE_LABELS[profile.life_stage]} · {calculateAge(profile.date_of_birth)} years
-                    </p>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <WazenAvatar
+                      fullName={profile.full_name}
+                      gender={profile.gender}
+                      lifeStage={profile.life_stage}
+                      avatarUrl={profile.avatar_url}
+                      size={44}
+                    />
+                    <div className="min-w-0">
+                      <p className="truncate text-base">{firstNameOf(profile.full_name)}</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {LIFE_STAGE_LABELS[profile.life_stage]} · {calculateAge(profile.date_of_birth)} years
+                      </p>
+                    </div>
                   </div>
                   <span className="rounded-full bg-background px-3 py-1 text-[0.7rem] text-muted-foreground">
                     {canFund ? "Allowance" : canMonitor ? "Monitoring" : "Linked"}

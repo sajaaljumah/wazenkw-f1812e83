@@ -1,7 +1,9 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { LayoutDashboard, LogOut, Settings, User } from "lucide-react";
 import type { ReactNode } from "react";
-import { useSignOut } from "@/hooks/use-wazen-auth";
+import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
+import { WazenAvatar } from "@/components/wazen/WazenAvatar";
+import { firstNameOf } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -22,6 +24,7 @@ export function WazenMark({ className }: { className?: string }) {
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const signOut = useSignOut();
+  const { data: profile } = useProfile();
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,13 +50,30 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
-          <button
-            onClick={signOut}
-            className="flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary"
-          >
-            <LogOut className="size-4" strokeWidth={1.5} />
-            <span className="hidden sm:inline">Sign out</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {profile ? (
+              <Link
+                to="/profile"
+                title={`${firstNameOf(profile.full_name)} — view profile`}
+                className="wazen-interactive rounded-full outline-none hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
+              >
+                <WazenAvatar
+                  fullName={profile.full_name}
+                  gender={profile.gender}
+                  lifeStage={profile.life_stage}
+                  avatarUrl={profile.avatar_url}
+                  size={36}
+                />
+              </Link>
+            ) : null}
+            <button
+              onClick={signOut}
+              className="flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:outline-none"
+            >
+              <LogOut className="size-4" strokeWidth={1.5} />
+              <span className="hidden sm:inline">Sign out</span>
+            </button>
+          </div>
         </div>
       </header>
 

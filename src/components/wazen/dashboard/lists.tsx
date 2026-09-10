@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, CalendarClock, PiggyBank, Receipt, Target, Undo2 } from "lucide-react";
 import { EmptyState, Panel, ProgressBar, percentOf } from "./primitives";
 import {
@@ -10,6 +11,22 @@ import {
 import type { Goal, RecurringItem, Transaction } from "@/lib/finance";
 import { cn } from "@/lib/utils";
 
+const FILTERS = [
+  { value: "all", label: "All" },
+  { value: "in", label: "Money in" },
+  { value: "out", label: "Spending" },
+  { value: "saving", label: "Saving" },
+] as const;
+
+type TransactionFilter = (typeof FILTERS)[number]["value"];
+
+function matchesFilter(kind: Transaction["kind"], filter: TransactionFilter): boolean {
+  if (filter === "all") return true;
+  if (filter === "in") return kind === "income" || kind === "refund";
+  if (filter === "saving") return kind === "saving";
+  return kind === "expense";
+}
+
 export function RecentTransactionsCard({
   transactions,
   currency,
@@ -21,14 +38,41 @@ export function RecentTransactionsCard({
   limit?: number;
   title?: string;
 }) {
-  const recent = transactions.slice(0, limit);
+  const [filter, setFilter] = useState<TransactionFilter>("all");
+  const recent = transactions.filter((t) => matchesFilter(t.kind, filter)).slice(0, limit);
   return (
-    <Panel title={title}>
+    <Panel
+      title={title}
+      action={
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter transactions">
+          {FILTERS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={filter === option.value}
+              onClick={() => setFilter(option.value)}
+              className={cn(
+                "rounded-full px-3 py-1.5 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:outline-none",
+                filter === option.value
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+              )}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      }
+    >
       {recent.length === 0 ? (
         <EmptyState
           icon={<Receipt className="size-5" strokeWidth={1.5} />}
-          title="No transactions yet"
-          description="Use the quick actions above to record your first income or expense."
+          title={filter === "all" ? "No transactions yet" : "Nothing here yet"}
+          description={
+            filter === "all"
+              ? "Use the quick actions above to record your first income or expense."
+              : "Try another filter, or add a new entry with the quick actions above."
+          }
         />
       ) : (
         <ul className="divide-y divide-border/70">

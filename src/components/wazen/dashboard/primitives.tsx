@@ -7,22 +7,27 @@ export function DashboardHeader({
   subtitle,
   eyebrow,
   today,
+  avatar,
 }: {
   name: string;
   subtitle: string;
   eyebrow: string;
   today: string;
+  avatar?: ReactNode;
 }) {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   return (
-    <section className="wazen-panel p-7 sm:p-10">
-      <p className="wazen-label">{eyebrow}</p>
-      <h1 className="mt-4 text-3xl sm:text-4xl">
-        {greeting}, {name}.
-      </h1>
-      <p className="mt-3 max-w-xl text-muted-foreground">{subtitle}</p>
-      <p className="mt-5 text-sm text-muted-foreground">{today}</p>
+    <section className="wazen-panel flex flex-col gap-6 p-7 sm:flex-row sm:items-center sm:p-10">
+      {avatar ? <div className="shrink-0">{avatar}</div> : null}
+      <div className="min-w-0">
+        <p className="wazen-label">{eyebrow}</p>
+        <h1 className="mt-4 text-3xl sm:text-4xl">
+          {greeting}, {name}.
+        </h1>
+        <p className="mt-3 max-w-xl text-muted-foreground">{subtitle}</p>
+        <p className="mt-5 text-sm text-muted-foreground">{today}</p>
+      </div>
     </section>
   );
 }

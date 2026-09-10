@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { AppShell } from "@/components/wazen/AppShell";
+import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { useProfile, useSession } from "@/hooks/use-wazen-auth";
 import {
   useFamilySummary,
@@ -19,7 +20,7 @@ import {
 import type { DashboardData } from "@/components/wazen/dashboard/variants";
 import { DashboardHeader } from "@/components/wazen/dashboard/primitives";
 import { formatToday } from "@/lib/finance";
-import { LIFE_STAGE_LABELS, welcomeMessage } from "@/lib/wazen";
+import { LIFE_STAGE_LABELS, firstNameOf, welcomeMessage } from "@/lib/wazen";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -85,7 +86,7 @@ function Dashboard() {
     recurring: recurring.data ?? [],
   };
 
-  const firstName = profile.full_name.split(" ")[0] ?? profile.full_name;
+  const firstName = firstNameOf(profile.full_name);
 
   return (
     <AppShell>
@@ -95,6 +96,21 @@ function Dashboard() {
           eyebrow={`${LIFE_STAGE_LABELS[profile.life_stage]} experience`}
           subtitle={welcomeMessage(profile.life_stage)}
           today={formatToday()}
+          avatar={
+            <Link
+              to="/profile"
+              className="wazen-interactive block rounded-full outline-none hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
+              title="View your profile"
+            >
+              <WazenAvatar
+                fullName={profile.full_name}
+                gender={profile.gender}
+                lifeStage={profile.life_stage}
+                avatarUrl={profile.avatar_url}
+                size={72}
+              />
+            </Link>
+          }
         />
 
         {profile.life_stage === "child" ? (

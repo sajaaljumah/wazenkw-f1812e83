@@ -13,6 +13,7 @@ import {
   LIFE_STAGE_LABELS,
   accountTypeFor,
   calculateAge,
+  firstNameOf,
   lifeStageForAge,
   welcomeMessage,
   type LifeStage,
@@ -75,7 +76,7 @@ function Onboarding() {
     const { error } = await supabase
       .from("profiles")
       .update({
-        full_name: fullName.trim(),
+        full_name: firstNameOf(fullName),
         life_stage: effectiveStage,
         account_type: accountTypeFor(effectiveStage),
         language,
@@ -128,7 +129,7 @@ function Onboarding() {
               </p>
               <div className="mt-7 space-y-5">
                 <label className="block">
-                  <span className="wazen-label">Full name</span>
+                  <span className="wazen-label">First name</span>
                   <input
                     className={cn(inputClass, "mt-2")}
                     value={fullName}
@@ -144,7 +145,7 @@ function Onboarding() {
               <NextButton
                 onClick={() => {
                   if (fullName.trim().length < 2) {
-                    toast.error("Enter your full name");
+                    toast.error("Enter your first name");
                     return;
                   }
                   setStep(1);
@@ -249,7 +250,7 @@ function Onboarding() {
             <div className="py-6 text-center">
               <p className="wazen-label">You're all set</p>
               <h1 className="mt-4 text-4xl sm:text-5xl">
-                Welcome to Wazen, {fullName.split(" ")[0]}.
+                Welcome to Wazen, {firstNameOf(fullName)}.
               </h1>
               <p className="mx-auto mt-4 max-w-md text-muted-foreground">
                 {welcomeMessage(effectiveStage)}
