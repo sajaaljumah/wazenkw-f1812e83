@@ -160,7 +160,7 @@ function SubscriptionPage() {
             <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
               {FREE_PLAN_HIGHLIGHTS.map((item) => (
                 <li key={item} className="flex gap-3">
-                  <Check className="mt-0.5 size-4 shrink-0 text-sage" strokeWidth={1.5} />
+                  <Check className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={1.5} />
                   {item}
                 </li>
               ))}

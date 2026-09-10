@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, LogOut, Settings, User } from "lucide-react";
+import { LayoutDashboard, LogOut, Settings, Sparkles, User } from "lucide-react";
 import type { ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/subscription", label: "Plan", icon: Sparkles },
   { to: "/profile", label: "Profile", icon: User },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
