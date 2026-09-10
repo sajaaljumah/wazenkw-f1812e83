@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -141,7 +142,7 @@ export function StarBadgeIllustration({ className }: IllustrationProps) {
   );
 }
 
-export type GoalIllustration = (props: IllustrationProps) => JSX.Element;
+export type GoalIllustration = (props: IllustrationProps) => ReactElement;
 
 /** Picks a friendly illustration from the goal's own name — no new data needed. */
 export function illustrationForGoal(name: string): GoalIllustration {
