@@ -6,9 +6,12 @@ import { Loader2, Lock, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/wazen/AppShell";
 import { useProfile, useSession, useSignOut } from "@/hooks/use-wazen-auth";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { PlanBadge } from "@/components/wazen/subscription/PlanBadge";
 import {
   ADULT_LIFE_STAGES,
   CURRENCIES,
+  DEFAULT_LANGUAGE,
   GENDER_LABELS,
   LANGUAGES,
   LIFE_STAGE_LABELS,
@@ -33,10 +36,11 @@ function SettingsPage() {
   const signOut = useSignOut();
   const { user } = useSession();
   const { data: profile, isLoading } = useProfile();
+  const { t } = useWazenLocale();
 
   const [fullName, setFullName] = useState("");
   const [lifeStage, setLifeStage] = useState<LifeStage | "">("");
-  const [language, setLanguage] = useState("en");
+  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
   const [currency, setCurrency] = useState("KWD");
   const [theme, setTheme] = useState("light");
   const [busy, setBusy] = useState(false);
@@ -72,7 +76,7 @@ function SettingsPage() {
   async function save() {
     if (!profile) return;
     if (fullName.trim().length < 2) {
-      toast.error("Enter your first name");
+      toast.error(t("enterFirstName"));
       return;
     }
     const stage = (stageLocked ? profile.life_stage : lifeStage) as LifeStage;
@@ -94,12 +98,12 @@ function SettingsPage() {
       return;
     }
     await queryClient.invalidateQueries({ queryKey: ["profile"] });
-    toast.success("Settings saved");
+    toast.success(t("settingsSaved"));
   }
 
   async function changePassword() {
     if (newPassword.length < 8) {
-      toast.error("New password must be at least 8 characters");
+      toast.error(t("passwordHint"));
       return;
     }
     setPwBusy(true);
@@ -114,35 +118,38 @@ function SettingsPage() {
     }
     setCurrentPassword("");
     setNewPassword("");
-    toast.success("Password updated");
+    toast.success(t("passwordUpdated"));
   }
 
   return (
     <AppShell>
-      <p className="wazen-label">Account controls</p>
-      <h1 className="wazen-page-title mt-3">Settings</h1>
+      <p className="wazen-label">{t("accountControls")}</p>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <h1 className="wazen-page-title">{t("settings")}</h1>
+        <PlanBadge />
+      </div>
 
       <section className="mt-8 max-w-3xl border-t border-border pt-7">
-        <h2 className="text-xl">Account</h2>
+        <h2 className="text-xl">{t("account")}</h2>
         <div className="mt-6 space-y-5">
           <label className="block">
-            <span className="wazen-label">First name</span>
+            <span className="wazen-label">{t("firstName")}</span>
             <input
               className={cn(inputClass, "mt-2")}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
             />
           </label>
-          <Locked label="Email" value={user?.email ?? ""} />
+          <Locked label={t("email")} value={user?.email ?? ""} />
           <div className="grid gap-5 sm:grid-cols-2">
-            <Locked label="Date of birth" value={profile.date_of_birth} />
-            <Locked label="Gender" value={GENDER_LABELS[profile.gender]} />
+            <Locked label={t("dateOfBirth")} value={profile.date_of_birth} />
+            <Locked label={t("gender")} value={GENDER_LABELS[profile.gender]} />
           </div>
           <label className="block">
-            <span className="wazen-label">Life stage</span>
+            <span className="wazen-label">{t("lifeStageField")}</span>
             {stageLocked ? (
               <div className="mt-2 rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground">
-                {LIFE_STAGE_LABELS[profile.life_stage]} — set automatically from your age ({age}).
+                {LIFE_STAGE_LABELS[profile.life_stage]} — {t("stageFromAge")} ({age}).
               </div>
             ) : (
               <select
@@ -162,10 +169,10 @@ function SettingsPage() {
       </section>
 
       <section className="mt-10 max-w-3xl border-t border-border pt-7">
-        <h2 className="text-xl">Preferences</h2>
+        <h2 className="text-xl">{t("preferences")}</h2>
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           <label className="block">
-            <span className="wazen-label">Language</span>
+            <span className="wazen-label">{t("language")}</span>
             <select
               className={cn(inputClass, "mt-2")}
               value={language}
@@ -179,7 +186,7 @@ function SettingsPage() {
             </select>
           </label>
           <label className="block">
-            <span className="wazen-label">Base currency</span>
+            <span className="wazen-label">{t("baseCurrency")}</span>
             <select
               className={cn(inputClass, "mt-2")}
               value={currency}
@@ -193,7 +200,7 @@ function SettingsPage() {
             </select>
           </label>
           <div>
-            <span className="wazen-label">Appearance</span>
+            <span className="wazen-label">{t("appearance")}</span>
             <div className="mt-2 flex gap-2">
               {(["light", "dark"] as const).map((value) => (
                 <Button
@@ -201,9 +208,9 @@ function SettingsPage() {
                   type="button"
                   onClick={() => setTheme(value)}
                   variant={theme === value ? "default" : "outline"}
-                  className="flex-1 capitalize"
+                  className="flex-1"
                 >
-                  {value} mode
+                  {value === "light" ? t("lightMode") : t("darkMode")}
                 </Button>
               ))}
             </div>
@@ -215,15 +222,15 @@ function SettingsPage() {
           className="mt-7"
         >
           {busy ? <Loader2 className="size-4 animate-spin" /> : null}
-          Save settings
+          {t("saveSettings")}
         </Button>
       </section>
 
       <section className="mt-10 max-w-3xl border-t border-border pt-7">
-        <h2 className="text-xl">Security</h2>
+        <h2 className="text-xl">{t("security")}</h2>
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           <label className="block">
-            <span className="wazen-label">Current password</span>
+            <span className="wazen-label">{t("currentPassword")}</span>
             <input
               type="password"
               autoComplete="current-password"
@@ -233,7 +240,7 @@ function SettingsPage() {
             />
           </label>
           <label className="block">
-            <span className="wazen-label">New password</span>
+            <span className="wazen-label">{t("newPassword")}</span>
             <input
               type="password"
               autoComplete="new-password"
@@ -249,14 +256,14 @@ function SettingsPage() {
             disabled={pwBusy}
           >
             {pwBusy ? <Loader2 className="size-4 animate-spin" /> : null}
-            Change password
+            {t("changePassword")}
           </Button>
           <Button
             onClick={signOut}
             variant="outline"
           >
             <LogOut className="size-4" strokeWidth={1.5} />
-            Sign out
+            {t("signOut")}
           </Button>
         </div>
       </section>

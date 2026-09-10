@@ -22,7 +22,7 @@ export async function loadEntitlements(
     supabase.from("subscriptions").select("*").eq("user_id", userId).maybeSingle(),
     supabase
       .from("family_members")
-      .select("id, family_id, user_id, member_role, seat_kind, created_at")
+      .select("id, family_id, user_id, member_role, seat_kind, seat_suspended, created_at")
       .eq("user_id", userId)
       .maybeSingle(),
     supabase.from("subscription_prices").select("*").eq("active", true),
@@ -48,7 +48,7 @@ export async function loadEntitlements(
         .maybeSingle(),
       supabase
         .from("family_members")
-        .select("id, family_id, user_id, member_role, seat_kind, created_at")
+        .select("id, family_id, user_id, member_role, seat_kind, seat_suspended, created_at")
         .eq("family_id", membership.family_id),
     ]);
     if (subRes.error) throw subRes.error;

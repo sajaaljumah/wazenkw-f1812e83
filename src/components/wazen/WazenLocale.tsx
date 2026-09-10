@@ -1,14 +1,32 @@
-import { createContext, useContext, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import { useProfile } from "@/hooks/use-wazen-auth";
 
 export type WazenLanguage = "en" | "ar";
 
+/** Arabic is Wazen's default language; English is available in Settings. */
+export const DEFAULT_LANGUAGE: WazenLanguage = "ar";
+const STORAGE_KEY = "wazen.language";
+
 const COPY = {
   en: {
+    // navigation & shell
     overview: "Overview",
     plan: "Plan",
     profile: "Profile",
     settings: "Settings",
     signOut: "Sign out",
+    language: "Language",
+    english: "English",
+    arabic: "العربية",
+
+    // dashboard
     quickEntry: "Quick entry",
     addIncome: "Add income",
     addExpense: "Add expense",
@@ -50,13 +68,146 @@ const COPY = {
     income: "Income",
     expense: "Expense",
     refund: "Refund",
+
+    // landing
+    landingEyebrow: "Personal finance & financial education",
+    landingTagline: "Balance your money with quiet confidence.",
+    landingBody:
+      "Wazen brings clarity to saving, spending and learning — for you and for the whole family.",
+    createAccount: "Create your account",
+    exploreDemo: "Explore a demo account",
+    signIn: "Sign in",
+    pillarStagesTitle: "Built for every life stage",
+    pillarStagesBody:
+      "Children, teenagers, university students, employees and the self-employed each get an experience that fits.",
+    pillarPrivacyTitle: "Private by design",
+    pillarPrivacyBody:
+      "Your profile and family links are protected at the database level, not just in the interface.",
+    pillarHabitsTitle: "Habits, not spreadsheets",
+    pillarHabitsBody: "Gentle guidance and financial education that grows with you over time.",
+
+    // auth
+    welcomeBack: "Welcome back",
+    createWazenAccount: "Create your Wazen account",
+    signinSub: "Sign in to continue where you left off.",
+    signupSub: "A few details help us shape Wazen around your life stage.",
+    haveAccount: "I already have an account",
+    email: "Email",
+    password: "Password",
+    firstName: "First name",
+    dateOfBirth: "Date of birth",
+    genderField: "Gender (cannot be changed later)",
+    female: "Female",
+    male: "Male",
+    lifeStageField: "Life stage",
+    preferredLanguage: "Preferred language",
+    baseCurrency: "Base currency",
+    forgotPassword: "Forgot password?",
+    passwordHint: "At least 8 characters",
+    selectDobFirst: "Select your date of birth first",
+    selectLifeStage: "Select your life stage",
+    setFromAge: "set automatically from age.",
+    guardianNote: "A parent or guardian will need to link this account to their own.",
+    ageAuto: "calculated automatically, never stored.",
+    age: "Age",
+
+    // profile & settings
+    yourIdentity: "Your identity",
+    editableDetails: "Editable details",
+    ageCalculated: "Age (calculated automatically)",
+    years: "years",
+    gender: "Gender",
+    accountType: "Account type",
+    photoUrl: "Profile photo URL (optional)",
+    firstNameHint: "Wazen only shows first names — no family name is needed.",
+    saveChanges: "Save changes",
+    profileSaved: "Profile saved",
+    accountControls: "Account controls",
+    account: "Account",
+    preferences: "Preferences",
+    security: "Security",
+    appearance: "Appearance",
+    lightMode: "Light mode",
+    darkMode: "Dark mode",
+    currentPassword: "Current password",
+    newPassword: "New password",
+    changePassword: "Change password",
+    saveSettings: "Save settings",
+    settingsSaved: "Settings saved",
+    passwordUpdated: "Password updated",
+    enterFirstName: "Enter your first name",
+    stageFromAge: "set automatically from your age",
+
+    // subscription
+    yourPlan: "Your plan",
+    premium: "Premium",
+    free: "Free",
+    subscriptionStatus: "Subscription status",
+    started: "Started",
+    renews: "Renews",
+    trialEnds: "Trial ends",
+    manageSubscription: "Manage subscription",
+    upgrade: "Upgrade",
+    viewPlan: "View plan",
+    statusActive: "Active",
+    statusInactive: "Inactive",
+    statusCancelled: "Cancelled",
+    statusPastDue: "Past due",
+    statusTrialing: "Trial",
+    premiumViaFamily: "Included in your family subscription",
+    goodMorning: "Good morning",
+    goodAfternoon: "Good afternoon",
+    goodEvening: "Good evening",
+    experience: "experience",
+    stageChild: "Child",
+    stageTeenager: "Teenager",
+    stageUniversity: "University student",
+    stageEmployee: "Employee",
+    stageSelfEmployed: "Self-employed",
+    stageParent: "Parent / Guardian",
+    welcomeChild: "Let's learn how to save, spend wisely and reach your goals — one step at a time.",
+    welcomeTeenager: "Let's turn smart money habits into second nature before you start earning.",
+    welcomeUniversity: "Let's make your budget stretch further while you study.",
+    welcomeEmployee: "Let's turn your salary into savings, security and long-term goals.",
+    welcomeSelfEmployed: "Let's bring calm and structure to income that changes month to month.",
+    welcomeParent: "Let's build healthier financial habits together with your family.",
+    afterExpensesHint: "After expenses and savings transfers",
+    refundsHint: "Refunds already deducted",
+    goalsHint: "Goals and emergency fund",
+    moneyAvailable: "Money available",
+    allowanceMonth: "Allowance this month",
+    spentMonth: "Spent this month",
+    savedSoFar: "Saved so far",
+    spendingLimit: "Your spending limit",
+    savingFor: "What you're saving for",
+    whereMoneyWent: "Where your money went",
+    comingUp: "Coming up",
+    latestActivity: "Latest activity",
+    financialLearning: "Financial learning",
+    lessonsSoon: "Lessons are on the way",
+    lessonsSoonBody: "Your learning progress will appear here once the Wazen lessons are released.",
+    studyTip: "Study-life money tip",
+    addMoneyIn: "Add money in",
+    addSpending: "Add spending",
+    allowanceTag: "Allowance",
+    monitoringTag: "Monitoring",
+    linkedTag: "Linked",
+    finishProfile: "Finish setting up your profile",
+    continueSetup: "Continue setup",
+    viewProfile: "View your profile",
   },
   ar: {
+    // navigation & shell
     overview: "الرئيسية",
     plan: "الاشتراك",
     profile: "الملف الشخصي",
     settings: "الإعدادات",
     signOut: "تسجيل الخروج",
+    language: "اللغة",
+    english: "English",
+    arabic: "العربية",
+
+    // dashboard
     quickEntry: "إضافة سريعة",
     addIncome: "إضافة دخل",
     addExpense: "إضافة مصروف",
@@ -98,22 +249,212 @@ const COPY = {
     income: "دخل",
     expense: "مصروف",
     refund: "مبلغ مسترد",
+
+    // landing
+    landingEyebrow: "التمويل الشخصي والتعليم المالي",
+    landingTagline: "وازن أموالك بثقة وهدوء.",
+    landingBody: "وازن يمنحك وضوحاً في الادخار والصرف والتعلّم — لك ولعائلتك بالكامل.",
+    createAccount: "أنشئ حسابك",
+    exploreDemo: "تجربة حساب تجريبي",
+    signIn: "تسجيل الدخول",
+    pillarStagesTitle: "مصمم لكل مرحلة عمرية",
+    pillarStagesBody:
+      "الأطفال والمراهقون وطلبة الجامعة والموظفون وأصحاب العمل الحر — لكل منهم تجربة تناسبه.",
+    pillarPrivacyTitle: "الخصوصية أولاً",
+    pillarPrivacyBody: "ملفك وروابط عائلتك محمية على مستوى قاعدة البيانات، وليس في الواجهة فقط.",
+    pillarHabitsTitle: "عادات، لا جداول",
+    pillarHabitsBody: "إرشاد لطيف وتعليم مالي ينمو معك مع الوقت.",
+
+    // auth
+    welcomeBack: "مرحباً بعودتك",
+    createWazenAccount: "أنشئ حسابك في وازن",
+    signinSub: "سجّل الدخول لتكمل من حيث توقفت.",
+    signupSub: "بعض التفاصيل تساعدنا على تهيئة وازن حسب مرحلتك العمرية.",
+    haveAccount: "لدي حساب بالفعل",
+    email: "البريد الإلكتروني",
+    password: "كلمة المرور",
+    firstName: "الاسم الأول",
+    dateOfBirth: "تاريخ الميلاد",
+    genderField: "الجنس (لا يمكن تغييره لاحقاً)",
+    female: "أنثى",
+    male: "ذكر",
+    lifeStageField: "المرحلة العمرية",
+    preferredLanguage: "اللغة المفضلة",
+    baseCurrency: "العملة الأساسية",
+    forgotPassword: "نسيت كلمة المرور؟",
+    passwordHint: "٨ أحرف على الأقل",
+    selectDobFirst: "اختر تاريخ ميلادك أولاً",
+    selectLifeStage: "اختر مرحلتك العمرية",
+    setFromAge: "تُحدد تلقائياً من العمر.",
+    guardianNote: "سيحتاج أحد الوالدين أو ولي الأمر إلى ربط هذا الحساب بحسابه.",
+    ageAuto: "يُحسب تلقائياً ولا يُخزَّن.",
+    age: "العمر",
+
+    // profile & settings
+    yourIdentity: "هويتك",
+    editableDetails: "بيانات قابلة للتعديل",
+    ageCalculated: "العمر (يُحسب تلقائياً)",
+    years: "سنة",
+    gender: "الجنس",
+    accountType: "نوع الحساب",
+    photoUrl: "رابط صورة الملف (اختياري)",
+    firstNameHint: "وازن يعرض الاسم الأول فقط — لا حاجة لاسم العائلة.",
+    saveChanges: "حفظ التغييرات",
+    profileSaved: "تم حفظ الملف الشخصي",
+    accountControls: "إدارة الحساب",
+    account: "الحساب",
+    preferences: "التفضيلات",
+    security: "الأمان",
+    appearance: "المظهر",
+    lightMode: "الوضع النهاري",
+    darkMode: "الوضع الليلي",
+    currentPassword: "كلمة المرور الحالية",
+    newPassword: "كلمة المرور الجديدة",
+    changePassword: "تغيير كلمة المرور",
+    saveSettings: "حفظ الإعدادات",
+    settingsSaved: "تم حفظ الإعدادات",
+    passwordUpdated: "تم تحديث كلمة المرور",
+    enterFirstName: "أدخل اسمك الأول",
+    stageFromAge: "تُحدد تلقائياً من عمرك",
+
+    // subscription
+    yourPlan: "اشتراكك",
+    premium: "بريميوم",
+    free: "مجاني",
+    subscriptionStatus: "حالة الاشتراك",
+    started: "تاريخ البدء",
+    renews: "التجديد",
+    trialEnds: "انتهاء التجربة",
+    manageSubscription: "إدارة الاشتراك",
+    upgrade: "الترقية",
+    viewPlan: "عرض الاشتراك",
+    statusActive: "نشط",
+    statusInactive: "غير نشط",
+    statusCancelled: "ملغى",
+    statusPastDue: "متأخر السداد",
+    statusTrialing: "تجريبي",
+    premiumViaFamily: "مشمول في اشتراك عائلتك",
+    goodMorning: "صباح الخير",
+    goodAfternoon: "طاب يومك",
+    goodEvening: "مساء الخير",
+    experience: "تجربة",
+    stageChild: "طفل",
+    stageTeenager: "مراهق",
+    stageUniversity: "طالب جامعي",
+    stageEmployee: "موظف",
+    stageSelfEmployed: "عمل حر",
+    stageParent: "والد / ولي أمر",
+    welcomeChild: "لنتعلّم معاً كيف ندخر ونصرف بحكمة ونصل إلى أهدافنا خطوة بخطوة.",
+    welcomeTeenager: "لنجعل العادات المالية الذكية طبيعة لديك قبل أن تبدأ العمل.",
+    welcomeUniversity: "لنجعل ميزانيتك تكفيك خلال سنوات دراستك.",
+    welcomeEmployee: "لنحوّل راتبك إلى مدخرات وأمان وأهداف طويلة المدى.",
+    welcomeSelfEmployed: "لنضع هدوءاً وتنظيماً لدخل يتغير من شهر إلى آخر.",
+    welcomeParent: "لنبنِ عادات مالية أفضل مع عائلتك.",
+    afterExpensesHint: "بعد المصروفات وتحويلات الادخار",
+    refundsHint: "بعد خصم المبالغ المستردة",
+    goalsHint: "الأهداف وصندوق الطوارئ",
+    moneyAvailable: "المال المتاح",
+    allowanceMonth: "مصروف هذا الشهر",
+    spentMonth: "المصروف هذا الشهر",
+    savedSoFar: "المدخر حتى الآن",
+    spendingLimit: "حدّ الصرف",
+    savingFor: "ما تدخر من أجله",
+    whereMoneyWent: "أين ذهبت أموالك",
+    comingUp: "القادم قريباً",
+    latestActivity: "أحدث النشاطات",
+    financialLearning: "التعلّم المالي",
+    lessonsSoon: "الدروس في الطريق",
+    lessonsSoonBody: "سيظهر تقدمك في التعلّم هنا عند إطلاق دروس وازن.",
+    studyTip: "نصيحة مالية للطلبة",
+    addMoneyIn: "إضافة مبلغ",
+    addSpending: "إضافة صرف",
+    allowanceTag: "مصروف",
+    monitoringTag: "متابعة",
+    linkedTag: "مرتبط",
+    finishProfile: "أكمل إعداد ملفك الشخصي",
+    continueSetup: "متابعة الإعداد",
+    viewProfile: "عرض ملفك الشخصي",
   },
 } as const;
 
 type CopyKey = keyof typeof COPY.en;
 
-const LocaleContext = createContext<WazenLanguage>("en");
+type LocaleValue = {
+  language: WazenLanguage;
+  setLanguage: (language: WazenLanguage) => void;
+};
 
-export function WazenLocaleProvider({ language, children }: { language: string | undefined; children: ReactNode }) {
-  return <LocaleContext.Provider value={language === "ar" ? "ar" : "en"}>{children}</LocaleContext.Provider>;
+const LocaleContext = createContext<LocaleValue>({
+  language: DEFAULT_LANGUAGE,
+  setLanguage: () => {},
+});
+
+function readStoredLanguage(): WazenLanguage | null {
+  try {
+    const value = localStorage.getItem(STORAGE_KEY);
+    return value === "en" || value === "ar" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Global language provider. A signed-in user's saved preference always wins;
+ * visitors fall back to their last choice on this device, then to Arabic.
+ */
+export function AppLocaleProvider({ children }: { children: ReactNode }) {
+  const { data: profile } = useProfile();
+  const [local, setLocal] = useState<WazenLanguage>(DEFAULT_LANGUAGE);
+
+  useEffect(() => {
+    const stored = readStoredLanguage();
+    if (stored) setLocal(stored);
+  }, []);
+
+  const language: WazenLanguage =
+    profile?.language === "en" ? "en" : profile?.language === "ar" ? "ar" : local;
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, language);
+    } catch {
+      /* storage unavailable — direction still applies */
+    }
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+  }, [language]);
+
+  const setLanguage = useCallback((next: WazenLanguage) => setLocal(next), []);
+
+  return (
+    <LocaleContext.Provider value={{ language, setLanguage }}>{children}</LocaleContext.Provider>
+  );
+}
+
+/** Kept for nested scopes that already know the language (e.g. the app shell). */
+export function WazenLocaleProvider({
+  language,
+  children,
+}: {
+  language: string | undefined;
+  children: ReactNode;
+}) {
+  const parent = useContext(LocaleContext);
+  const resolved: WazenLanguage = language === "ar" ? "ar" : language === "en" ? "en" : parent.language;
+  return (
+    <LocaleContext.Provider value={{ language: resolved, setLanguage: parent.setLanguage }}>
+      {children}
+    </LocaleContext.Provider>
+  );
 }
 
 export function useWazenLocale() {
-  const language = useContext(LocaleContext);
+  const { language, setLanguage } = useContext(LocaleContext);
   return {
     language,
+    setLanguage,
     isArabic: language === "ar",
+    /** Numbers, currencies and dates stay structurally correct in both languages. */
     locale: language === "ar" ? "ar-KW" : "en-KW",
     t: (key: CopyKey) => COPY[language][key],
   };

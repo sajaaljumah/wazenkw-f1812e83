@@ -9,6 +9,7 @@ import { useProfile } from "@/hooks/use-wazen-auth";
 import {
   ADULT_LIFE_STAGES,
   CURRENCIES,
+  DEFAULT_LANGUAGE,
   LANGUAGES,
   LIFE_STAGE_LABELS,
   accountTypeFor,
@@ -38,7 +39,7 @@ function Onboarding() {
   const [busy, setBusy] = useState(false);
   const [fullName, setFullName] = useState("");
   const [lifeStage, setLifeStage] = useState<LifeStage | "">("");
-  const [language, setLanguage] = useState("en");
+  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
   const [currency, setCurrency] = useState("KWD");
 
   useEffect(() => {

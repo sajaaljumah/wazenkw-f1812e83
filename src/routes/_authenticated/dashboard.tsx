@@ -20,7 +20,8 @@ import {
 import type { DashboardData } from "@/components/wazen/dashboard/variants";
 import { DashboardHeader } from "@/components/wazen/dashboard/primitives";
 import { formatToday } from "@/lib/finance";
-import { LIFE_STAGE_LABELS, firstNameOf, welcomeMessage } from "@/lib/wazen";
+import { firstNameOf } from "@/lib/wazen";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -36,8 +37,27 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
 });
 
+const STAGE_KEY = {
+  child: "stageChild",
+  teenager: "stageTeenager",
+  university_student: "stageUniversity",
+  employee: "stageEmployee",
+  self_employed: "stageSelfEmployed",
+  parent: "stageParent",
+} as const;
+
+const WELCOME_KEY = {
+  child: "welcomeChild",
+  teenager: "welcomeTeenager",
+  university_student: "welcomeUniversity",
+  employee: "welcomeEmployee",
+  self_employed: "welcomeSelfEmployed",
+  parent: "welcomeParent",
+} as const;
+
 function Dashboard() {
   const navigate = useNavigate();
+  const { t, locale } = useWazenLocale();
   const { user } = useSession();
   const { data: profile, isLoading: profileLoading } = useProfile();
   const transactions = useTransactions();
@@ -68,9 +88,9 @@ function Dashboard() {
     return (
       <AppShell>
         <div className="wazen-panel p-8">
-          <h1 className="text-2xl">Finish setting up your profile</h1>
+          <h1 className="text-2xl">{t("finishProfile")}</h1>
           <Link to="/onboarding" className="mt-4 inline-block text-sm underline underline-offset-4">
-            Continue setup
+            {t("continueSetup")}
           </Link>
         </div>
       </AppShell>
@@ -94,14 +114,14 @@ function Dashboard() {
         {profile.life_stage === "child" ? null : (
           <DashboardHeader
             name={firstName}
-            eyebrow={`${LIFE_STAGE_LABELS[profile.life_stage]} experience`}
-            subtitle={welcomeMessage(profile.life_stage)}
-            today={formatToday()}
+            eyebrow={`${t(STAGE_KEY[profile.life_stage])} ${t("experience")}`}
+            subtitle={t(WELCOME_KEY[profile.life_stage])}
+            today={formatToday(new Date(), locale)}
             avatar={
               <Link
                 to="/profile"
                 className="wazen-interactive block rounded-full outline-hidden hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
-                title="View your profile"
+                title={t("viewProfile")}
               >
                 <WazenAvatar
                   fullName={profile.full_name}

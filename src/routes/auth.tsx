@@ -5,10 +5,13 @@ import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
+import { LanguageToggle } from "@/components/wazen/LanguageToggle";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { DEMO_ACCOUNTS, DEMO_PASSWORD } from "@/lib/demo-accounts";
 import {
   ADULT_LIFE_STAGES,
   CURRENCIES,
+  DEFAULT_LANGUAGE,
   LANGUAGES,
   LIFE_STAGE_LABELS,
   accountTypeFor,
@@ -80,6 +83,7 @@ function Field({
 function AuthPage() {
   const { mode } = Route.useSearch();
   const navigate = useNavigate();
+  const { t } = useWazenLocale();
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
@@ -89,7 +93,7 @@ function AuthPage() {
     date_of_birth: "",
     gender: "" as "" | "female" | "male",
     life_stage: "" as "" | LifeStage,
-    language: "en",
+    language: DEFAULT_LANGUAGE,
     base_currency: "KWD",
   });
 
@@ -177,29 +181,32 @@ function AuthPage() {
         <Link to="/">
           <WazenMark />
         </Link>
-        <Link
-          to="/auth"
-          search={{ mode: mode === "signin" ? "signup" : "signin" }}
-          className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-        >
-          {mode === "signin" ? "Create an account" : "I already have an account"}
-        </Link>
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
+          <Link
+            to="/auth"
+            search={{ mode: mode === "signin" ? "signup" : "signin" }}
+            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+          >
+            {mode === "signin" ? t("createAccount") : t("haveAccount")}
+          </Link>
+        </div>
       </header>
 
       <main className="mx-auto grid max-w-6xl px-5 pb-20 sm:px-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.8fr)]">
         <section className="py-10 lg:border-e lg:border-border lg:pe-12">
           <h1 className="text-3xl sm:text-4xl">
-            {mode === "signin" ? "Welcome back" : "Create your Wazen account"}
+            {mode === "signin" ? t("welcomeBack") : t("createWazenAccount")}
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
             {mode === "signin"
-              ? "Sign in to continue where you left off."
-              : "A few details help us shape Wazen around your life stage."}
+              ? t("signinSub")
+              : t("signupSub")}
           </p>
 
           {mode === "signin" ? (
             <form onSubmit={handleSignIn} className="mt-8 space-y-5">
-              <Field label="Email" error={errors['email']}>
+              <Field label={t("email")} error={errors['email']}>
                 <input
                   type="email"
                   autoComplete="email"
@@ -209,7 +216,7 @@ function AuthPage() {
                   placeholder="you@example.com"
                 />
               </Field>
-              <Field label="Password" error={errors['password']}>
+              <Field label={t("password")} error={errors['password']}>
                 <input
                   type="password"
                   autoComplete="current-password"
@@ -224,14 +231,14 @@ function AuthPage() {
                   to="/forgot-password"
                   className="text-sm text-muted-foreground underline-offset-4 hover:underline"
                 >
-                  Forgot password?
+                  {t("forgotPassword")}
                 </Link>
               </div>
-              <SubmitButton busy={busy}>Sign in</SubmitButton>
+              <SubmitButton busy={busy}>{t("signIn")}</SubmitButton>
             </form>
           ) : (
             <form onSubmit={handleSignUp} className="mt-8 space-y-5">
-              <Field label="First name" error={errors['full_name']}>
+              <Field label={t("firstName")} error={errors['full_name']}>
                 <input
                   className={inputClass}
                   value={form.full_name}
@@ -257,12 +264,12 @@ function AuthPage() {
                     className={inputClass}
                     value={form.password}
                     onChange={(e) => set("password", e.target.value)}
-                    placeholder="At least 8 characters"
+                    placeholder={t("passwordHint")}
                   />
                 </Field>
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Date of birth" error={errors['date_of_birth']}>
+                <Field label={t("dateOfBirth")} error={errors['date_of_birth']}>
                   <input
                     type="date"
                     max={new Date().toISOString().slice(0, 10)}
@@ -272,11 +279,11 @@ function AuthPage() {
                   />
                   {age !== null ? (
                     <span className="mt-1.5 block text-xs text-muted-foreground">
-                      Age {age} — calculated automatically, never stored.
+                      {t("age")} {age} — {t("ageAuto")}
                     </span>
                   ) : null}
                 </Field>
-                <Field label="Gender (cannot be changed later)" error={errors['gender']}>
+                <Field label={t("genderField")} error={errors['gender']}>
                   <div className="flex gap-2">
                     {(["female", "male"] as const).map((value) => (
                         <Button
@@ -285,25 +292,25 @@ function AuthPage() {
                         onClick={() => set("gender", value)}
                           variant={form.gender === value ? "default" : "outline"}
                           className={cn(
-                            "flex-1 capitalize",
+                            "flex-1",
                           form.gender === value
                               ? ""
                               : "",
                         )}
                       >
-                        {value}
+                        {t(value)}
                         </Button>
                     ))}
                   </div>
                 </Field>
               </div>
 
-              <Field label="Life stage" error={errors['life_stage']}>
+              <Field label={t("lifeStageField")} error={errors['life_stage']}>
                 {autoStage ? (
                   <div className="rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm">
-                    {LIFE_STAGE_LABELS[autoStage]} — set automatically from age.
+                    {LIFE_STAGE_LABELS[autoStage]} — {t("setFromAge")}
                     <span className="mt-1 block text-xs text-muted-foreground">
-                      A parent or guardian will need to link this account to their own.
+                      {t("guardianNote")}
                     </span>
                   </div>
                 ) : (
@@ -314,7 +321,7 @@ function AuthPage() {
                     disabled={age === null}
                   >
                     <option value="">
-                      {age === null ? "Select your date of birth first" : "Select your life stage"}
+                      {age === null ? t("selectDobFirst") : t("selectLifeStage")}
                     </option>
                     {ADULT_LIFE_STAGES.map((stage) => (
                       <option key={stage} value={stage}>
@@ -326,7 +333,7 @@ function AuthPage() {
               </Field>
 
               <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Preferred language">
+                <Field label={t("preferredLanguage")}>
                   <select
                     className={inputClass}
                     value={form.language}
@@ -339,7 +346,7 @@ function AuthPage() {
                     ))}
                   </select>
                 </Field>
-                <Field label="Base currency">
+                <Field label={t("baseCurrency")}>
                   <select
                     className={inputClass}
                     value={form.base_currency}
@@ -354,7 +361,7 @@ function AuthPage() {
                 </Field>
               </div>
 
-              <SubmitButton busy={busy}>Create account</SubmitButton>
+              <SubmitButton busy={busy}>{t("createAccount")}</SubmitButton>
             </form>
           )}
         </section>

@@ -55,6 +55,8 @@ export type FamilyMemberRow = {
   user_id: string;
   member_role: FamilySeatRole;
   seat_kind: SeatKind;
+  /** Data-driven, per-seat override: a suspended seat never inherits premium. */
+  seat_suspended?: boolean | null;
   created_at: string;
 };
 
@@ -281,6 +283,7 @@ export function resolveFamilySeats(
 
   return byDate.map((m) => {
     let entitled = false;
+    const suspended = m.seat_suspended === true;
     if (m.member_role === "parent") {
       parentIndex += 1;
       entitled = premium && parentIndex <= includedParents;
@@ -290,7 +293,7 @@ export function resolveFamilySeats(
       additionalIndex += 1;
       entitled = premium && additionalIndex <= paidAdditional;
     }
-    return { userId: m.user_id, role: m.member_role, seatKind: m.seat_kind, entitled };
+    return { userId: m.user_id, role: m.member_role, seatKind: m.seat_kind, entitled: entitled && !suspended };
   });
 }
 

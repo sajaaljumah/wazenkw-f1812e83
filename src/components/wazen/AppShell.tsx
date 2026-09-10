@@ -4,15 +4,16 @@ import { useEffect, type ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { Button } from "@/components/ui/button";
-import { WazenLocaleProvider } from "@/components/wazen/WazenLocale";
+import { WazenLocaleProvider, useWazenLocale } from "@/components/wazen/WazenLocale";
+import { PlanBadge } from "@/components/wazen/subscription/PlanBadge";
 import { firstNameOf } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/subscription", label: "Plan", icon: Sparkles },
-  { to: "/profile", label: "Profile", icon: User },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/dashboard", label: "overview", icon: LayoutDashboard },
+  { to: "/subscription", label: "plan", icon: Sparkles },
+  { to: "/profile", label: "profile", icon: User },
+  { to: "/settings", label: "settings", icon: Settings },
 ] as const;
 
 export function WazenMark({ className }: { className?: string }) {
@@ -28,22 +29,15 @@ export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const signOut = useSignOut();
   const { data: profile } = useProfile();
-  const isArabic = profile?.language === "ar";
+  const { t } = useWazenLocale();
 
   useEffect(() => {
-    document.documentElement.lang = isArabic ? "ar" : "en";
-    document.documentElement.dir = isArabic ? "rtl" : "ltr";
     document.documentElement.classList.toggle("dark", profile?.theme === "dark");
     return () => {
-      document.documentElement.lang = "en";
-      document.documentElement.dir = "ltr";
       document.documentElement.classList.remove("dark");
     };
-  }, [isArabic, profile?.theme]);
+  }, [profile?.theme]);
 
-  const labels = isArabic
-    ? { Dashboard: "الرئيسية", Plan: "الاشتراك", Profile: "الملف الشخصي", Settings: "الإعدادات", signOut: "تسجيل الخروج" }
-    : { Dashboard: "Overview", Plan: "Plan", Profile: "Profile", Settings: "Settings", signOut: "Sign out" };
 
   return (
     <div className={cn("min-h-screen bg-background", profile?.life_stage === "teenager" && "stage-teen", profile?.life_stage === "university_student" && "stage-university")}>
@@ -66,12 +60,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                 )}
               >
                 <Icon className="size-4" strokeWidth={1.7} />
-                {labels[label]}
+                {t(label)}
               </Link>
             ))}
             </nav>
           </div>
           <div className="flex items-center gap-2">
+            <PlanBadge className="hidden sm:inline-flex" size="sm" />
             {profile ? (
               <Link
                 to="/profile"
@@ -91,8 +86,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={signOut}
               variant="ghost"
               size="icon"
-              title={labels.signOut}
-              aria-label={labels.signOut}
+              title={t("signOut")}
+              aria-label={t("signOut")}
             >
               <LogOut className="size-4" strokeWidth={1.5} />
             </Button>
@@ -116,7 +111,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               )}
             >
               <Icon className="size-5" strokeWidth={1.5} />
-              {labels[label]}
+              {t(label)}
             </Link>
           ))}
         </div>

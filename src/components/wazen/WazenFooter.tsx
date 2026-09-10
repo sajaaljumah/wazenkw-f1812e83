@@ -1,10 +1,9 @@
 import { cn } from "@/lib/utils";
-import { useProfile } from "@/hooks/use-wazen-auth";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 
 /** Global Wazen footer — subtle, consistent across every screen. */
 export function WazenFooter({ className }: { className?: string }) {
-  const { data: profile } = useProfile();
-  const isArabic = profile?.language === "ar";
+  const { isArabic } = useWazenLocale();
   const copyright = isArabic ? "© سجى الجمعه" : "© Saja Aljumah";
 
   return (

@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/finance";
 
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
+
 export function DashboardHeader({
   name,
   subtitle,
@@ -15,8 +17,9 @@ export function DashboardHeader({
   today: string;
   avatar?: ReactNode;
 }) {
+  const { t } = useWazenLocale();
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const greeting = hour < 12 ? t("goodMorning") : hour < 18 ? t("goodAfternoon") : t("goodEvening");
   return (
     <section className="flex flex-col gap-5 border-b border-border pb-8 sm:flex-row sm:items-center sm:pb-10">
       {avatar ? <div className="shrink-0">{avatar}</div> : null}
