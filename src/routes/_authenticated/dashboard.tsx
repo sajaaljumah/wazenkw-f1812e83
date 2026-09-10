@@ -91,30 +91,38 @@ function Dashboard() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <DashboardHeader
-          name={firstName}
-          eyebrow={`${LIFE_STAGE_LABELS[profile.life_stage]} experience`}
-          subtitle={welcomeMessage(profile.life_stage)}
-          today={formatToday()}
-          avatar={
-            <Link
-              to="/profile"
-              className="wazen-interactive block rounded-full outline-none hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
-              title="View your profile"
-            >
-              <WazenAvatar
-                fullName={profile.full_name}
-                gender={profile.gender}
-                lifeStage={profile.life_stage}
-                avatarUrl={profile.avatar_url}
-                size={72}
-              />
-            </Link>
-          }
-        />
+        {profile.life_stage === "child" ? null : (
+          <DashboardHeader
+            name={firstName}
+            eyebrow={`${LIFE_STAGE_LABELS[profile.life_stage]} experience`}
+            subtitle={welcomeMessage(profile.life_stage)}
+            today={formatToday()}
+            avatar={
+              <Link
+                to="/profile"
+                className="wazen-interactive block rounded-full outline-none hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
+                title="View your profile"
+              >
+                <WazenAvatar
+                  fullName={profile.full_name}
+                  gender={profile.gender}
+                  lifeStage={profile.life_stage}
+                  avatarUrl={profile.avatar_url}
+                  size={72}
+                />
+              </Link>
+            }
+          />
+        )}
 
         {profile.life_stage === "child" ? (
-          <ChildDashboard data={data} firstName={firstName} />
+          <ChildDashboard
+            data={data}
+            firstName={firstName}
+            fullName={profile.full_name}
+            gender={profile.gender}
+            avatarUrl={profile.avatar_url}
+          />
         ) : profile.life_stage === "teenager" ? (
           <TeenagerDashboard data={data} />
         ) : (
