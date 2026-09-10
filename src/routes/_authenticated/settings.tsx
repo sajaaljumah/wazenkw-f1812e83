@@ -70,11 +70,12 @@ function SettingsPage() {
   const stageLocked = lifeStageForAge(age) !== null;
 
   async function save() {
+    if (!profile) return;
     if (fullName.trim().length < 2) {
       toast.error("Enter your first name");
       return;
     }
-    const stage = (stageLocked ? profile!.life_stage : lifeStage) as LifeStage;
+    const stage = (stageLocked ? profile.life_stage : lifeStage) as LifeStage;
     setBusy(true);
     const { error } = await supabase
       .from("profiles")
@@ -86,7 +87,7 @@ function SettingsPage() {
         base_currency: currency,
         theme,
       })
-      .eq("id", profile!.id);
+      .eq("id", profile.id);
     setBusy(false);
     if (error) {
       toast.error(error.message);

@@ -369,7 +369,7 @@ function AuthPage() {
           </p>
           <div className="mt-5 wazen-rule-list border-y border-border">
             {DEMO_ACCOUNTS.map((account) => (
-              <button
+              <Button
                 key={account.email}
                 type="button"
                 onClick={() => {
@@ -382,7 +382,8 @@ function AuthPage() {
                   if (mode !== "signin") navigate({ to: "/auth", search: { mode: "signin" } });
                   toast.success(`${account.name} loaded — press Sign in`);
                 }}
-                className="flex w-full items-center justify-between gap-3 px-1 py-3.5 text-start text-sm transition-colors hover:bg-secondary/55"
+                variant="ghost"
+                className="h-auto w-full justify-between rounded-none px-1 py-3.5 text-start text-sm font-normal"
               >
                 <span>
                   {account.name}
@@ -390,7 +391,7 @@ function AuthPage() {
                     {LIFE_STAGE_LABELS[account.life_stage]} · {account.note}
                   </span>
                 </span>
-              </button>
+              </Button>
             ))}
           </div>
         </aside>

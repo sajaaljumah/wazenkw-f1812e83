@@ -33,11 +33,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.lang = isArabic ? "ar" : "en";
     document.documentElement.dir = isArabic ? "rtl" : "ltr";
+    document.documentElement.classList.toggle("dark", profile?.theme === "dark");
     return () => {
       document.documentElement.lang = "en";
       document.documentElement.dir = "ltr";
+      document.documentElement.classList.remove("dark");
     };
-  }, [isArabic]);
+  }, [isArabic, profile?.theme]);
 
   const labels = isArabic
     ? { Dashboard: "الرئيسية", Plan: "الاشتراك", Profile: "الملف الشخصي", Settings: "الإعدادات", signOut: "تسجيل الخروج" }

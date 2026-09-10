@@ -52,6 +52,7 @@ function ProfilePage() {
   }
 
   async function save() {
+    if (!profile) return;
     if (firstNameOf(fullName).length < 2) {
       toast.error("Enter your first name");
       return;
@@ -65,7 +66,7 @@ function ProfilePage() {
         language,
         base_currency: currency,
       })
-      .eq("id", profile!.id);
+      .eq("id", profile.id);
     setBusy(false);
     if (error) {
       toast.error(error.message);

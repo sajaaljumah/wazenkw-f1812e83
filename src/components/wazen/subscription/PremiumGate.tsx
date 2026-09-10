@@ -4,6 +4,7 @@ import { Lock, Sparkles } from "lucide-react";
 import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { FEATURE_DESCRIPTIONS, FEATURE_LABELS, type PremiumFeature } from "@/lib/subscription";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export function PremiumBadge({ className }: { className?: string }) {
   return (
@@ -46,12 +47,7 @@ export function UpgradePrompt({
         <p className="mt-2 text-sm text-muted-foreground">{description}</p>
       </div>
       {hideCta ? null : (
-        <Link
-          to="/subscription"
-          className="mx-auto rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90"
-        >
-          See Premium
-        </Link>
+        <Button asChild className="mx-auto"><Link to="/subscription">See Premium</Link></Button>
       )}
     </div>
   );

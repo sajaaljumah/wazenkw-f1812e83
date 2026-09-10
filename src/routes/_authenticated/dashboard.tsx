@@ -90,7 +90,7 @@ function Dashboard() {
 
   return (
     <AppShell>
-      <div className="space-y-8 wazen-enter">
+      <div className={`space-y-8 wazen-enter ${profile.life_stage === "teenager" ? "stage-teen" : profile.life_stage === "university_student" ? "stage-university" : ""}`}>
         {profile.life_stage === "child" ? null : (
           <DashboardHeader
             name={firstName}
