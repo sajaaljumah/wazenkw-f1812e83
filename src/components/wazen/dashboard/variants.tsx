@@ -160,69 +160,8 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
   );
 }
 
-/** Child: playful, visual, simple Save / Spend / Give language. */
-export function ChildDashboard({ data, firstName }: { data: DashboardData; firstName: string }) {
-  const { currency, transactions, goals, recurring, userId } = data;
-  const { monthTransactions, month, all } = useMonthTotals(transactions);
-  const allowance = monthTransactions
-    .filter((t) => t.kind === "income" && /allowance/i.test(t.category))
-    .reduce((sum, t) => sum + Number(t.amount), 0);
-  const give = monthTransactions
-    .filter((t) => t.kind === "expense" && /giv|charity|sadaqah|donat/i.test(t.category))
-    .reduce((sum, t) => sum + Number(t.amount), 0);
-  const firstGoal = goals.find((goal) => goal.kind === "goal");
-  const savedForFirst = firstGoal ? savedForGoal(transactions, firstGoal.id) : 0;
-
-  return (
-    <>
-      <QuickActions
-        userId={userId}
-        currency={currency}
-        goals={goals}
-        labels={{ income: "Money I got", expense: "Money I spent", saving: "Money I saved", goal: "New goal" }}
-      />
-
-      {firstGoal ? (
-        <section className="wazen-panel p-7 text-center sm:p-9">
-          <Sparkles className="mx-auto size-6 text-gold" strokeWidth={1.25} />
-          <h2 className="mt-4 text-2xl">
-            {firstName}, you're {percentOf(savedForFirst, Number(firstGoal.target_amount))}% of the way to your{" "}
-            {firstGoal.name.toLowerCase()}!
-          </h2>
-          <ProgressBar
-            value={savedForFirst}
-            max={Number(firstGoal.target_amount)}
-            tone="sage"
-            className="mx-auto mt-6 h-5 max-w-md"
-          />
-          <p className="mt-3 text-sm text-muted-foreground">
-            {formatMoney(savedForFirst, currency)} saved of {formatMoney(Number(firstGoal.target_amount), currency)}
-          </p>
-        </section>
-      ) : null}
-
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="My money" amount={all.net} currency={currency} icon={<Wallet className="size-4" strokeWidth={1.5} />} />
-        <StatCard label="Save" amount={all.savings} currency={currency} tone="gold" icon={<PiggyBank className="size-4" strokeWidth={1.5} />} />
-        <StatCard label="Spend" amount={month.expenses} currency={currency} hint="This month" icon={<Coins className="size-4" strokeWidth={1.5} />} />
-        <StatCard label="Give" amount={give} currency={currency} tone="positive" hint="Kindness this month" icon={<HandHeart className="size-4" strokeWidth={1.5} />} />
-      </div>
-
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Panel title="My allowance">
-          <p className="text-2xl tabular-nums">{formatMoney(allowance, currency)}</p>
-          <p className="mt-2 text-sm text-muted-foreground">Received this month</p>
-        </Panel>
-        <GoalsCard goals={goals} transactions={transactions} currency={currency} title="My goals" playful />
-      </div>
-
-      <div className="grid gap-5 lg:grid-cols-2">
-        <RecentTransactionsCard transactions={transactions} currency={currency} title="What happened lately" limit={5} />
-        <UpcomingCashFlowCard items={recurring} currency={currency} title="Coming soon" />
-      </div>
-    </>
-  );
-}
+/** Child: the playful-luxury experience lives in its own module. */
+export { ChildDashboard } from "./child/ChildDashboard";
 
 /** Parent: personal overview plus a summary of permitted family members only. */
 export function FamilySummaryCard({
