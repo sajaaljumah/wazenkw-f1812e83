@@ -84,9 +84,10 @@ export const getSubscriptionQuote = createServerFn({ method: "GET" })
   });
 
 /**
- * Upgrade entry point. Stripe checkout is not wired up yet: this returns a
- * `not_configured` result so the UI has its final shape. When Stripe is added,
- * create the Checkout Session here and return its URL — no UI changes needed.
+ * Upgrade entry point. Payment processing is not connected yet, so activating a
+ * premium plan writes the subscription state directly (Free → Premium) and the
+ * UI reads it back from the server. When Stripe is added, create the Checkout
+ * Session here and call `activatePremium` from the webhook instead.
  * Child/teenager accounts are rejected server-side.
  */
 export const startPremiumUpgrade = createServerFn({ method: "POST" })
@@ -104,16 +105,29 @@ export const startPremiumUpgrade = createServerFn({ method: "POST" })
     async ({
       context,
       data,
-    }): Promise<{ status: "not_configured" | "redirect"; url: string | null; message: string }> => {
-      const { requireBillingOwner } = await import("@/lib/subscription.server");
-      await requireBillingOwner(context.supabase, context.userId);
-      return {
-        status: "not_configured",
-        url: null,
-        message: `${data.kind} ${data.billingPeriod} checkout is not connected yet.`,
-      };
+    }): Promise<{
+      status: "activated" | "redirect";
+      url: string | null;
+      entitlements: Entitlements | null;
+    }> => {
+      const { activatePremium } = await import("@/lib/subscription.server");
+      const entitlements = await activatePremium(context.supabase, context.userId, {
+        kind: data.kind,
+        billingPeriod: data.billingPeriod,
+        additionalChildren: data.additionalChildren,
+      });
+      return { status: "activated", url: null, entitlements };
     },
   );
+
+/** Cancels premium immediately; the account returns to Free by stored status. */
+export const cancelPremiumSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ status: "cancelled"; entitlements: Entitlements }> => {
+    const { cancelPremium } = await import("@/lib/subscription.server");
+    const entitlements = await cancelPremium(context.supabase, context.userId);
+    return { status: "cancelled", entitlements };
+  });
 
 /**
  * Billing management entry point (cancel / resume / update card). Will return a

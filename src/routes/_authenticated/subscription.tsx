@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, Sparkles, Users } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/wazen/AppShell";
 import { PremiumBadge } from "@/components/wazen/subscription/PremiumGate";
 import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
-import { openBillingPortal, startPremiumUpgrade } from "@/lib/subscription.functions";
+import { cancelPremiumSubscription, startPremiumUpgrade } from "@/lib/subscription.functions";
 import {
   FAMILY_PLAN_HIGHLIGHTS,
   FEATURE_DESCRIPTIONS,
@@ -68,7 +69,8 @@ function SubscriptionPage() {
     useSubscriptionAccess();
   const { t } = useWazenLocale();
   const upgrade = useServerFn(startPremiumUpgrade);
-  const manage = useServerFn(openBillingPortal);
+  const cancel = useServerFn(cancelPremiumSubscription);
+  const queryClient = useQueryClient();
   const [busy, setBusy] = useState<"upgrade" | "manage" | null>(null);
 
   const isFamily = entitlements.subscriptionKind === "family" || !!family;
@@ -79,6 +81,12 @@ function SubscriptionPage() {
     (family?.childCount ?? 0) - (family?.includedChildCount ?? 0),
   );
   const familyMoney = computeFamilyTotal(familyPrice, additionalChildren);
+
+  /** Refreshes every place the plan status is shown (header, profile, settings). */
+  async function refreshPlanEverywhere() {
+    await queryClient.invalidateQueries({ queryKey: ["entitlements"] });
+    await refetch();
+  }
 
   async function handleUpgrade() {
     setBusy("upgrade");
@@ -94,30 +102,29 @@ function SubscriptionPage() {
         window.location.assign(result.url);
         return;
       }
-      toast.info("Checkout is coming soon", {
-        description: "Payments aren't connected yet — your plan is unchanged.",
+      toast.success("Premium is active", {
+        description: "Your account has been upgraded from Free to Premium.",
       });
     } catch {
       toast.error("Could not start the upgrade. Please try again.");
     } finally {
       setBusy(null);
-      refetch();
+      await refreshPlanEverywhere();
     }
   }
 
   async function handleManage() {
     setBusy("manage");
     try {
-      const result = await manage();
-      if (result.status === "redirect" && result.url) {
-        window.location.assign(result.url);
-        return;
-      }
-      toast.info("Subscription management is coming soon");
+      await cancel({ data: undefined });
+      toast.success("Premium cancelled", {
+        description: "Your account is back on the Free plan.",
+      });
     } catch {
-      toast.error("Could not open subscription management.");
+      toast.error("Could not update your subscription. Please try again.");
     } finally {
       setBusy(null);
+      await refreshPlanEverywhere();
     }
   }
 
@@ -135,7 +142,7 @@ function SubscriptionPage() {
         <section className="border-b border-border pb-9">
           <p className="wazen-label">{t("yourPlan")}</p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl sm:text-4xl">{entitlements.plan === "premium" ? t("premium") : t("free")}</h1>
+            <h1 className="text-3xl sm:text-4xl">{isPremium ? t("premium") : t("free")}</h1>
             {isPremium ? <PremiumBadge /> : null}
             <span
               className={cn(

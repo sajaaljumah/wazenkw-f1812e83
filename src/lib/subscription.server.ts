@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   buildEntitlements,
+  findPrice,
   hasFeature,
   type Entitlements,
   type FamilyMemberRow,
@@ -114,6 +115,101 @@ export async function requireBillingOwner(
     );
   }
   return entitlements;
+}
+
+function addPeriod(from: Date, period: "monthly" | "yearly"): Date {
+  const next = new Date(from);
+  if (period === "yearly") next.setFullYear(next.getFullYear() + 1);
+  else next.setMonth(next.getMonth() + 1);
+  return next;
+}
+
+export type ActivationInput = {
+  kind: "individual" | "family";
+  billingPeriod: "monthly" | "yearly";
+  additionalChildren: number;
+};
+
+/**
+ * Activates premium for the caller. Plan state is stored with the user's
+ * subscription row, so Premium/Free is always data-driven — never derived from
+ * gender, demo identity or any other user attribute. When a payment provider is
+ * connected later, it simply calls this after a successful payment.
+ */
+export async function activatePremium(
+  supabase: SupabaseClient<any, any, any>,
+  userId: string,
+  input: ActivationInput,
+): Promise<Entitlements> {
+  const current = await requireBillingOwner(supabase, userId);
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  const familyId = current.family?.familyId ?? null;
+  const kind = input.kind === "family" && familyId ? "family" : "individual";
+  const price = findPrice(current.prices, kind, input.billingPeriod);
+  const now = new Date();
+  const periodEnd = addPeriod(now, input.billingPeriod);
+
+  const { error } = await supabaseAdmin
+    .from("subscriptions")
+    .upsert(
+      {
+        user_id: userId,
+        plan: "premium",
+        status: "active",
+        subscription_type: kind,
+        family_id: kind === "family" ? familyId : null,
+        billing_period: input.billingPeriod,
+        price_key: price?.key ?? null,
+        included_parent_count: kind === "family" ? (price?.included_parent_count ?? 2) : 1,
+        included_child_count: kind === "family" ? (price?.included_child_count ?? 4) : 0,
+        additional_child_count: kind === "family" ? Math.max(0, input.additionalChildren) : 0,
+        started_at: current.startedAt ?? now.toISOString(),
+        current_period_start: now.toISOString(),
+        current_period_end: periodEnd.toISOString(),
+        cancel_at_period_end: false,
+        cancelled_at: null,
+      },
+      { onConflict: "user_id" },
+    );
+  if (error) throw error;
+
+  // Family seats inherit premium from the family subscription: clear any
+  // per-seat suspension so every member of this family is entitled.
+  if (kind === "family" && familyId) {
+    const { error: seatError } = await supabaseAdmin
+      .from("family_members")
+      .update({ seat_suspended: false })
+      .eq("family_id", familyId);
+    if (seatError) throw seatError;
+  }
+
+  return loadEntitlements(supabase, userId);
+}
+
+/**
+ * Cancels premium and returns the account to Free. Access is decided by the
+ * stored subscription status, so cancelled or expired subscriptions are Free.
+ */
+export async function cancelPremium(
+  supabase: SupabaseClient<any, any, any>,
+  userId: string,
+): Promise<Entitlements> {
+  await requireBillingOwner(supabase, userId);
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const now = new Date().toISOString();
+  const { error } = await supabaseAdmin
+    .from("subscriptions")
+    .update({
+      plan: "free",
+      status: "cancelled",
+      cancelled_at: now,
+      cancel_at_period_end: false,
+      current_period_end: now,
+    })
+    .eq("user_id", userId);
+  if (error) throw error;
+  return loadEntitlements(supabase, userId);
 }
 
 /** Free-plan quota guard for future modules (goals, budgets, recurring items). */

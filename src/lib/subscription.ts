@@ -365,7 +365,9 @@ export function buildEntitlements(input: BuildInput): Entitlements {
   const isOwner = !!active && active.user_id === input.userId;
 
   return {
-    plan: active?.plan ?? "free",
+    // Effective plan: premium only while a stored subscription actually grants
+    // access, so cancelled or expired subscriptions read back as free.
+    plan: premium ? "premium" : "free",
     status: active?.status ?? "active",
     isPremium: premium,
     isCancelling: premium && !!active?.cancel_at_period_end,
