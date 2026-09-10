@@ -91,7 +91,7 @@ export function QuickActions({
   );
 }
 
-function ActionDialog({
+export function ActionDialog({
   kind,
   onClose,
   userId,
