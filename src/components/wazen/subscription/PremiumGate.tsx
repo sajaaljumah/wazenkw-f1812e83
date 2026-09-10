@@ -26,7 +26,7 @@ export function UpgradePrompt({
 }: {
   title: string;
   description: string;
-  compact?: boolean;
+  compact?: boolean | undefined;
 }) {
   return (
     <div
@@ -66,7 +66,7 @@ export function PremiumGate({
   feature: PremiumFeature;
   children: ReactNode;
   fallback?: ReactNode;
-  compact?: boolean;
+  compact?: boolean | undefined;
 }) {
   const { can, isLoading } = useSubscriptionAccess();
 
