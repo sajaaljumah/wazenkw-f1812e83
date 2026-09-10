@@ -51,8 +51,8 @@ function ProfilePage() {
   }
 
   async function save() {
-    if (fullName.trim().length < 2) {
-      toast.error("Enter your full name");
+    if (firstNameOf(fullName).length < 2) {
+      toast.error("Enter your first name");
       return;
     }
     setBusy(true);
@@ -105,12 +105,16 @@ function ProfilePage() {
         <h2 className="text-xl">Editable details</h2>
         <div className="mt-6 space-y-5">
           <label className="block">
-            <span className="wazen-label">Full name</span>
+            <span className="wazen-label">First name</span>
             <input
               className={cn(inputClass, "mt-2")}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
+              placeholder="Mariam"
             />
+            <span className="mt-1.5 block text-xs text-muted-foreground">
+              Wazen only shows first names — no family name is needed.
+            </span>
           </label>
           <label className="block">
             <span className="wazen-label">Profile photo URL (optional)</span>
