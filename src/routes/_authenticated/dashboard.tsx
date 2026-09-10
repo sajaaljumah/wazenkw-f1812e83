@@ -1,31 +1,69 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { AppShell } from "@/components/wazen/AppShell";
-import { useProfile } from "@/hooks/use-wazen-auth";
-import { LIFE_STAGE_LABELS, calculateAge, welcomeMessage } from "@/lib/wazen";
+import { useProfile, useSession } from "@/hooks/use-wazen-auth";
+import {
+  useFamilySummary,
+  useGoals,
+  useMonthlyBudget,
+  useRecurringItems,
+  useTransactions,
+} from "@/hooks/use-wazen-finance";
+import {
+  AdultDashboard,
+  ChildDashboard,
+  FamilySummaryCard,
+  TeenagerDashboard,
+} from "@/components/wazen/dashboard/variants";
+import type { DashboardData } from "@/components/wazen/dashboard/variants";
+import { DashboardHeader } from "@/components/wazen/dashboard/primitives";
+import { formatToday } from "@/lib/finance";
+import { LIFE_STAGE_LABELS, welcomeMessage } from "@/lib/wazen";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  head: () => ({
+    meta: [
+      { title: "Dashboard — Wazen" },
+      { name: "description", content: "Your Wazen money overview: available money, budget, savings goals and upcoming cash flow." },
+      { property: "og:title", content: "Dashboard — Wazen" },
+      { property: "og:description", content: "Your Wazen money overview: available money, budget, savings goals and upcoming cash flow." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Dashboard,
 });
 
 function Dashboard() {
   const navigate = useNavigate();
-  const { data: profile, isLoading } = useProfile();
+  const { user } = useSession();
+  const { data: profile, isLoading: profileLoading } = useProfile();
+  const transactions = useTransactions();
+  const goals = useGoals();
+  const budget = useMonthlyBudget();
+  const recurring = useRecurringItems();
+  const isParent = profile?.life_stage === "parent";
+  const family = useFamilySummary(!!isParent);
 
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding" });
   }, [profile, navigate]);
 
-  if (isLoading) {
+  const loading =
+    profileLoading || transactions.isLoading || goals.isLoading || budget.isLoading || recurring.isLoading;
+
+  if (loading) {
     return (
       <AppShell>
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        <div className="flex min-h-[40vh] items-center justify-center">
+          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        </div>
       </AppShell>
     );
   }
 
-  if (!profile) {
+  if (!profile || !user) {
     return (
       <AppShell>
         <div className="wazen-panel p-8">
@@ -38,39 +76,40 @@ function Dashboard() {
     );
   }
 
+  const data: DashboardData = {
+    userId: user.id,
+    currency: profile.base_currency,
+    transactions: transactions.data ?? [],
+    goals: goals.data ?? [],
+    budget: budget.data ?? null,
+    recurring: recurring.data ?? [],
+  };
+
+  const firstName = profile.full_name.split(" ")[0] ?? profile.full_name;
+
   return (
     <AppShell>
-      <section className="wazen-panel p-7 sm:p-10">
-        <p className="wazen-label">{LIFE_STAGE_LABELS[profile.life_stage]} experience</p>
-        <h1 className="mt-4 text-3xl sm:text-4xl">
-          Welcome to Wazen, {profile.full_name.split(" ")[0]}.
-        </h1>
-        <p className="mt-3 max-w-lg text-muted-foreground">{welcomeMessage(profile.life_stage)}</p>
-      </section>
+      <div className="space-y-6">
+        <DashboardHeader
+          name={firstName}
+          eyebrow={`${LIFE_STAGE_LABELS[profile.life_stage]} experience`}
+          subtitle={welcomeMessage(profile.life_stage)}
+          today={formatToday()}
+        />
 
-      <section className="mt-6 grid gap-5 sm:grid-cols-3">
-        <Stat label="Age" value={`${calculateAge(profile.date_of_birth)} years`} />
-        <Stat label="Base currency" value={profile.base_currency} />
-        <Stat label="Language" value={profile.language === "ar" ? "العربية" : "English"} />
-      </section>
+        {profile.life_stage === "child" ? (
+          <ChildDashboard data={data} firstName={firstName} />
+        ) : profile.life_stage === "teenager" ? (
+          <TeenagerDashboard data={data} />
+        ) : (
+          <AdultDashboard
+            data={data}
+            focus={profile.life_stage === "university_student" ? "student" : "employee"}
+          />
+        )}
 
-      <section className="mt-6 wazen-panel p-7 text-center sm:p-12">
-        <Sparkles className="mx-auto size-6 text-gold" strokeWidth={1.25} />
-        <h2 className="mt-5 text-2xl">Your financial dashboard is coming next</h2>
-        <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
-          Budgets, goals, allowances and financial education will appear here as Wazen grows. For
-          now, your account, profile and family foundation are ready.
-        </p>
-      </section>
+        {isParent ? <FamilySummaryCard members={family.data ?? []} isLoading={family.isLoading} /> : null}
+      </div>
     </AppShell>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="wazen-panel p-6">
-      <span className="wazen-label">{label}</span>
-      <p className="mt-3 text-2xl">{value}</p>
-    </div>
   );
 }
