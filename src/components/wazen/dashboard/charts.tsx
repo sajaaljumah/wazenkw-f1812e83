@@ -53,7 +53,7 @@ export function SpendingByCategoryCard({
                 <Tooltip
                   formatter={(value) => formatMoney(Number(value), currency)}
                   contentStyle={{
-                    borderRadius: "1rem",
+                    borderRadius: "0.625rem",
                     border: "1px solid var(--border)",
                     background: "var(--card)",
                     color: "var(--card-foreground)",
@@ -119,15 +119,15 @@ export function IncomeVsExpensesCard({
               <Tooltip
                 formatter={(value) => formatMoney(Number(value), currency)}
                 contentStyle={{
-                  borderRadius: "1rem",
+                    borderRadius: "0.625rem",
                   border: "1px solid var(--border)",
                   background: "var(--card)",
                   color: "var(--card-foreground)",
                   fontSize: "0.8rem",
                 }}
               />
-              <Bar dataKey="income" fill="var(--chart-2)" radius={[8, 8, 8, 8]} maxBarSize={16} />
-              <Bar dataKey="expenses" fill="var(--chart-1)" radius={[8, 8, 8, 8]} maxBarSize={16} />
+              <Bar dataKey="income" fill="var(--chart-2)" radius={[3, 3, 0, 0]} maxBarSize={16} />
+              <Bar dataKey="expenses" fill="var(--chart-1)" radius={[3, 3, 0, 0]} maxBarSize={16} />
             </BarChart>
           </ResponsiveContainer>
         </div>

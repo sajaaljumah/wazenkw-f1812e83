@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
@@ -46,13 +47,13 @@ function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="mx-auto flex h-20 max-w-5xl items-center px-6">
+      <header className="mx-auto flex h-20 max-w-6xl items-center border-b border-border px-5 sm:px-8">
         <Link to="/">
           <WazenMark />
         </Link>
       </header>
       <main className="mx-auto max-w-md px-4 pb-20 sm:px-6">
-        <section className="wazen-panel p-6 sm:p-9">
+        <section className="border-y border-border py-9">
           <h1 className="text-3xl">Forgot your password?</h1>
           {sent ? (
             <p className="mt-4 text-sm text-muted-foreground">
@@ -69,17 +70,18 @@ function ForgotPassword() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="mt-2 w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring/50"
+                  className="wazen-field mt-2"
                 />
               </label>
-              <button
+              <Button
                 type="submit"
                 disabled={busy}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+                size="lg"
+                className="w-full"
               >
                 {busy ? <Loader2 className="size-4 animate-spin" /> : null}
                 Send reset link
-              </button>
+              </Button>
             </form>
           )}
           <Link

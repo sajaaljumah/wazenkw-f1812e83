@@ -5,21 +5,21 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Wazen design system — Luxury Minimal / Premium Financial.
- * Warm ivory surfaces, charcoal text, bronze accent, soft shadows,
- * rounded corners everywhere. All colors are oklch semantic tokens.
+ * Wazen design system — Warm Editorial Fintech.
+ * Paper-like ivory, ink charcoal, sage, olive, taupe and champagne.
+ * Restrained radii and ruled surfaces replace generic card grids.
  */
 
 @theme inline {
-  --font-display: "Cormorant Garamond", Georgia, serif;
-  --font-sans: "Karla", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "DM Serif Display", "Noto Kufi Arabic", Georgia, serif;
+  --font-sans: "Manrope", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 6px);
-  --radius-2xl: calc(var(--radius) + 12px);
-  --radius-3xl: calc(var(--radius) + 20px);
-  --radius-4xl: calc(var(--radius) + 28px);
+  --radius-xl: calc(var(--radius) + 2px);
+  --radius-2xl: calc(var(--radius) + 6px);
+  --radius-3xl: calc(var(--radius) + 10px);
+  --radius-4xl: calc(var(--radius) + 14px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -62,38 +62,50 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --shadow-soft: 0 1px 2px oklch(0.3 0.02 70 / 4%), 0 8px 24px oklch(0.3 0.02 70 / 6%);
-  --shadow-lifted: 0 2px 4px oklch(0.3 0.02 70 / 5%), 0 18px 48px oklch(0.3 0.02 70 / 10%);
+  --color-sage: var(--sage);
+  --color-olive: var(--olive);
+  --color-taupe: var(--taupe);
+  --color-paper: var(--paper);
+  --color-ink-soft: var(--ink-soft);
+  --color-positive: var(--positive);
+  --shadow-soft: 0 1px 2px oklch(0.25 0.02 70 / 3%), 0 8px 28px oklch(0.25 0.02 70 / 5%);
+  --shadow-lifted: 0 2px 4px oklch(0.25 0.02 70 / 4%), 0 18px 46px oklch(0.25 0.02 70 / 9%);
 }
 
 :root {
-  --radius: 1rem;
-  --background: oklch(0.974 0.009 85);
-  --foreground: oklch(0.285 0.012 60);
-  --card: oklch(0.991 0.005 90);
+  --radius: 0.625rem;
+  --background: oklch(0.972 0.011 88);
+  --foreground: oklch(0.265 0.012 72);
+  --card: oklch(0.988 0.006 88);
   --card-foreground: oklch(0.285 0.012 60);
   --popover: oklch(0.991 0.005 90);
   --popover-foreground: oklch(0.285 0.012 60);
-  --primary: oklch(0.33 0.021 62);
+  --primary: oklch(0.31 0.018 72);
   --primary-foreground: oklch(0.98 0.008 88);
-  --secondary: oklch(0.945 0.014 85);
+  --secondary: oklch(0.938 0.014 92);
   --secondary-foreground: oklch(0.33 0.021 62);
   --muted: oklch(0.945 0.014 85);
   --muted-foreground: oklch(0.53 0.017 66);
-  --accent: oklch(0.925 0.032 82);
+  --accent: oklch(0.91 0.026 105);
   --accent-foreground: oklch(0.33 0.021 62);
   --destructive: oklch(0.53 0.17 26);
   --destructive-foreground: oklch(0.98 0.008 88);
-  --border: oklch(0.9 0.014 82);
-  --input: oklch(0.9 0.014 82);
-  --ring: oklch(0.68 0.07 72);
-  --gold: oklch(0.68 0.078 72);
-  --sand: oklch(0.955 0.018 84);
-  --chart-1: oklch(0.68 0.078 72);
-  --chart-2: oklch(0.6 0.06 160);
-  --chart-3: oklch(0.5 0.05 250);
-  --chart-4: oklch(0.75 0.09 60);
-  --chart-5: oklch(0.45 0.04 20);
+  --border: oklch(0.872 0.012 86);
+  --input: oklch(0.84 0.013 86);
+  --ring: oklch(0.56 0.055 142);
+  --gold: oklch(0.66 0.078 78);
+  --sand: oklch(0.946 0.02 86);
+  --sage: oklch(0.69 0.045 145);
+  --olive: oklch(0.56 0.05 112);
+  --taupe: oklch(0.62 0.025 65);
+  --paper: oklch(0.995 0.004 90);
+  --ink-soft: oklch(0.42 0.015 72);
+  --positive: oklch(0.52 0.072 158);
+  --chart-1: oklch(0.66 0.078 78);
+  --chart-2: oklch(0.56 0.06 153);
+  --chart-3: oklch(0.57 0.055 220);
+  --chart-4: oklch(0.68 0.075 45);
+  --chart-5: oklch(0.5 0.045 335);
   --sidebar: oklch(0.962 0.012 85);
   --sidebar-foreground: oklch(0.285 0.012 60);
   --sidebar-primary: oklch(0.33 0.021 62);
@@ -117,7 +129,7 @@
 }
 
 .dark {
-  --background: oklch(0.22 0.012 62);
+  --background: oklch(0.205 0.011 72);
   --foreground: oklch(0.95 0.008 86);
   --card: oklch(0.265 0.014 62);
   --card-foreground: oklch(0.95 0.008 86);
@@ -138,6 +150,12 @@
   --ring: oklch(0.7 0.07 72);
   --gold: oklch(0.76 0.08 74);
   --sand: oklch(0.31 0.014 62);
+  --sage: oklch(0.7 0.045 145);
+  --olive: oklch(0.7 0.05 112);
+  --taupe: oklch(0.7 0.025 65);
+  --paper: oklch(0.275 0.013 72);
+  --ink-soft: oklch(0.76 0.012 75);
+  --positive: oklch(0.68 0.07 158);
   --sidebar: oklch(0.25 0.014 62);
   --sidebar-foreground: oklch(0.95 0.008 86);
   --sidebar-primary: oklch(0.9 0.03 82);
@@ -146,6 +164,24 @@
   --sidebar-accent-foreground: oklch(0.95 0.008 86);
   --sidebar-border: oklch(1 0 0 / 12%);
   --sidebar-ring: oklch(0.7 0.07 72);
+}
+
+.stage-teen {
+  --accent: oklch(0.91 0.035 338);
+  --gold: oklch(0.66 0.06 25);
+  --sage: oklch(0.66 0.035 285);
+  --chart-1: oklch(0.62 0.07 340);
+  --chart-2: oklch(0.58 0.055 245);
+  --chart-3: oklch(0.69 0.065 48);
+}
+
+.stage-university {
+  --accent: oklch(0.91 0.03 148);
+  --gold: oklch(0.65 0.055 105);
+  --sage: oklch(0.61 0.055 154);
+  --chart-1: oklch(0.61 0.055 154);
+  --chart-2: oklch(0.55 0.055 205);
+  --chart-3: oklch(0.62 0.035 76);
 }
 
 @layer base {
@@ -158,21 +194,45 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   h1,
   h2,
   h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--color-ring) 70%, transparent);
+    outline-offset: 3px;
+  }
+
+  html[dir="rtl"] body {
+    font-family: "Noto Sans Arabic", var(--font-sans);
+  }
+
+  html[dir="rtl"] h1,
+  html[dir="rtl"] h2,
+  html[dir="rtl"] h3 {
+    font-family: "Noto Kufi Arabic", var(--font-sans);
   }
 }
 
 @utility wazen-panel {
   background-color: var(--color-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-3xl);
-  box-shadow: var(--shadow-soft);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 1px 0 oklch(1 0 0 / 55%);
 }
 
 @utility wazen-interactive {
@@ -185,14 +245,62 @@
 
 @utility wazen-interactive-hover {
   box-shadow: var(--shadow-lifted);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 @utility wazen-label {
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-muted-foreground);
+}
+
+@utility wazen-page-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+}
+
+@utility wazen-section {
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.5rem;
+}
+
+@utility wazen-field {
+  width: 100%;
+  min-height: 2.875rem;
+  border: 1px solid var(--color-input);
+  border-radius: var(--radius-md);
+  background: var(--color-paper);
+  padding: 0.7rem 0.875rem;
+  font-size: 0.875rem;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  &:focus {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ring) 16%, transparent);
+    outline: none;
+  }
+}
+
+@utility wazen-rule-list {
+  & > * + * {
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+@utility wazen-number {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0;
+}
+
+@keyframes wazen-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@utility wazen-enter {
+  animation: wazen-enter 420ms ease-out both;
 }
 
 /* ---------------------------------------------------------------
@@ -285,6 +393,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+  .wazen-enter,
   .kid-float,
   .kid-twinkle,
   .kid-pop,

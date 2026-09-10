@@ -18,6 +18,7 @@ import {
   type LifeStage,
 } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -56,7 +57,7 @@ const signUpSchema = z.object({
 });
 
 const inputClass =
-  "w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none transition-shadow placeholder:text-muted-foreground/70 focus:ring-2 focus:ring-ring/50";
+  "wazen-field placeholder:text-muted-foreground/70";
 
 function Field({
   label,
@@ -172,7 +173,7 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="mx-auto flex h-20 max-w-5xl items-center justify-between px-6">
+      <header className="mx-auto flex h-20 max-w-6xl items-center justify-between border-b border-border px-5 sm:px-8">
         <Link to="/">
           <WazenMark />
         </Link>
@@ -185,8 +186,8 @@ function AuthPage() {
         </Link>
       </header>
 
-      <main className="mx-auto grid max-w-5xl gap-6 px-4 pb-20 sm:px-6 lg:grid-cols-[1.4fr_1fr]">
-        <section className="wazen-panel p-6 sm:p-10">
+      <main className="mx-auto grid max-w-6xl px-5 pb-20 sm:px-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.8fr)]">
+        <section className="py-10 lg:border-e lg:border-border lg:pe-12">
           <h1 className="text-3xl sm:text-4xl">
             {mode === "signin" ? "Welcome back" : "Create your Wazen account"}
           </h1>
@@ -278,19 +279,20 @@ function AuthPage() {
                 <Field label="Gender (cannot be changed later)" error={errors['gender']}>
                   <div className="flex gap-2">
                     {(["female", "male"] as const).map((value) => (
-                      <button
+                        <Button
                         key={value}
                         type="button"
                         onClick={() => set("gender", value)}
-                        className={cn(
-                          "flex-1 rounded-2xl border px-4 py-3 text-sm capitalize transition-colors",
+                          variant={form.gender === value ? "default" : "outline"}
+                          className={cn(
+                            "flex-1 capitalize",
                           form.gender === value
-                            ? "border-transparent bg-primary text-primary-foreground"
-                            : "border-input hover:bg-secondary",
+                              ? ""
+                              : "",
                         )}
                       >
                         {value}
-                      </button>
+                        </Button>
                     ))}
                   </div>
                 </Field>
@@ -298,7 +300,7 @@ function AuthPage() {
 
               <Field label="Life stage" error={errors['life_stage']}>
                 {autoStage ? (
-                  <div className="rounded-2xl border border-input bg-secondary/60 px-4 py-3 text-sm">
+                  <div className="rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm">
                     {LIFE_STAGE_LABELS[autoStage]} — set automatically from age.
                     <span className="mt-1 block text-xs text-muted-foreground">
                       A parent or guardian will need to link this account to their own.
@@ -357,7 +359,7 @@ function AuthPage() {
           )}
         </section>
 
-        <aside className="wazen-panel h-fit p-6 sm:p-8">
+        <aside className="py-10 lg:ps-10">
           <div className="flex items-center gap-2">
             <Sparkles className="size-4 text-gold" strokeWidth={1.5} />
             <h2 className="text-lg">Explore Wazen</h2>
@@ -365,9 +367,9 @@ function AuthPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Pick a demo account to fill the sign-in form, then press Sign in.
           </p>
-          <div className="mt-5 space-y-2">
+          <div className="mt-5 wazen-rule-list border-y border-border">
             {DEMO_ACCOUNTS.map((account) => (
-              <button
+              <Button
                 key={account.email}
                 type="button"
                 onClick={() => {
@@ -380,7 +382,8 @@ function AuthPage() {
                   if (mode !== "signin") navigate({ to: "/auth", search: { mode: "signin" } });
                   toast.success(`${account.name} loaded — press Sign in`);
                 }}
-                className="flex w-full items-center justify-between gap-3 rounded-2xl border border-border px-4 py-3 text-left text-sm transition-colors hover:bg-secondary"
+                variant="ghost"
+                className="h-auto w-full justify-between rounded-none px-1 py-3.5 text-start text-sm font-normal"
               >
                 <span>
                   {account.name}
@@ -388,7 +391,7 @@ function AuthPage() {
                     {LIFE_STAGE_LABELS[account.life_stage]} · {account.note}
                   </span>
                 </span>
-              </button>
+              </Button>
             ))}
           </div>
         </aside>
@@ -399,14 +402,15 @@ function AuthPage() {
 
 function SubmitButton({ busy, children }: { busy: boolean; children: React.ReactNode }) {
   return (
-    <button
+    <Button
       type="submit"
       disabled={busy}
-      className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground shadow-[var(--shadow-soft)] transition-opacity hover:opacity-90 disabled:opacity-60"
+      size="lg"
+      className="w-full"
     >
       {busy ? <Loader2 className="size-4 animate-spin" /> : null}
       {children}
-    </button>
+    </Button>
   );
 }
 

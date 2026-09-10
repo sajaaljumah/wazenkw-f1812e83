@@ -16,6 +16,7 @@ export function useSession() {
       setLoading(false);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
+      if (!active) return;
       setSession(next);
       setLoading(false);
     });
@@ -34,10 +35,11 @@ export function useProfile() {
     queryKey: ["profile", user?.id],
     enabled: !loading && !!user,
     queryFn: async (): Promise<Profile | null> => {
+      if (!user) return null;
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", user!.id)
+        .eq("id", user.id)
         .maybeSingle();
       if (error) throw error;
       return data as Profile | null;

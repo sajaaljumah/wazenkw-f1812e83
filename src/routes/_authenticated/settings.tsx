@@ -19,13 +19,14 @@ import {
   type LifeStage,
 } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
 const inputClass =
-  "w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring/50";
+  "wazen-field";
 
 function SettingsPage() {
   const queryClient = useQueryClient();
@@ -69,11 +70,12 @@ function SettingsPage() {
   const stageLocked = lifeStageForAge(age) !== null;
 
   async function save() {
+    if (!profile) return;
     if (fullName.trim().length < 2) {
       toast.error("Enter your first name");
       return;
     }
-    const stage = (stageLocked ? profile!.life_stage : lifeStage) as LifeStage;
+    const stage = (stageLocked ? profile.life_stage : lifeStage) as LifeStage;
     setBusy(true);
     const { error } = await supabase
       .from("profiles")
@@ -85,7 +87,7 @@ function SettingsPage() {
         base_currency: currency,
         theme,
       })
-      .eq("id", profile!.id);
+      .eq("id", profile.id);
     setBusy(false);
     if (error) {
       toast.error(error.message);
@@ -117,9 +119,10 @@ function SettingsPage() {
 
   return (
     <AppShell>
-      <h1 className="text-3xl sm:text-4xl">Settings</h1>
+      <p className="wazen-label">Account controls</p>
+      <h1 className="wazen-page-title mt-3">Settings</h1>
 
-      <section className="mt-6 wazen-panel p-7 sm:p-9">
+      <section className="mt-8 max-w-3xl border-t border-border pt-7">
         <h2 className="text-xl">Account</h2>
         <div className="mt-6 space-y-5">
           <label className="block">
@@ -138,7 +141,7 @@ function SettingsPage() {
           <label className="block">
             <span className="wazen-label">Life stage</span>
             {stageLocked ? (
-              <div className="mt-2 rounded-2xl border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground">
+              <div className="mt-2 rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground">
                 {LIFE_STAGE_LABELS[profile.life_stage]} — set automatically from your age ({age}).
               </div>
             ) : (
@@ -158,7 +161,7 @@ function SettingsPage() {
         </div>
       </section>
 
-      <section className="mt-6 wazen-panel p-7 sm:p-9">
+      <section className="mt-10 max-w-3xl border-t border-border pt-7">
         <h2 className="text-xl">Preferences</h2>
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           <label className="block">
@@ -193,34 +196,30 @@ function SettingsPage() {
             <span className="wazen-label">Appearance</span>
             <div className="mt-2 flex gap-2">
               {(["light", "dark"] as const).map((value) => (
-                <button
+                <Button
                   key={value}
                   type="button"
                   onClick={() => setTheme(value)}
-                  className={cn(
-                    "flex-1 rounded-2xl border px-4 py-3 text-sm capitalize transition-colors",
-                    theme === value
-                      ? "border-transparent bg-primary text-primary-foreground"
-                      : "border-input hover:bg-secondary",
-                  )}
+                  variant={theme === value ? "default" : "outline"}
+                  className="flex-1 capitalize"
                 >
                   {value} mode
-                </button>
+                </Button>
               ))}
             </div>
           </div>
         </div>
-        <button
+        <Button
           onClick={save}
           disabled={busy}
-          className="mt-7 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="mt-7"
         >
           {busy ? <Loader2 className="size-4 animate-spin" /> : null}
           Save settings
-        </button>
+        </Button>
       </section>
 
-      <section className="mt-6 wazen-panel p-7 sm:p-9">
+      <section className="mt-10 max-w-3xl border-t border-border pt-7">
         <h2 className="text-xl">Security</h2>
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           <label className="block">
@@ -245,21 +244,20 @@ function SettingsPage() {
           </label>
         </div>
         <div className="mt-7 flex flex-wrap gap-3">
-          <button
+          <Button
             onClick={changePassword}
             disabled={pwBusy}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
           >
             {pwBusy ? <Loader2 className="size-4 animate-spin" /> : null}
             Change password
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={signOut}
-            className="inline-flex items-center gap-2 rounded-full border border-border px-7 py-3 text-sm transition-colors hover:bg-secondary"
+            variant="outline"
           >
             <LogOut className="size-4" strokeWidth={1.5} />
             Sign out
-          </button>
+          </Button>
         </div>
       </section>
     </AppShell>
@@ -273,7 +271,7 @@ function Locked({ label, value }: { label: string; value: string }) {
         <Lock className="size-3" strokeWidth={1.75} />
         {label}
       </span>
-      <div className="mt-2 rounded-2xl border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground">
+      <div className="mt-2 rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground">
         {value}
       </div>
     </div>

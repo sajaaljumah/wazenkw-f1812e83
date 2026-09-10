@@ -1,8 +1,10 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { LayoutDashboard, LogOut, Settings, Sparkles, User } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
+import { Button } from "@/components/ui/button";
+import { WazenLocaleProvider } from "@/components/wazen/WazenLocale";
 import { firstNameOf } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +17,7 @@ const NAV = [
 
 export function WazenMark({ className }: { className?: string }) {
   return (
-    <span className={cn("font-display text-2xl tracking-tight", className)} style={{ fontFamily: "var(--font-display)" }}>
+    <span className={cn("font-display text-2xl", className)}>
       Wazen
       <span className="text-gold">.</span>
     </span>
@@ -26,37 +28,55 @@ export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const signOut = useSignOut();
   const { data: profile } = useProfile();
+  const isArabic = profile?.language === "ar";
+
+  useEffect(() => {
+    document.documentElement.lang = isArabic ? "ar" : "en";
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+    document.documentElement.classList.toggle("dark", profile?.theme === "dark");
+    return () => {
+      document.documentElement.lang = "en";
+      document.documentElement.dir = "ltr";
+      document.documentElement.classList.remove("dark");
+    };
+  }, [isArabic, profile?.theme]);
+
+  const labels = isArabic
+    ? { Dashboard: "الرئيسية", Plan: "الاشتراك", Profile: "الملف الشخصي", Settings: "الإعدادات", signOut: "تسجيل الخروج" }
+    : { Dashboard: "Overview", Plan: "Plan", Profile: "Profile", Settings: "Settings", signOut: "Sign out" };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-20 border-b border-border/70 bg-background/85 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link to="/dashboard" className="shrink-0">
-            <WazenMark />
-          </Link>
-          <nav className="hidden items-center gap-1 sm:flex">
+    <div className={cn("min-h-screen bg-background", profile?.life_stage === "teenager" && "stage-teen", profile?.life_stage === "university_student" && "stage-university")}>
+      <header className="sticky top-0 z-30 border-b border-border bg-background/92 backdrop-blur-md">
+        <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-8">
+            <Link to="/dashboard" className="shrink-0" aria-label="Wazen overview">
+              <WazenMark />
+            </Link>
+            <nav className="hidden items-center gap-6 sm:flex" aria-label="Primary navigation">
             {NAV.map(({ to, label, icon: Icon }) => (
               <Link
                 key={to}
                 to={to}
                 className={cn(
-                  "flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-colors",
+                  "relative flex h-[4.5rem] items-center gap-2 border-b-2 px-1 text-sm font-medium transition-colors",
                   location.pathname === to
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-secondary",
+                    ? "border-foreground text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
-                <Icon className="size-4" strokeWidth={1.5} />
-                {label}
+                <Icon className="size-4" strokeWidth={1.7} />
+                {labels[label]}
               </Link>
             ))}
-          </nav>
+            </nav>
+          </div>
           <div className="flex items-center gap-2">
             {profile ? (
               <Link
                 to="/profile"
                 title={`${firstNameOf(profile.full_name)} — view profile`}
-                className="wazen-interactive rounded-full outline-none hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
+                className="wazen-interactive rounded-full outline-hidden hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
               >
                 <WazenAvatar
                   fullName={profile.full_name}
@@ -67,32 +87,36 @@ export function AppShell({ children }: { children: ReactNode }) {
                 />
               </Link>
             ) : null}
-            <button
+            <Button
               onClick={signOut}
-              className="flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:outline-none"
+              variant="ghost"
+              size="icon"
+              title={labels.signOut}
+              aria-label={labels.signOut}
             >
               <LogOut className="size-4" strokeWidth={1.5} />
-              <span className="hidden sm:inline">Sign out</span>
-            </button>
+            </Button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 pb-28 pt-8 sm:px-6 sm:pb-12">{children}</main>
+      <WazenLocaleProvider language={profile?.language}>
+        <main className="mx-auto max-w-6xl px-4 pb-28 pt-7 sm:px-6 sm:pb-14 sm:pt-10 lg:px-8">{children}</main>
+      </WazenLocaleProvider>
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border/70 bg-background/95 backdrop-blur sm:hidden">
-        <div className="flex items-stretch justify-around">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/96 pb-[env(safe-area-inset-bottom)] backdrop-blur-md sm:hidden" aria-label="Mobile navigation">
+        <div className="mx-auto flex max-w-md items-stretch justify-around">
           {NAV.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}
               className={cn(
-                "flex flex-1 flex-col items-center gap-1 py-3 text-xs",
-                location.pathname === to ? "text-foreground" : "text-muted-foreground",
+                "relative flex min-h-16 flex-1 flex-col items-center justify-center gap-1 py-2 text-[0.6875rem] font-medium",
+                location.pathname === to ? "text-foreground after:absolute after:top-0 after:h-0.5 after:w-8 after:bg-foreground" : "text-muted-foreground",
               )}
             >
               <Icon className="size-5" strokeWidth={1.5} />
-              {label}
+              {labels[label]}
             </Link>
           ))}
         </div>

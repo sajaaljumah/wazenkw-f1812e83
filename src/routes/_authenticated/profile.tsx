@@ -17,13 +17,14 @@ import {
   firstNameOf,
 } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
 });
 
 const inputClass =
-  "w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring/50";
+  "wazen-field";
 
 function ProfilePage() {
   const queryClient = useQueryClient();
@@ -51,6 +52,7 @@ function ProfilePage() {
   }
 
   async function save() {
+    if (!profile) return;
     if (firstNameOf(fullName).length < 2) {
       toast.error("Enter your first name");
       return;
@@ -64,7 +66,7 @@ function ProfilePage() {
         language,
         base_currency: currency,
       })
-      .eq("id", profile!.id);
+      .eq("id", profile.id);
     setBusy(false);
     if (error) {
       toast.error(error.message);
@@ -76,9 +78,10 @@ function ProfilePage() {
 
   return (
     <AppShell>
-      <h1 className="text-3xl sm:text-4xl">Profile</h1>
+      <p className="wazen-label">Your identity</p>
+      <h1 className="wazen-page-title mt-3">Profile</h1>
 
-      <section className="mt-6 wazen-panel flex flex-col items-center gap-5 p-7 sm:flex-row sm:p-9">
+      <section className="mt-8 flex flex-col items-center gap-5 border-y border-border py-7 sm:flex-row">
         <WazenAvatar
           fullName={profile.full_name}
           gender={profile.gender}
@@ -86,7 +89,7 @@ function ProfilePage() {
           avatarUrl={profile.avatar_url}
           size={80}
         />
-        <div className="text-center sm:text-left">
+        <div className="text-center sm:text-start">
           <p className="text-2xl">{firstNameOf(profile.full_name)}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {LIFE_STAGE_LABELS[profile.life_stage]} · {ACCOUNT_TYPE_LABELS[profile.account_type]}
@@ -94,14 +97,14 @@ function ProfilePage() {
         </div>
       </section>
 
-      <section className="mt-6 grid gap-5 sm:grid-cols-2">
+      <section className="mt-8 grid border-y border-border sm:grid-cols-2">
         <LockedField label="Date of birth" value={profile.date_of_birth} />
         <LockedField label="Age (calculated automatically)" value={`${calculateAge(profile.date_of_birth)} years`} />
         <LockedField label="Gender" value={GENDER_LABELS[profile.gender]} />
         <LockedField label="Account type" value={ACCOUNT_TYPE_LABELS[profile.account_type]} />
       </section>
 
-      <section className="mt-6 wazen-panel p-7 sm:p-9">
+      <section className="mt-10 max-w-3xl border-t border-border pt-7">
         <h2 className="text-xl">Editable details</h2>
         <div className="mt-6 space-y-5">
           <label className="block">
@@ -155,14 +158,13 @@ function ProfilePage() {
               </select>
             </label>
           </div>
-          <button
+          <Button
             onClick={save}
             disabled={busy}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
           >
             {busy ? <Loader2 className="size-4 animate-spin" /> : null}
             Save changes
-          </button>
+          </Button>
         </div>
       </section>
     </AppShell>
@@ -171,7 +173,7 @@ function ProfilePage() {
 
 function LockedField({ label, value }: { label: string; value: string }) {
   return (
-    <div className="wazen-panel p-6">
+    <div className="border-b border-border px-1 py-5 odd:sm:border-e odd:sm:pe-6 even:sm:ps-6 sm:[&:nth-last-child(-n+2)]:border-b-0">
       <span className="wazen-label flex items-center gap-1.5">
         <Lock className="size-3" strokeWidth={1.75} />
         {label}

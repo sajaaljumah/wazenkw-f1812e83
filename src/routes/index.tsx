@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, LineChart, ShieldCheck, Sprout } from "lucide-react";
 import { WazenMark } from "@/components/wazen/AppShell";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -44,50 +45,60 @@ const PILLARS = [
 
 function Landing() {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="mx-auto flex h-20 max-w-5xl items-center justify-between px-6">
+    <div className="min-h-screen overflow-hidden bg-background">
+      <header className="mx-auto flex h-20 max-w-6xl items-center justify-between border-b border-border px-5 sm:px-8">
         <WazenMark />
-        <Link
-          to="/auth"
+        <Button asChild variant="ghost">
+          <Link to="/auth"
             search={{ mode: "signin" as const }}
-          className="rounded-full border border-border px-5 py-2 text-sm text-foreground transition-colors hover:bg-secondary"
-        >
-          Sign in
-        </Link>
+          >Sign in</Link>
+        </Button>
       </header>
 
-      <main className="mx-auto max-w-5xl px-6 pb-24">
-        <section className="pt-10 sm:pt-20">
+      <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
+        <section className="relative grid min-h-[62vh] items-end border-b border-border py-14 sm:min-h-[68vh] sm:py-20">
+          <div className="absolute inset-y-0 end-0 hidden w-2/5 border-s border-border lg:block" aria-hidden="true">
+            <div className="grid h-full grid-cols-3">
+              <span className="border-e border-border/70" />
+              <span className="border-e border-border/70" />
+            </div>
+            <div className="absolute inset-x-0 top-1/3 border-t border-border/70" />
+            <div className="absolute inset-x-0 top-2/3 border-t border-border/70" />
+            <div className="absolute bottom-10 end-10 font-display text-8xl text-gold/25">W.</div>
+          </div>
+          <div className="relative max-w-3xl wazen-enter">
           <p className="wazen-label">Personal finance & financial education</p>
-          <h1 className="mt-5 max-w-2xl text-4xl leading-tight sm:text-6xl">
-            Balance your money with quiet confidence.
-          </h1>
+          <h1 className="mt-5 text-6xl leading-[0.92] sm:text-8xl">Wazen.</h1>
+          <p className="mt-6 max-w-2xl font-display text-3xl leading-tight sm:text-5xl">Balance your money with quiet confidence.</p>
           <p className="mt-6 max-w-xl text-lg text-muted-foreground">
             Wazen brings clarity to saving, spending and learning — for you and for the whole
             family.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
-            <Link
+            <Button asChild size="lg">
+              <Link
               to="/auth"
               search={{ mode: "signup" as const }}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground shadow-[var(--shadow-soft)] transition-opacity hover:opacity-90"
             >
               Create your account
               <ArrowRight className="size-4" strokeWidth={1.5} />
-            </Link>
-            <Link
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link
               to="/auth"
-            search={{ mode: "signin" as const }}
-              className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm transition-colors hover:bg-secondary"
+              search={{ mode: "signin" as const }}
             >
               Explore a demo account
-            </Link>
+              </Link>
+            </Button>
+          </div>
           </div>
         </section>
 
-        <section className="mt-20 grid gap-5 sm:grid-cols-3">
+        <section className="grid sm:grid-cols-3">
           {PILLARS.map(({ icon: Icon, title, body }) => (
-            <article key={title} className="wazen-panel p-7">
+            <article key={title} className="border-b border-border py-9 sm:border-b-0 sm:border-e sm:px-8 sm:first:ps-0 sm:last:border-e-0 sm:last:pe-0">
               <Icon className="size-6 text-gold" strokeWidth={1.25} />
               <h2 className="mt-5 text-xl">{title}</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{body}</p>
