@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/wazen/AppShell";
 import { PremiumBadge } from "@/components/wazen/subscription/PremiumGate";
 import { useSubscriptionAccess } from "@/hooks/use-subscription";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { openBillingPortal, startPremiumUpgrade } from "@/lib/subscription.functions";
 import {
   FAMILY_PLAN_HIGHLIGHTS,
@@ -15,9 +16,7 @@ import {
   INDIVIDUAL_PLAN_HIGHLIGHTS,
   KIND_LABELS,
   PERIOD_LABELS,
-  PLAN_LABELS,
   PREMIUM_FEATURES,
-  STATUS_LABELS,
   computeFamilyTotal,
   findPrice,
   formatMoney,
@@ -47,9 +46,27 @@ export const Route = createFileRoute("/_authenticated/subscription")({
   }),
 });
 
+type Translate = (key: "statusActive" | "statusInactive" | "statusCancelled" | "statusPastDue" | "statusTrialing") => string;
+
+function statusLabel(status: string, t: Translate): string {
+  switch (status) {
+    case "active":
+      return t("statusActive");
+    case "trialing":
+      return t("statusTrialing");
+    case "cancelled":
+      return t("statusCancelled");
+    case "past_due":
+      return t("statusPastDue");
+    default:
+      return t("statusInactive");
+  }
+}
+
 function SubscriptionPage() {
   const { entitlements, isPremium, isLoading, refetch, canSubscribe, canManageBilling, family } =
     useSubscriptionAccess();
+  const { t } = useWazenLocale();
   const upgrade = useServerFn(startPremiumUpgrade);
   const manage = useServerFn(openBillingPortal);
   const [busy, setBusy] = useState<"upgrade" | "manage" | null>(null);
@@ -116,9 +133,9 @@ function SubscriptionPage() {
     <AppShell>
       <div className="space-y-10 wazen-enter">
         <section className="border-b border-border pb-9">
-          <p className="wazen-label">Your plan</p>
+          <p className="wazen-label">{t("yourPlan")}</p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl sm:text-4xl">{PLAN_LABELS[entitlements.plan]}</h1>
+            <h1 className="text-3xl sm:text-4xl">{entitlements.plan === "premium" ? t("premium") : t("free")}</h1>
             {isPremium ? <PremiumBadge /> : null}
             <span
               className={cn(
@@ -128,7 +145,7 @@ function SubscriptionPage() {
                   : "bg-secondary text-muted-foreground",
               )}
             >
-              {STATUS_LABELS[entitlements.status]}
+              {statusLabel(entitlements.status, t)}
             </span>
             {entitlements.subscriptionKind ? (
               <span className="rounded-md bg-secondary px-2.5 py-1 text-xs text-muted-foreground">
@@ -149,15 +166,15 @@ function SubscriptionPage() {
           </p>
           <dl className="mt-7 grid gap-5 sm:grid-cols-3">
             <div>
-              <dt className="wazen-label">Started</dt>
+              <dt className="wazen-label">{t("started")}</dt>
               <dd className="mt-2 text-sm">{formatPlanDate(entitlements.startedAt)}</dd>
             </div>
             <div>
-              <dt className="wazen-label">Renews</dt>
+              <dt className="wazen-label">{t("renews")}</dt>
               <dd className="mt-2 text-sm">{formatPlanDate(entitlements.renewalAt)}</dd>
             </div>
             <div>
-              <dt className="wazen-label">Trial ends</dt>
+              <dt className="wazen-label">{t("trialEnds")}</dt>
               <dd className="mt-2 text-sm">{formatPlanDate(entitlements.trialEndsAt)}</dd>
             </div>
           </dl>
@@ -170,7 +187,7 @@ function SubscriptionPage() {
                     disabled={busy === "manage"}
                     variant="outline"
                   >
-                    {busy === "manage" ? "Opening…" : "Manage subscription"}
+                    {busy === "manage" ? "…" : t("manageSubscription")}
                   </Button>
                 ) : null
               ) : (
@@ -180,8 +197,8 @@ function SubscriptionPage() {
                 >
                   <Sparkles className="size-4" strokeWidth={1.5} />
                   {busy === "upgrade"
-                    ? "Preparing…"
-                    : `Upgrade — ${formatMoney(
+                    ? "…"
+                    : `${t("upgrade")} — ${formatMoney(
                         isFamily ? familyMoney.total : (individualPrice?.amount ?? 0),
                         isFamily ? familyMoney.currency : (individualPrice?.currency ?? "KWD"),
                       )}/${PERIOD_LABELS[entitlements.billingPeriod ?? "monthly"]}`}
@@ -241,7 +258,7 @@ function SubscriptionPage() {
 
         <div className="grid border-y border-border lg:grid-cols-2">
           <section className="border-b border-border py-7 lg:border-b-0 lg:border-e lg:pe-8">
-            <p className="wazen-label">Free</p>
+            <p className="wazen-label">{t("free")}</p>
             <h2 className="mt-3 text-xl">Everything you use today</h2>
             <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
               {FREE_PLAN_HIGHLIGHTS.map((item) => (
@@ -255,7 +272,7 @@ function SubscriptionPage() {
 
           <section className="py-7 lg:ps-8">
             <div className="flex items-center justify-between gap-3">
-              <p className="wazen-label">Premium</p>
+              <p className="wazen-label">{t("premium")}</p>
               <PremiumBadge />
             </div>
             <h2 className="mt-3 text-xl">Wazen at full depth</h2>

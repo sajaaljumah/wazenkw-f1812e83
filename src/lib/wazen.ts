@@ -64,10 +64,13 @@ export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
   parent: "Parent / Guardian account",
 };
 
+/** Arabic first: it is Wazen's default language. */
 export const LANGUAGES = [
-  { value: "en", label: "English" },
   { value: "ar", label: "العربية (Arabic)" },
+  { value: "en", label: "English" },
 ];
+
+export const DEFAULT_LANGUAGE = "ar";
 
 export const CURRENCIES = [
   { value: "KWD", label: "KWD — Kuwaiti Dinar" },

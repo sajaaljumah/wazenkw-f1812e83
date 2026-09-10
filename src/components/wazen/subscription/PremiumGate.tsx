@@ -2,11 +2,13 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Lock, Sparkles } from "lucide-react";
 import { useSubscriptionAccess } from "@/hooks/use-subscription";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { FEATURE_DESCRIPTIONS, FEATURE_LABELS, type PremiumFeature } from "@/lib/subscription";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export function PremiumBadge({ className }: { className?: string }) {
+  const { t } = useWazenLocale();
   return (
     <span
       className={cn(
@@ -15,7 +17,7 @@ export function PremiumBadge({ className }: { className?: string }) {
       )}
     >
       <Sparkles className="size-3.5" strokeWidth={1.5} />
-      Premium
+      {t("premium")}
     </span>
   );
 }

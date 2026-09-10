@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { WazenFooter } from "@/components/wazen/WazenFooter";
+import { AppLocaleProvider } from "@/components/wazen/WazenLocale";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
@@ -146,10 +147,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthSync queryClient={queryClient} />
-      <Toaster position="top-center" />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <WazenFooter />
+      <AppLocaleProvider>
+        <Toaster position="top-center" />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <WazenFooter />
+      </AppLocaleProvider>
     </QueryClientProvider>
   );
 }

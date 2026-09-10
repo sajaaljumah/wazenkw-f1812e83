@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, LineChart, ShieldCheck, Sprout } from "lucide-react";
 import { WazenMark } from "@/components/wazen/AppShell";
+import { LanguageToggle } from "@/components/wazen/LanguageToggle";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -26,33 +28,25 @@ export const Route = createFileRoute("/")({
 });
 
 const PILLARS = [
-  {
-    icon: Sprout,
-    title: "Built for every life stage",
-    body: "Children, teenagers, university students, employees and the self-employed each get an experience that fits.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Private by design",
-    body: "Your profile and family links are protected at the database level, not just in the interface.",
-  },
-  {
-    icon: LineChart,
-    title: "Habits, not spreadsheets",
-    body: "Gentle guidance and financial education that grows with you over time.",
-  },
-];
+  { icon: Sprout, title: "pillarStagesTitle", body: "pillarStagesBody" },
+  { icon: ShieldCheck, title: "pillarPrivacyTitle", body: "pillarPrivacyBody" },
+  { icon: LineChart, title: "pillarHabitsTitle", body: "pillarHabitsBody" },
+] as const;
 
 function Landing() {
+  const { t } = useWazenLocale();
   return (
     <div className="min-h-screen overflow-hidden bg-background">
       <header className="mx-auto flex h-20 max-w-6xl items-center justify-between border-b border-border px-5 sm:px-8">
         <WazenMark />
-        <Button asChild variant="ghost">
-          <Link to="/auth"
-            search={{ mode: "signin" as const }}
-          >Sign in</Link>
-        </Button>
+        <div className="flex items-center gap-1">
+          <LanguageToggle />
+          <Button asChild variant="ghost">
+            <Link to="/auth"
+              search={{ mode: "signin" as const }}
+            >{t("signIn")}</Link>
+          </Button>
+        </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
@@ -67,20 +61,17 @@ function Landing() {
             <div className="absolute bottom-10 end-10 font-display text-8xl text-gold/25">W.</div>
           </div>
           <div className="relative max-w-3xl wazen-enter">
-          <p className="wazen-label">Personal finance & financial education</p>
+          <p className="wazen-label">{t("landingEyebrow")}</p>
           <h1 className="mt-5 text-6xl leading-[0.92] sm:text-8xl">Wazen.</h1>
-          <p className="mt-6 max-w-2xl font-display text-3xl leading-tight sm:text-5xl">Balance your money with quiet confidence.</p>
-          <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-            Wazen brings clarity to saving, spending and learning — for you and for the whole
-            family.
-          </p>
+          <p className="mt-6 max-w-2xl font-display text-3xl leading-tight sm:text-5xl">{t("landingTagline")}</p>
+          <p className="mt-6 max-w-xl text-lg text-muted-foreground">{t("landingBody")}</p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Button asChild size="lg">
               <Link
               to="/auth"
               search={{ mode: "signup" as const }}
             >
-              Create your account
+              {t("createAccount")}
               <ArrowRight className="size-4" strokeWidth={1.5} />
               </Link>
             </Button>
@@ -89,7 +80,7 @@ function Landing() {
               to="/auth"
               search={{ mode: "signin" as const }}
             >
-              Explore a demo account
+              {t("exploreDemo")}
               </Link>
             </Button>
           </div>
@@ -100,8 +91,8 @@ function Landing() {
           {PILLARS.map(({ icon: Icon, title, body }) => (
             <article key={title} className="border-b border-border py-9 sm:border-b-0 sm:border-e sm:px-8 sm:first:ps-0 sm:last:border-e-0 sm:last:pe-0">
               <Icon className="size-6 text-gold" strokeWidth={1.25} />
-              <h2 className="mt-5 text-xl">{title}</h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{body}</p>
+              <h2 className="mt-5 text-xl">{t(title)}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(body)}</p>
             </article>
           ))}
         </section>

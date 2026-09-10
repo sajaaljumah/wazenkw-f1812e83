@@ -69,6 +69,7 @@ export type Database = {
           id: string
           member_role: string
           seat_kind: string
+          seat_suspended: boolean
           updated_at: string
           user_id: string
         }
@@ -78,6 +79,7 @@ export type Database = {
           id?: string
           member_role: string
           seat_kind?: string
+          seat_suspended?: boolean
           updated_at?: string
           user_id: string
         }
@@ -87,6 +89,7 @@ export type Database = {
           id?: string
           member_role?: string
           seat_kind?: string
+          seat_suspended?: boolean
           updated_at?: string
           user_id?: string
         }
