@@ -218,6 +218,60 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          cancelled_at: string | null
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          started_at: string | null
+          status: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id: string | null
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          cancelled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          cancelled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -278,6 +332,7 @@ export type Database = {
     Functions: {
       calculate_age: { Args: { dob: string }; Returns: number }
       can_monitor_child: { Args: { _child: string }; Returns: boolean }
+      has_premium_access: { Args: { _user_id: string }; Returns: boolean }
       is_guardian_of: {
         Args: { _child: string; _parent: string }
         Returns: boolean
@@ -293,6 +348,13 @@ export type Database = {
         | "employee"
         | "self_employed"
         | "parent"
+      subscription_plan: "free" | "premium"
+      subscription_status:
+        | "active"
+        | "inactive"
+        | "cancelled"
+        | "past_due"
+        | "trialing"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -429,6 +491,14 @@ export const Constants = {
         "employee",
         "self_employed",
         "parent",
+      ],
+      subscription_plan: ["free", "premium"],
+      subscription_status: [
+        "active",
+        "inactive",
+        "cancelled",
+        "past_due",
+        "trialing",
       ],
     },
   },
