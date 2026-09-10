@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      budgets: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          period_month: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          period_month: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          period_month?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       family_relationships: {
         Row: {
           child_user_id: string
@@ -61,6 +91,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      goals: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          kind: string
+          name: string
+          target_amount: number
+          target_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          kind?: string
+          name: string
+          target_amount: number
+          target_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          kind?: string
+          name?: string
+          target_amount?: number
+          target_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -110,12 +176,108 @@ export type Database = {
         }
         Relationships: []
       }
+      recurring_items: {
+        Row: {
+          active: boolean
+          amount: number
+          category: string
+          created_at: string
+          currency: string
+          day_of_month: number
+          id: string
+          kind: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          amount: number
+          category: string
+          created_at?: string
+          currency?: string
+          day_of_month: number
+          id?: string
+          kind: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          amount?: number
+          category?: string
+          created_at?: string
+          currency?: string
+          day_of_month?: number
+          id?: string
+          kind?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          currency: string
+          goal_id: string | null
+          id: string
+          kind: string
+          merchant: string | null
+          note: string | null
+          occurred_on: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          currency?: string
+          goal_id?: string | null
+          id?: string
+          kind: string
+          merchant?: string | null
+          note?: string | null
+          occurred_on?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          currency?: string
+          goal_id?: string | null
+          id?: string
+          kind?: string
+          merchant?: string | null
+          note?: string | null
+          occurred_on?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       calculate_age: { Args: { dob: string }; Returns: number }
+      can_monitor_child: { Args: { _child: string }; Returns: boolean }
       is_guardian_of: {
         Args: { _child: string; _parent: string }
         Returns: boolean
