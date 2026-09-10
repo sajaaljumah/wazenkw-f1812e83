@@ -33,6 +33,7 @@ import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { formatDate, formatMoney, inMonth, monthKey, savedForGoal, totalsFor } from "@/lib/finance";
 import type { Goal, Transaction } from "@/lib/finance";
 import type { DashboardData } from "../variants";
+import type { Gender } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
 
 type ActionKind = "income" | "expense" | "saving" | "goal";
@@ -135,7 +136,7 @@ export function ChildDashboard({
   data: DashboardData;
   firstName: string;
   fullName: string;
-  gender: "male" | "female" | string;
+  gender: Gender;
   avatarUrl: string | null;
 }) {
   const { currency, transactions, goals, userId } = data;
