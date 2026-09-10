@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   buildEntitlements,
+  findPrice,
   hasFeature,
   type Entitlements,
   type FamilyMemberRow,
