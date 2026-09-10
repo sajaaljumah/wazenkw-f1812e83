@@ -24,6 +24,15 @@ export type Profile = {
   updated_at: string;
 };
 
+/**
+ * Wazen never shows family names or surnames anywhere in the interface —
+ * users are always displayed by their first name.
+ */
+export function firstNameOf(name: string): string {
+  const first = name.trim().split(/\s+/)[0];
+  return first && first.length > 0 ? first : name.trim();
+}
+
 /** Age is always derived from date_of_birth — never stored. */
 export function calculateAge(dateOfBirth: string | Date): number {
   const dob = typeof dateOfBirth === "string" ? new Date(dateOfBirth) : dateOfBirth;

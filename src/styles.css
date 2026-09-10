@@ -95,6 +95,18 @@
   --sidebar-accent-foreground: oklch(0.33 0.021 62);
   --sidebar-border: oklch(0.9 0.014 82);
   --sidebar-ring: oklch(0.68 0.07 72);
+  --avatar-skin: oklch(0.86 0.045 60);
+  --avatar-hair: oklch(0.34 0.02 45);
+  --avatar-pastel-pink: oklch(0.93 0.038 12);
+  --avatar-pastel-blue: oklch(0.93 0.036 240);
+  --avatar-rose: oklch(0.85 0.05 15);
+  --avatar-blue: oklch(0.83 0.045 248);
+  --avatar-lavender: oklch(0.84 0.045 300);
+  --avatar-slate: oklch(0.66 0.025 250);
+  --avatar-sage: oklch(0.79 0.04 155);
+  --avatar-champagne: oklch(0.9 0.042 85);
+  --avatar-taupe: oklch(0.86 0.022 70);
+  --avatar-garment-dark: oklch(0.44 0.022 62);
 }
 
 .dark {
@@ -154,6 +166,19 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-3xl);
   box-shadow: var(--shadow-soft);
+}
+
+@utility wazen-interactive {
+  cursor: pointer;
+  transition:
+    box-shadow 200ms ease,
+    transform 200ms ease,
+    background-color 200ms ease;
+}
+
+@utility wazen-interactive-hover {
+  box-shadow: var(--shadow-lifted);
+  transform: translateY(-2px);
 }
 
 @utility wazen-label {
