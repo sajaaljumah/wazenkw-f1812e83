@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, Sparkles, Users } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/wazen/AppShell";
 import { PremiumBadge } from "@/components/wazen/subscription/PremiumGate";
 import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
-import { openBillingPortal, startPremiumUpgrade } from "@/lib/subscription.functions";
+import { cancelPremiumSubscription, startPremiumUpgrade } from "@/lib/subscription.functions";
 import {
   FAMILY_PLAN_HIGHLIGHTS,
   FEATURE_DESCRIPTIONS,
