@@ -235,7 +235,7 @@ function SettingsPage() {
                 <Button
                   key={value}
                   type="button"
-                  onClick={() => setTheme(value)}
+                  onClick={() => void chooseTheme(value)}
                   variant={theme === value ? "default" : "outline"}
                   className="flex-1"
                 >
