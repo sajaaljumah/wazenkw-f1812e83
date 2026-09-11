@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/wazen/AppShell";
 import { useProfile, useSession, useSignOut } from "@/hooks/use-wazen-auth";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { applyTheme, cacheTheme } from "@/components/wazen/WazenTheme";
 import { PlanBadge } from "@/components/wazen/subscription/PlanBadge";
 import {
   ADULT_LIFE_STAGES,
@@ -58,9 +59,11 @@ function SettingsPage() {
     setTheme(profile.theme);
   }, [profile]);
 
+  // Live preview while choosing; the saved profile value stays authoritative.
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
+    applyTheme(theme);
+    if (user?.id) cacheTheme(user.id, theme);
+  }, [theme, user?.id]);
 
   if (isLoading || !profile) {
     return (

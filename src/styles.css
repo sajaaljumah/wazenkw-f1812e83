@@ -126,6 +126,15 @@
   --avatar-adult-plate: oklch(0.7 0.018 55);
   --avatar-adult-field: oklch(0.95 0.007 65);
   --avatar-adult-accent: oklch(0.28 0.012 30);
+  --logo-plate: transparent;
+  --chart-fade: oklch(1 0 0);
+  /* Child experience — "Playful Luxury": soft pastel surfaces, champagne accents. */
+  --kid-ivory: oklch(0.992 0.002 85);
+  --kid-tint: oklch(0.965 0.006 85);
+  --kid-soft: oklch(0.925 0.018 82);
+  --kid-mid: oklch(0.78 0.045 78);
+  --kid-deep: oklch(0.32 0.012 30);
+  --kid-champagne: oklch(0.72 0.075 78);
 }
 
 .dark {
@@ -169,6 +178,16 @@
   --sidebar-accent-foreground: oklch(0.94 0.02 25);
   --sidebar-border: oklch(1 0 0 / 11%);
   --sidebar-ring: oklch(0.62 0.185 26);
+  /* Child surfaces on a dark foundation: deep charcoal, champagne accents. */
+  --kid-ivory: oklch(0.262 0.008 70);
+  --kid-tint: oklch(0.232 0.007 70);
+  --kid-soft: oklch(0.355 0.015 78);
+  --kid-mid: oklch(0.6 0.045 78);
+  --kid-deep: oklch(0.9 0.012 80);
+  --kid-champagne: oklch(0.78 0.085 80);
+  /* Logo plate keeps the printed lockup readable on dark surfaces. */
+  --logo-plate: oklch(0.97 0.004 80);
+  --chart-fade: oklch(0.72 0.01 60);
 }
 
 .stage-teen {
@@ -187,6 +206,25 @@
   --chart-1: oklch(0.5 0.17 30);
   --chart-2: oklch(0.52 0.08 168);
   --chart-3: oklch(0.5 0.05 250);
+}
+
+/* Life-stage personalities keep their hue on a dark foundation. */
+.dark .stage-teen {
+  --accent: oklch(0.33 0.05 12);
+  --gold: oklch(0.68 0.17 18);
+  --sage: oklch(0.7 0.08 300);
+  --chart-1: oklch(0.68 0.17 18);
+  --chart-2: oklch(0.68 0.08 285);
+  --chart-3: oklch(0.75 0.11 45);
+}
+
+.dark .stage-university {
+  --accent: oklch(0.33 0.045 30);
+  --gold: oklch(0.66 0.16 30);
+  --sage: oklch(0.7 0.08 168);
+  --chart-1: oklch(0.66 0.16 30);
+  --chart-2: oklch(0.7 0.08 168);
+  --chart-3: oklch(0.68 0.06 250);
 }
 
 @layer base {
@@ -408,26 +446,13 @@
    Child experience — "Playful Luxury"
    Soft pastel surfaces, champagne accents, gentle motion.
    --------------------------------------------------------------- */
-:root {
-  --kid-ivory: oklch(0.992 0.002 85);
-  --kid-tint: oklch(0.965 0.006 85);
-  --kid-soft: oklch(0.925 0.018 82);
-  --kid-mid: oklch(0.78 0.045 78);
-  --kid-deep: oklch(0.32 0.012 30);
-  --kid-champagne: oklch(0.72 0.075 78);
-}
+/* Light child palette lives in :root above; dark values live in .dark. */
 
-.kid-theme {
-  --kid-tint: oklch(0.965 0.006 85);
-  --kid-soft: oklch(0.925 0.018 82);
-  --kid-mid: oklch(0.78 0.045 78);
-  --kid-deep: oklch(0.32 0.012 30);
-  --kid-champagne: oklch(0.72 0.075 78);
-}
 
 @utility kid-panel {
-  background-color: var(--color-kid-ivory);
-  border: 1px solid var(--color-kid-soft);
+  background-color: var(--kid-ivory);
+  color: var(--foreground);
+  border: 1px solid var(--kid-soft);
   border-radius: calc(var(--radius) + 6px);
   box-shadow: 0 2px 4px oklch(0.3 0.02 70 / 4%), 0 18px 40px oklch(0.3 0.02 70 / 7%);
 }

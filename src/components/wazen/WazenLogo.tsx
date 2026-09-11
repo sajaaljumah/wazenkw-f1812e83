@@ -26,7 +26,13 @@ export function WazenLogo({
   if (withWordmark) {
     return (
       <span
-        className={cn("inline-flex shrink-0 items-center justify-center", className)}
+        className={cn(
+          "inline-flex shrink-0 items-center justify-center",
+          // Dark mode: the printed lockup keeps its dark wordmark, so it sits on a
+          // light plate instead of being recoloured or inverted.
+          "dark:rounded-md dark:bg-[var(--logo-plate)] dark:px-1.5 dark:py-0.5",
+          className,
+        )}
         style={{ height: size, width: (size * SRC_W) / SRC_H }}
       >
         <img
@@ -34,7 +40,7 @@ export function WazenLogo({
           alt="Wazen"
           width={SRC_W}
           height={SRC_H}
-          className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal"
+          className="h-full w-full object-contain mix-blend-multiply"
           loading="eager"
           decoding="async"
         />
@@ -46,7 +52,11 @@ export function WazenLogo({
   const scale = size / MARK.h;
   return (
     <span
-      className={cn("relative inline-block shrink-0 overflow-hidden", className)}
+      className={cn(
+        "relative inline-block shrink-0 overflow-hidden",
+        "dark:rounded-md dark:bg-[var(--logo-plate)]",
+        className,
+      )}
       style={{ height: size, width: MARK.w * scale }}
     >
       <img
@@ -54,7 +64,7 @@ export function WazenLogo({
         alt="Wazen"
         width={SRC_W}
         height={SRC_H}
-        className="absolute mix-blend-multiply dark:mix-blend-normal"
+        className="absolute mix-blend-multiply"
         style={{
           width: SRC_W * scale,
           height: SRC_H * scale,
