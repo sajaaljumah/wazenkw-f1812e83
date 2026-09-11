@@ -14,3 +14,4 @@
 - [x] Verify scroll-triggered reveals, chart drawing, and progress animation in the live preview
 - [x] Make the live scroll reveal visibly perceptible across existing sections
 - [x] Blend the dashboard greeting area into the page background without a separate rectangle
+- [x] Blend the dusty-red brand wash into every authenticated page background

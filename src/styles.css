@@ -280,6 +280,20 @@
   box-shadow: var(--shadow-soft);
 }
 
+/* A single page-level dusty-red wash. It belongs to the canvas rather than
+   any header or card, so every authenticated screen blends into it naturally. */
+@utility wazen-app-canvas {
+  background-color: var(--color-background);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 10%, var(--color-background)) 0,
+    color-mix(in oklab, var(--color-primary) 5%, var(--color-background)) 10rem,
+    var(--color-background) 27rem
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 27rem;
+}
+
 @utility wazen-card {
   background-color: var(--color-card);
   border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
