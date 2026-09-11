@@ -43,6 +43,33 @@ function readCachedTheme(userId: string): string | null {
   }
 }
 
+export const resolveTheme = resolve;
+
+/** Theme chosen on the public screens, before anyone is signed in. */
+export function cacheGuestTheme(theme: string) {
+  try {
+    localStorage.setItem(GUEST_KEY, theme);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+export function readGuestTheme(): string | null {
+  try {
+    return localStorage.getItem(GUEST_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function clearGuestTheme() {
+  try {
+    localStorage.removeItem(GUEST_KEY);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 /**
  * Single source of truth for the active theme.
  * The preference belongs to the signed-in account: it is read from that
