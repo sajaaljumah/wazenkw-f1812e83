@@ -1,9 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
-import { ForwardIcon, ICON_STROKE, ShieldCheck as _unused } from "@/components/wazen/icons";
-import { CheckIcon, ScheduledIcon } from "@/components/wazen/icons";
-import { HandCoinsIcon } from "@/components/wazen/icons";
-import { formatMoney } from "@/lib/finance";
+import {
+  CheckIcon,
+  ForwardIcon,
+  ICON_STROKE,
+  ScheduledIcon,
+  ZakatIcon,
+} from "@/components/wazen/icons";
+
 import type { ZakatResult } from "@/lib/zakat";
 import { cn } from "@/lib/utils";
 
