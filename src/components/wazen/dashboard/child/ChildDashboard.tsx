@@ -178,15 +178,14 @@ export function ChildDashboard({
   ];
   const earnedCount = badges.filter((b) => b.earned).length;
 
-  const themeClass = gender === "female" ? "kid-female" : "kid-male";
   const recent = transactions.slice(0, 5);
 
   return (
-    <div className={cn(themeClass, "space-y-6")}>
+    <div className="kid-theme space-y-6">
       {/* Welcome */}
       <section className="kid-panel relative overflow-hidden bg-kid-tint p-7 sm:p-9">
         <KidDecorations />
-        <div className="relative flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:gap-7 sm:text-left">
+        <div className="relative grid grid-cols-1 items-center gap-5 text-center sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-7 sm:text-start">
           <span className="kid-float rounded-full bg-kid-soft/70 p-2">
             <WazenAvatar fullName={fullName} gender={gender} lifeStage="child" avatarUrl={avatarUrl} size={84} />
           </span>
@@ -200,7 +199,7 @@ export function ChildDashboard({
           <button
             type="button"
             onClick={() => setAction("saving")}
-               className="kid-press sm:ms-auto flex items-center gap-2 rounded-xl bg-kid-deep px-6 py-3 text-sm text-kid-ivory"
+             className="kid-press flex w-full items-center justify-center gap-2 rounded-xl bg-kid-deep px-6 py-3 text-sm text-kid-ivory sm:w-auto"
           >
             <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
             Save money
@@ -211,7 +210,7 @@ export function ChildDashboard({
       {/* My money */}
       <section className="space-y-4">
         <h2 className="px-1 text-xl">My money</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 min-[520px]:grid-cols-3">
           <MoneyTile
             label="Money I got"
             amount={month.income}
@@ -243,7 +242,7 @@ export function ChildDashboard({
           <button
             type="button"
             onClick={() => setSheet("goal")}
-            className="relative flex w-full flex-col items-center gap-6 text-center sm:flex-row sm:text-left"
+             className="relative flex w-full flex-col items-center gap-6 text-center sm:flex-row sm:text-start"
           >
             <span className="size-32 shrink-0 kid-float sm:size-40">
               <GoalArt />
@@ -284,7 +283,7 @@ export function ChildDashboard({
       {/* Save / Spend / Give */}
       <section className="space-y-4">
         <h2 className="px-1 text-xl">What do you want to do?</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 min-[520px]:grid-cols-3">
           <ChoiceTile
             title="Save"
             caption={`${formatMoney(all.savings, currency)} saved`}
@@ -367,7 +366,7 @@ export function ChildDashboard({
               const Icon = ACTIVITY_ICON[item.kind];
               const isOut = item.kind === "expense";
               return (
-                <li key={item.id} className="flex items-center gap-4 rounded-3xl bg-kid-tint/60 p-4">
+                <li key={item.id} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-2xl bg-kid-tint/60 p-4 min-[420px]:grid-cols-[auto_minmax(0,1fr)_auto]">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-kid-soft/80 text-kid-deep">
                     <Icon className="size-5" strokeWidth={ICON_STROKE} />
                   </span>
@@ -377,7 +376,7 @@ export function ChildDashboard({
                     </span>
                     <span className="block text-xs text-muted-foreground">{formatDate(item.occurred_on)}</span>
                   </span>
-                  <span className={cn("shrink-0 text-sm tabular-nums", isOut ? "text-kid-deep" : "text-foreground")}>
+                  <span className={cn("col-start-2 text-sm tabular-nums min-[420px]:col-start-3", isOut ? "text-kid-deep" : "text-foreground")}>
                     {isOut ? "−" : "+"}
                     {formatMoney(Number(item.amount), currency)}
                   </span>
@@ -399,7 +398,7 @@ export function ChildDashboard({
         ) : (
           <ul className="mt-5 space-y-3">
             {(parentPaid.data ?? []).slice(0, 5).map((item) => (
-              <li key={item.id} className="flex items-center gap-4 rounded-3xl bg-kid-tint/60 p-4">
+              <li key={item.id} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-2xl bg-kid-tint/60 p-4 min-[420px]:grid-cols-[auto_minmax(0,1fr)_auto]">
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-kid-soft/80 text-kid-deep">
                   <GiveIcon className="size-5" strokeWidth={ICON_STROKE} />
                 </span>
@@ -410,7 +409,7 @@ export function ChildDashboard({
                     {item.deducted_from_child ? "from your money" : "your family paid this"}
                   </span>
                 </span>
-                <span className="shrink-0 text-sm tabular-nums">
+                <span className="col-start-2 text-sm tabular-nums min-[420px]:col-start-3">
                   {formatMoney(Number(item.amount), item.currency)}
                 </span>
               </li>

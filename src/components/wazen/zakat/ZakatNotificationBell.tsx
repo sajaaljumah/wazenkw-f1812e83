@@ -35,7 +35,7 @@ export function ZakatNotificationBell({
           ) : null}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 text-sm">
+      <PopoverContent align="end" className="w-[min(20rem,calc(100vw-1rem))] text-sm">
         {!result ? (
           <p className="text-muted-foreground">…</p>
         ) : due ? (

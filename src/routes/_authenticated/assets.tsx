@@ -147,13 +147,13 @@ function AssetsPage() {
           </div>
         </section>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:gap-4 lg:grid-cols-4">
           <StatCard
             label={t("totalAssetValue")}
             amount={totals.value}
             currency={currency}
             hint={t("notSpendable")}
-            className="col-span-2 lg:col-span-1"
+            className="min-[420px]:col-span-2 lg:col-span-1"
             icon={<PortfolioIcon className="size-4" strokeWidth={ICON_STROKE} />}
           />
           <StatCard label={t("investedAmount")} amount={totals.cost} currency={currency} />
@@ -180,10 +180,10 @@ function AssetsPage() {
               description={t("noAssetsDescription")}
             />
           ) : (
-            <div className="h-56 w-full">
+            <div className="h-52 w-full min-w-0 sm:h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={series} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={11} />
+                  <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={10} interval="preserveStartEnd" minTickGap={24} />
                   <YAxis hide />
                   <Tooltip
                     formatter={(value) => formatMoney(Number(value), currency)}
@@ -280,9 +280,9 @@ function AssetRow({
 
   return (
     <li className="rounded-2xl border border-border bg-secondary/35 p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-base">
+       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+         <div className="min-w-0">
+           <p className="break-words text-base">
             {asset.name}
             {asset.symbol ? <span className="ms-2 text-xs text-muted-foreground">{asset.symbol}</span> : null}
           </p>
@@ -296,7 +296,7 @@ function AssetRow({
             {t("purchaseDate")}: {formatDate(asset.purchase_date)}
           </p>
         </div>
-        <div className="flex items-center gap-1">
+         <div className="flex shrink-0 items-center gap-1">
           <Button variant="ghost" size="icon" onClick={onEdit} aria-label={t("editAsset")} title={t("editAsset")}>
             <EditIcon className="size-4" strokeWidth={ICON_STROKE} />
           </Button>
@@ -312,7 +312,7 @@ function AssetRow({
         </div>
       </div>
 
-      <dl className="mt-4 grid gap-3 sm:grid-cols-4">
+       <dl className="mt-4 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
         <Cell label={t("investedAmount")} value={formatMoney(costBasis(asset), asset.currency)} />
         <Cell label={t("totalAssetValue")} value={formatMoney(marketValue(asset), asset.currency)} />
         <Cell
@@ -391,9 +391,9 @@ function Cell({
 }) {
   const toneClass = tone === "positive" ? "text-chart-2" : tone === "negative" ? "text-destructive" : "";
   return (
-    <div>
+    <div className="min-w-0">
       <dt className="wazen-label">{label}</dt>
-      <dd className={`wazen-number mt-1 inline-flex items-center gap-1.5 text-sm ${toneClass}`}>
+      <dd className={`wazen-number mt-1 flex min-w-0 items-center gap-1.5 break-words text-sm ${toneClass}`}>
         {icon}
         {value}
       </dd>

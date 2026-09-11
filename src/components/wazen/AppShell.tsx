@@ -44,31 +44,31 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className={cn("min-h-screen bg-background", profile?.life_stage === "teenager" && "stage-teen", profile?.life_stage === "university_student" && "stage-university")}>
       <header className="sticky top-0 z-30 border-b border-border/70 bg-card/85 shadow-soft backdrop-blur-xl">
-        <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center gap-8">
+        <div className="mx-auto grid h-[4.5rem] max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3 lg:gap-8">
             <Link to="/dashboard" className="shrink-0" aria-label="Wazen overview">
               <WazenMark />
             </Link>
-            <nav className="hidden items-center gap-6 sm:flex" aria-label="Primary navigation">
+            <nav className="hidden min-w-0 items-center gap-2 lg:flex xl:gap-6" aria-label="Primary navigation">
             {nav.map(({ to, label, icon: Icon }) => (
               <Link
                 key={to}
                 to={to}
                 className={cn(
-                  "relative flex h-[4.5rem] items-center gap-2 border-b-2 px-1 text-sm font-semibold transition-colors",
+                  "relative flex h-[4.5rem] min-w-0 items-center gap-1.5 border-b-2 px-1 text-xs font-semibold transition-colors xl:gap-2 xl:text-sm",
                   location.pathname === to
                     ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
                 <Icon className="size-4" strokeWidth={ICON_STROKE} />
-                {t(label)}
+                <span className="truncate">{t(label)}</span>
               </Link>
             ))}
             </nav>
           </div>
-          <div className="flex items-center gap-2">
-            <PlanBadge className="hidden sm:inline-flex" size="sm" />
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
+            <PlanBadge className="hidden lg:inline-flex" size="sm" />
             {profile ? (
               <ZakatNotificationBell lifeStage={profile.life_stage} currency={profile.base_currency} />
             ) : null}
@@ -101,24 +101,24 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       <WazenLocaleProvider language={profile?.language}>
-        <main className="mx-auto max-w-6xl px-4 pb-28 pt-7 sm:px-6 sm:pb-14 sm:pt-10 lg:px-8">{children}</main>
+        <main className="mx-auto max-w-6xl px-3 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-6 min-[375px]:px-4 sm:px-6 sm:pb-14 sm:pt-9 lg:px-8">{children}</main>
       </WazenLocaleProvider>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lifted backdrop-blur-xl sm:hidden" aria-label="Mobile navigation">
-        <div className="mx-auto flex max-w-md items-stretch justify-around">
+        <div className="mx-auto grid max-w-md grid-cols-6 items-stretch">
           {nav.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}
               className={cn(
-                "relative flex min-h-16 flex-1 flex-col items-center justify-center gap-1 py-2 text-[0.6875rem] font-semibold transition-colors",
+                "relative flex min-h-[4.25rem] min-w-0 flex-col items-center justify-center gap-1 px-0.5 py-2 text-center text-[0.625rem] font-semibold leading-tight transition-colors",
                 location.pathname === to
                   ? "text-primary after:absolute after:top-0 after:h-0.5 after:w-8 after:rounded-full after:bg-primary"
                   : "text-muted-foreground",
               )}
             >
               <Icon className="size-5" strokeWidth={ICON_STROKE} />
-              {t(label)}
+              <span className="line-clamp-2">{t(label)}</span>
             </Link>
           ))}
         </div>

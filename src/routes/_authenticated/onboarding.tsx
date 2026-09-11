@@ -247,7 +247,7 @@ function Onboarding() {
           {step === 3 ? (
             <div className="py-6 text-center">
               <p className="wazen-label">You're all set</p>
-              <h1 className="mt-4 text-4xl sm:text-5xl">
+              <h1 className="mt-4 text-2xl min-[375px]:text-3xl sm:text-5xl">
                 Welcome to Wazen, {firstNameOf(fullName)}.
               </h1>
               <p className="mx-auto mt-4 max-w-md text-muted-foreground">

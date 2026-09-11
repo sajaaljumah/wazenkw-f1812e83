@@ -61,20 +61,20 @@ export function BalanceHero({
   return (
     <section className="wazen-balance">
       <div aria-hidden className="wazen-balance-grid" />
-      <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+      <div className="relative grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] xl:items-end">
         <div className="min-w-0">
           <p className="wazen-label text-primary-foreground/65">{label}</p>
-          <p className="wazen-number mt-3 text-4xl leading-none sm:text-5xl">{formatMoney(amount, currency)}</p>
+          <p className="wazen-number mt-3 break-words text-3xl leading-none min-[375px]:text-4xl sm:text-5xl">{formatMoney(amount, currency)}</p>
           {hint ? <p className="mt-3 max-w-sm text-sm text-primary-foreground/70">{hint}</p> : null}
           {action ? <div className="mt-6">{action}</div> : null}
         </div>
-        <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-xl bg-primary-foreground/15 lg:min-w-[22rem]">
+        <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-xl bg-primary-foreground/15 min-[390px]:grid-cols-3">
           {items.map((item) => (
-            <div key={item.label} className="bg-transparent px-4 py-4">
+            <div key={item.label} className="min-w-0 bg-transparent px-3 py-4 sm:px-4">
               <dt className="text-[0.68rem] tracking-[0.14em] uppercase text-primary-foreground/60">{item.label}</dt>
               <dd
-                className={cn(
-                  "wazen-number mt-2 text-base",
+                 className={cn(
+                   "wazen-number mt-2 break-words text-sm sm:text-base",
                   item.tone === "positive"
                     ? "wazen-balance-pos"
                     : item.tone === "negative"
@@ -151,9 +151,9 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section className={cn("wazen-card", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-4">
-        <h2 className="text-xl sm:text-2xl">{title}</h2>
+    <section className={cn("wazen-card min-w-0", className)}>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border/70 pb-4">
+        <h2 className="min-w-0 text-xl sm:text-2xl">{title}</h2>
         {action}
       </div>
       <div className="mt-6">{children}</div>
