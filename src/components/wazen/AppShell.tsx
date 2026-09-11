@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { DashboardIcon, PortfolioIcon, PremiumIcon, ProfileIcon, SettingsIcon, SignOutIcon, ZakatIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { DashboardIcon, DocumentIcon, PortfolioIcon, PremiumIcon, ProfileIcon, ScheduledIcon, SettingsIcon, SignOutIcon, ZakatIcon, ICON_STROKE } from "@/components/wazen/icons";
 import type { ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -14,6 +14,8 @@ import { ZakatNotificationBell } from "@/components/wazen/zakat/ZakatNotificatio
 
 const NAV = [
   { to: "/dashboard", label: "overview", icon: DashboardIcon },
+  { to: "/recurring", label: "recurringNav", icon: ScheduledIcon },
+  { to: "/documents", label: "documentsNav", icon: DocumentIcon },
   { to: "/assets", label: "assets", icon: PortfolioIcon, adultsOnly: true },
   { to: "/zakat", label: "zakat", icon: ZakatIcon, adultsOnly: true },
   { to: "/subscription", label: "plan", icon: PremiumIcon },

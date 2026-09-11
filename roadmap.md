@@ -12,3 +12,6 @@
 - [x] Correct 320px-to-wide responsive behavior for navigation, dashboards, charts, Assets, and Zakat
 - [x] Simplify demo access while preserving all 12 accounts and seed missing Give/Zakat histories
 - [x] Complete final representative life-stage and route verification
+- [x] Keep KWD as the working currency with a swappable rate source for later
+- [x] Add full recurring commitments/subscriptions management and dashboard representation
+- [x] Add the document/photo upload, review, edit and save flow ready for a future extraction service

@@ -147,10 +147,16 @@ export function UpcomingCashFlowCard({
               className="flex items-center justify-between gap-4 py-3.5"
             >
               <div className="min-w-0">
-                <p className="truncate text-sm">{entry.name}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="truncate text-sm">{entry.name}</p>
+                  <span className="rounded-full border border-border/70 px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {t("recurringBadge")}
+                  </span>
+                </div>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  {entry.kind === "income" ? "Income" : entry.kind === "saving" ? "Saving transfer" : "Recurring expense"}{" "}
-                  · {formatDate(entry.date)}
+                  {entry.kind === "income" ? t("income") : entry.kind === "saving" ? t("savingKind") : t("expense")} ·{" "}
+                  {t(entry.frequency === "monthly" ? "monthlyFreq" : entry.frequency)} · {t("nextPayment")}:{" "}
+                  {formatDate(entry.date)}
                 </p>
               </div>
               <span

@@ -253,6 +253,78 @@ export type Database = {
           },
         ]
       }
+      financial_documents: {
+        Row: {
+          created_at: string
+          doc_type: string
+          error_message: string | null
+          extracted: Json
+          extraction_source: string
+          file_name: string | null
+          file_path: string | null
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          saved_asset_id: string | null
+          saved_transaction_id: string | null
+          status: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          doc_type?: string
+          error_message?: string | null
+          extracted?: Json
+          extraction_source?: string
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          saved_asset_id?: string | null
+          saved_transaction_id?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          doc_type?: string
+          error_message?: string | null
+          extracted?: Json
+          extraction_source?: string
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          saved_asset_id?: string | null
+          saved_transaction_id?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_documents_saved_asset_id_fkey"
+            columns: ["saved_asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_documents_saved_transaction_id_fkey"
+            columns: ["saved_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       goals: {
         Row: {
           created_at: string
@@ -375,9 +447,14 @@ export type Database = {
           created_at: string
           currency: string
           day_of_month: number
+          ends_on: string | null
+          frequency: string
           id: string
           kind: string
+          merchant: string | null
           name: string
+          note: string | null
+          start_date: string
           updated_at: string
           user_id: string
         }
@@ -388,9 +465,14 @@ export type Database = {
           created_at?: string
           currency?: string
           day_of_month: number
+          ends_on?: string | null
+          frequency?: string
           id?: string
           kind: string
+          merchant?: string | null
           name: string
+          note?: string | null
+          start_date?: string
           updated_at?: string
           user_id: string
         }
@@ -401,9 +483,14 @@ export type Database = {
           created_at?: string
           currency?: string
           day_of_month?: number
+          ends_on?: string | null
+          frequency?: string
           id?: string
           kind?: string
+          merchant?: string | null
           name?: string
+          note?: string | null
+          start_date?: string
           updated_at?: string
           user_id?: string
         }

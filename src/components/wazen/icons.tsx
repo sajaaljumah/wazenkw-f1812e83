@@ -50,6 +50,11 @@ import {
   User,
   Users,
   Wallet,
+  FileText,
+  Upload,
+  Camera,
+  TriangleAlert,
+  RefreshCw,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -121,3 +126,8 @@ export const ForwardIcon = ArrowRight;
 export const SpinnerIcon = Loader2;
 export const EditIcon = Pencil;
 export const DeleteIcon = Trash2;
+export const DocumentIcon = FileText;
+export const UploadIcon = Upload;
+export const CameraIcon = Camera;
+export const AlertIcon = TriangleAlert;
+export const RetryIcon = RefreshCw;

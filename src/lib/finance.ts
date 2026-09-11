@@ -43,6 +43,9 @@ export type Budget = {
   currency: string;
 };
 
+/** How often a recurring commitment repeats. */
+export type RecurringFrequency = "weekly" | "monthly" | "quarterly" | "yearly";
+
 export type RecurringItem = {
   id: string;
   user_id: string;
@@ -53,7 +56,118 @@ export type RecurringItem = {
   currency: string;
   day_of_month: number;
   active: boolean;
+  frequency?: RecurringFrequency;
+  merchant?: string | null;
+  start_date?: string | null;
+  ends_on?: string | null;
+  note?: string | null;
 };
+
+export type RecurringStatus = "active" | "paused" | "ended" | "scheduled";
+
+export function frequencyOf(item: RecurringItem): RecurringFrequency {
+  return item.frequency ?? "monthly";
+}
+
+function startOfDay(date = new Date()): Date {
+  const copy = new Date(date);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+
+function parseDate(value: string | null | undefined): Date | null {
+  if (!value) return null;
+  const date = new Date(`${value.slice(0, 10)}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+/**
+ * The next date a recurring item is due, honouring its frequency, start date and
+ * end date. Returns null once the commitment has ended.
+ */
+export function nextDueDate(item: RecurringItem, from = new Date()): Date | null {
+  const today = startOfDay(from);
+  const ends = parseDate(item.ends_on);
+  if (ends && ends < today) return null;
+  const start = parseDate(item.start_date) ?? today;
+  const frequency = frequencyOf(item);
+
+  let candidate: Date;
+  if (frequency === "weekly") {
+    candidate = new Date(start);
+    while (candidate < today) candidate.setDate(candidate.getDate() + 7);
+  } else {
+    const step = frequency === "monthly" ? 1 : frequency === "quarterly" ? 3 : 12;
+    const anchor = start > today ? start : today;
+    let monthIndex = anchor.getMonth();
+    let year = anchor.getFullYear();
+    if (frequency !== "monthly") {
+      // Keep the cycle aligned to the start month.
+      const monthsSinceStart =
+        (anchor.getFullYear() - start.getFullYear()) * 12 + (anchor.getMonth() - start.getMonth());
+      const cycles = Math.max(0, Math.ceil(monthsSinceStart / step));
+      monthIndex = start.getMonth() + cycles * step;
+      year = start.getFullYear();
+    }
+    const build = (y: number, m: number) => {
+      const base = new Date(y, m, 1);
+      const day = Math.min(item.day_of_month, daysInMonth(base.getFullYear(), base.getMonth()));
+      return new Date(base.getFullYear(), base.getMonth(), day);
+    };
+    candidate = build(year, monthIndex);
+    let guard = 0;
+    while ((candidate < today || candidate < start) && guard < 60) {
+      monthIndex += step;
+      candidate = build(year, monthIndex);
+      guard += 1;
+    }
+  }
+  if (ends && candidate > ends) return null;
+  return candidate;
+}
+
+export function recurringStatus(item: RecurringItem, from = new Date()): RecurringStatus {
+  if (!item.active) return "paused";
+  const today = startOfDay(from);
+  const ends = parseDate(item.ends_on);
+  if (ends && ends < today) return "ended";
+  const start = parseDate(item.start_date);
+  if (start && start > today) return "scheduled";
+  return "active";
+}
+
+/** Total committed per calendar month, normalised across frequencies. */
+export function monthlyEquivalent(item: RecurringItem): number {
+  const amount = Number(item.amount) || 0;
+  switch (frequencyOf(item)) {
+    case "weekly":
+      return (amount * 52) / 12;
+    case "quarterly":
+      return amount / 3;
+    case "yearly":
+      return amount / 12;
+    default:
+      return amount;
+  }
+}
+
+export function monthlyCommitments(items: RecurringItem[]): {
+  expenses: number;
+  income: number;
+  savings: number;
+} {
+  let expenses = 0;
+  let income = 0;
+  let savings = 0;
+  for (const item of items) {
+    if (recurringStatus(item) !== "active") continue;
+    const value = monthlyEquivalent(item);
+    if (item.kind === "income") income += value;
+    else if (item.kind === "saving") savings += value;
+    else expenses += value;
+  }
+  return { expenses, income, savings };
+}
 
 const THREE_DECIMAL_CURRENCIES = new Set(["KWD", "BHD", "OMR", "JOD", "TND"]);
 
@@ -199,37 +313,30 @@ export type UpcomingEntry = {
   amount: number;
   currency: string;
   date: Date;
+  frequency: RecurringFrequency;
 };
 
 /** Next occurrence of each active recurring item within the given horizon. */
 export function upcomingCashFlow(items: RecurringItem[], horizonDays = 45): UpcomingEntry[] {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = startOfDay();
   const horizon = new Date(today);
   horizon.setDate(horizon.getDate() + horizonDays);
 
   const entries: UpcomingEntry[] = [];
   for (const item of items) {
-    if (!item.active) continue;
-    for (let offset = 0; offset < 3; offset += 1) {
-      const year = today.getFullYear();
-      const monthIndex = today.getMonth() + offset;
-      const base = new Date(year, monthIndex, 1);
-      const day = Math.min(item.day_of_month, daysInMonth(base.getFullYear(), base.getMonth()));
-      const date = new Date(base.getFullYear(), base.getMonth(), day);
-      if (date < today) continue;
-      if (date > horizon) break;
-      entries.push({
-        id: `${item.id}-${offset}`,
-        name: item.name,
-        category: item.category,
-        kind: item.kind,
-        amount: Number(item.amount) || 0,
-        currency: item.currency,
-        date,
-      });
-      break;
-    }
+    if (recurringStatus(item, today) !== "active") continue;
+    const date = nextDueDate(item, today);
+    if (!date || date > horizon) continue;
+    entries.push({
+      id: item.id,
+      name: item.name,
+      category: item.category,
+      kind: item.kind,
+      amount: Number(item.amount) || 0,
+      currency: item.currency,
+      date,
+      frequency: frequencyOf(item),
+    });
   }
   return entries.sort((a, b) => a.date.getTime() - b.date.getTime());
 }
