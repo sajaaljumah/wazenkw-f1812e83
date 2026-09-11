@@ -212,7 +212,7 @@ export function ChildDashboard({
       </section>
 
       {/* My money */}
-      <section className="order-3 space-y-4">
+      <section className="wazen-reveal order-3 space-y-4" data-revealed={r3.revealed} ref={r3.ref}>
         <h2 className="px-1 text-xl">{t("kidMyMoney")}</h2>
         <div className="grid gap-4 min-[520px]:grid-cols-3">
           <MoneyTile
@@ -283,7 +283,7 @@ export function ChildDashboard({
       </section>
 
       {/* Save / Spend / Give */}
-      <section className="order-2 space-y-4">
+      <section className="wazen-reveal order-2 space-y-4" data-revealed={r2.revealed} ref={r2.ref}>
         <h2 className="px-1 text-xl">{t("kidWhatDo")}</h2>
         <div className="grid gap-4 min-[520px]:grid-cols-3">
           <ChoiceTile
@@ -309,7 +309,7 @@ export function ChildDashboard({
 
       {/* Allowance + badges */}
       <div className="order-4 grid gap-4 lg:grid-cols-2">
-        <section className="kid-panel relative overflow-hidden p-6">
+        <section className="kid-panel wazen-reveal relative overflow-hidden p-6" data-revealed={r4.revealed} ref={r4.ref}>
           <div className="flex items-center gap-4">
             <span className="size-14 kid-float">
               <CoinIllustration />
@@ -322,7 +322,7 @@ export function ChildDashboard({
           </div>
         </section>
 
-        <section className="kid-panel p-6">
+        <section className="kid-panel wazen-reveal p-6" data-revealed={r5.revealed} ref={r5.ref}>
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-kid-deep">{t("kidMyStars")}</p>
             <p className="text-xs text-muted-foreground">
