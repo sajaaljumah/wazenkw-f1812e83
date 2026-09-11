@@ -98,9 +98,10 @@ function AdultBust({ palette, gender }: { palette: Palette; gender: Gender }) {
       )}
       <circle cx="48" cy="40" r="16" fill={SKIN} />
       <path d="M32 37a16 16 0 0 1 32 0c-5-6-10-8-16-8s-11 2-16 8Z" fill={palette.hair} />
-      <circle cx="42.5" cy="41" r="1.9" fill={palette.hair} />
-      <circle cx="53.5" cy="41" r="1.9" fill={palette.hair} />
-      <path d="M44 48.5c2.5 2 5.5 2 8 0" stroke={palette.hair} strokeWidth="1.8" strokeLinecap="round" fill="none" />
+      <circle cx="42.5" cy="41" r="1.7" fill={palette.hair} />
+      <circle cx="53.5" cy="41" r="1.7" fill={palette.hair} />
+      <path d="M45 48.5h6" stroke={palette.hair} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.75" />
+
     </>
   );
 }
@@ -144,10 +145,12 @@ export function WazenAvatar({
       style={{ width: size, height: size }}
       role="img"
       aria-label={`${name}'s avatar`}
-      className={cn("shrink-0 rounded-full border border-border/60 shadow-[var(--shadow-soft)]", className)}
+      className={cn("shrink-0 rounded-full ring-1 ring-border/70 shadow-[var(--shadow-soft)]", className)}
     >
       <circle cx="48" cy="48" r="48" fill={palette.bg} />
       <g clipPath="url(#wazen-avatar-clip)">
+        {/* Soft light from the top-left keeps the portrait from looking flat. */}
+        <circle cx="30" cy="26" r="42" fill="white" opacity="0.16" />
         {lifeStage === "child" ? (
           <ChildFace palette={palette} gender={gender} />
         ) : lifeStage === "teenager" ? (
@@ -156,6 +159,7 @@ export function WazenAvatar({
           <AdultBust palette={palette} gender={gender} />
         )}
       </g>
+
       <defs>
         <clipPath id="wazen-avatar-clip">
           <circle cx="48" cy="48" r="48" />
