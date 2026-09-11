@@ -152,7 +152,14 @@ function Dashboard() {
           />
         )}
 
-        {isParent ? <FamilySummaryCard members={family.data ?? []} isLoading={family.isLoading} /> : null}
+        {isParent ? (
+          <FamilySummaryCard
+            members={family.data ?? []}
+            isLoading={family.isLoading}
+            currency={profile.base_currency}
+            transactions={transactions.data ?? []}
+          />
+        ) : null}
       </div>
     </AppShell>
   );
