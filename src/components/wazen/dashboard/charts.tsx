@@ -16,6 +16,7 @@ import { formatMoney, monthKeyOf, monthlySeries, spendingByCategory } from "@/li
 import type { Transaction } from "@/lib/finance";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { useWazenLabels } from "@/lib/i18n-labels";
+import { Button } from "@/components/ui/button";
 
 const BAR_COLORS = [
   "var(--chart-1)",
@@ -83,8 +84,9 @@ export function SpendingByCategoryCard({
                   key={slice.category}
                   className="min-w-0"
                 >
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     className="wazen-chart-row group w-full rounded-lg px-2 py-1.5 text-start outline-hidden focus-visible:ring-2 focus-visible:ring-ring/60"
                     data-active={selectedCategory === slice.category ? "true" : undefined}
                     aria-pressed={selectedCategory === slice.category}
@@ -110,7 +112,7 @@ export function SpendingByCategoryCard({
                       }}
                     />
                   </div>
-                  </button>
+                  </Button>
                 </li>
               );
             })}
