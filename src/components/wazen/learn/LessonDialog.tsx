@@ -33,18 +33,15 @@ export function LessonDialog({
   const current = lesson.steps[Math.min(step, lesson.steps.length - 1)]!;
 
   const finish = () => {
-    record.mutate(
-      {
-        activity_type: "lesson",
-        activity_key: lesson.key,
-        topic: lesson.topic,
-        score: 100,
-        max_score: 100,
-        completed: true,
-        xp: alreadyDone ? 0 : lesson.xp,
-      },
-      { onSuccess: onClose, onError: onClose },
-    );
+    record.mutate({
+      activity_type: "lesson",
+      activity_key: lesson.key,
+      topic: lesson.topic,
+      score: 100,
+      max_score: 100,
+      completed: true,
+      xp: alreadyDone ? 0 : lesson.xp,
+    });
   };
 
   return (
