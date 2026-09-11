@@ -1,9 +1,11 @@
 import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useProfile, useSession } from "@/hooks/use-wazen-auth";
 
 export type WazenTheme = "light" | "dark" | "system";
 
 const STORAGE_PREFIX = "wazen-theme:";
+const GUEST_KEY = "wazen-theme:guest";
 
 function resolve(theme: string | null | undefined): "light" | "dark" {
   if (theme === "dark") return "dark";
