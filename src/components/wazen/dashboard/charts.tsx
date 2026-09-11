@@ -56,6 +56,7 @@ export function SpendingByCategoryCard({
   const max = slices.reduce((peak, slice) => Math.max(peak, slice.amount), 0);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const topSlice = slices[0];
+  const { ref, revealed } = useReveal<HTMLUListElement>();
 
   return (
     <Panel title={title ?? t("spendingCategory")}>
