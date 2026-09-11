@@ -33,12 +33,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   // Assets belong to independent adult accounts only.
   const nav = NAV.filter((item) => !("adultsOnly" in item && item.adultsOnly) || canOwnAssets(profile?.life_stage));
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", profile?.theme === "dark");
-    return () => {
-      document.documentElement.classList.remove("dark");
-    };
-  }, [profile?.theme]);
+  // Theme is applied globally by <ThemeSync /> in the root route.
+
+
 
 
   return (
