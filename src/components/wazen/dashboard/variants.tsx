@@ -157,12 +157,26 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
       />
 
 
+      <BalanceHero
+        label={t("moneyAvailable")}
+        amount={all.net}
+        currency={currency}
+        items={[
+          { label: t("allowanceMonth"), amount: allowance, tone: "positive" },
+          { label: t("spentMonth"), amount: month.expenses, tone: "negative" },
+          { label: t("savedSoFar"), amount: all.savings, tone: "gold" },
+        ]}
+      />
+
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label={t("moneyAvailable")} amount={all.net} currency={currency} icon={<BudgetIcon className="size-4" strokeWidth={ICON_STROKE} />} />
         <StatCard label={t("allowanceMonth")} amount={allowance} currency={currency} tone="positive" icon={<AllowanceIcon className="size-4" strokeWidth={ICON_STROKE} />} />
         <StatCard label={t("spentMonth")} amount={month.expenses} currency={currency} icon={<ExpensesIcon className="size-4" strokeWidth={ICON_STROKE} />} />
         <StatCard label={t("savedSoFar")} amount={all.savings} currency={currency} tone="gold" icon={<SavingsIcon className="size-4" strokeWidth={ICON_STROKE} />} />
       </div>
+
+      <SavingsTrendCard transactions={transactions} currency={currency} title={t("savedSoFar")} />
+
 
       <div className="grid gap-5 lg:grid-cols-2">
         <BudgetCard
