@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useState } from "react";
 import { CategoryChartIcon as CategoryIcon, TrendChartIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { EmptyState, Panel } from "./primitives";
 import { formatMoney, monthKeyOf, monthlySeries, spendingByCategory } from "@/lib/finance";
@@ -51,6 +52,7 @@ export function SpendingByCategoryCard({
   const slices = spendingByCategory(transactions).slice(0, 6);
   const total = slices.reduce((sum, slice) => sum + slice.amount, 0);
   const max = slices.reduce((peak, slice) => Math.max(peak, slice.amount), 0);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   return (
     <Panel title={title ?? t("spendingCategory")}>
@@ -63,7 +65,12 @@ export function SpendingByCategoryCard({
       ) : (
         <div className="space-y-5">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 border-b border-border/70 pb-4">
-            <span className="wazen-label">{t("total")}</span>
+            <span>
+              <span className="wazen-label block">{t("topSpendingCategory")}</span>
+              <span className="mt-1 block text-sm text-muted-foreground">
+                {labels.category(slices[0].category)} · {Math.round((slices[0].amount / total) * 100)}% {t("ofSpending")}
+              </span>
+            </span>
             <span className="wazen-number text-lg">{formatMoney(total, currency)}</span>
           </div>
           <ul className="space-y-4">
@@ -74,11 +81,17 @@ export function SpendingByCategoryCard({
               return (
                 <li
                   key={slice.category}
-                  className="wazen-chart-row group rounded-lg px-2 py-1.5 outline-hidden focus-visible:ring-2 focus-visible:ring-ring/60"
-                  tabIndex={0}
-                  title={`${labels.category(slice.category)}: ${formatMoney(slice.amount, currency)} · ${share}%`}
-                  aria-label={`${labels.category(slice.category)}: ${formatMoney(slice.amount, currency)}, ${share}%`}
+                  className="min-w-0"
                 >
+                  <button
+                    type="button"
+                    className="wazen-chart-row group w-full rounded-lg px-2 py-1.5 text-start outline-hidden focus-visible:ring-2 focus-visible:ring-ring/60"
+                    data-active={selectedCategory === slice.category ? "true" : undefined}
+                    aria-pressed={selectedCategory === slice.category}
+                    onClick={() => setSelectedCategory((current) => current === slice.category ? null : slice.category)}
+                    title={`${labels.category(slice.category)}: ${formatMoney(slice.amount, currency)} · ${share}%`}
+                    aria-label={`${labels.category(slice.category)}: ${formatMoney(slice.amount, currency)}, ${share}%`}
+                  >
                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 text-sm">
                     <span className="flex min-w-0 items-center gap-2.5">
                       <span className="size-2 rounded-full" style={{ background: color }} />
@@ -97,6 +110,7 @@ export function SpendingByCategoryCard({
                       }}
                     />
                   </div>
+                  </button>
                 </li>
               );
             })}
@@ -126,6 +140,8 @@ export function IncomeVsExpensesCard({
   }));
   const hasData = series.some((point) => point.income > 0 || point.expenses > 0);
   const { t } = useWazenLocale();
+  const latest = series.at(-1);
+  const latestNet = latest?.net ?? 0;
 
   return (
     <Panel title={t("incomeExpenses")}>
@@ -136,7 +152,14 @@ export function IncomeVsExpensesCard({
           description={t("notEnoughDataBody")}
         />
       ) : (
-         <div className="h-52 w-full min-w-0 sm:h-56">
+        <>
+          <div className="mb-4 flex items-baseline justify-between gap-3 border-b border-border/70 pb-3">
+            <span className="text-sm text-muted-foreground">{t("latestMonthlyNet")}</span>
+            <span className={latestNet >= 0 ? "wazen-number text-sm text-chart-2" : "wazen-number text-sm text-destructive"}>
+              {latestNet >= 0 ? "+" : "−"}{formatMoney(Math.abs(latestNet), currency)}
+            </span>
+          </div>
+          <div className="h-52 w-full min-w-0 sm:h-56" role="img" aria-label={`${t("incomeExpenses")}: ${t("latestMonthlyNet")} ${formatMoney(latestNet, currency)}`}>
           <ResponsiveContainer width="100%" height="100%">
              <ComposedChart data={series} barGap={3} margin={{ top: 8, right: 2, bottom: 0, left: -28 }}>
               <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.7} strokeDasharray="3 5" />
@@ -176,7 +199,8 @@ export function IncomeVsExpensesCard({
               />
             </ComposedChart>
           </ResponsiveContainer>
-        </div>
+          </div>
+        </>
       )}
       <div className="mt-4 flex flex-wrap items-center gap-5 text-xs text-muted-foreground">
         <span className="flex items-center gap-2">
@@ -226,6 +250,7 @@ export function SavingsTrendCard({
     return { label: key.slice(5), total: Math.round(running * 100) / 100 };
   });
   const hasData = series.some((point) => point.total > 0);
+  const currentTotal = series.at(-1)?.total ?? 0;
 
   return (
     <Panel title={title ?? t("savingsOverTime")}>
@@ -236,7 +261,12 @@ export function SavingsTrendCard({
           description={t("noSavingsYetBody")}
         />
       ) : (
-         <div className="h-48 w-full min-w-0">
+        <>
+          <div className="mb-4 flex items-baseline justify-between gap-3 border-b border-border/70 pb-3">
+            <span className="text-sm text-muted-foreground">{t("savedThisPeriod")}</span>
+            <span className="wazen-number text-sm text-chart-2">{formatMoney(currentTotal, currency)}</span>
+          </div>
+          <div className="h-48 w-full min-w-0" role="img" aria-label={`${title ?? t("savingsOverTime")}: ${formatMoney(currentTotal, currency)}`}>
           <ResponsiveContainer width="100%" height="100%">
              <ComposedChart data={series} margin={{ top: 8, right: 2, bottom: 0, left: -28 }}>
               <defs>
@@ -279,7 +309,8 @@ export function SavingsTrendCard({
               />
             </ComposedChart>
           </ResponsiveContainer>
-        </div>
+          </div>
+        </>
       )}
     </Panel>
   );

@@ -93,13 +93,13 @@ export function AdultDashboard({
         </div>
       </JourneySection>
 
-      <DisclosurePanel defaultOpen title={t("deeperAnalytics")} summary={t("deeperAnalyticsSummary")}>
+      <JourneySection eyebrow={t("lookBack")} title={t("deeperAnalytics")} description={t("deeperAnalyticsSummary")}>
         <div className="grid gap-4 lg:grid-cols-2">
           <SpendingByCategoryCard transactions={monthTransactions} currency={currency} />
           <IncomeVsExpensesCard transactions={transactions} currency={currency} />
         </div>
         <div className="mt-4"><SavingsTrendCard transactions={transactions} currency={currency} /></div>
-      </DisclosurePanel>
+      </JourneySection>
 
       <DisclosurePanel title={t("portfolioSummary")} summary={t("notSpendable")}>
         <PortfolioSummaryCard assets={assets.data ?? []} currency={currency} />
@@ -158,13 +158,13 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
         </div>
       </JourneySection>
 
-      <DisclosurePanel defaultOpen title={t("deeperAnalytics")} summary={t("deeperAnalyticsSummary")}>
+      <JourneySection eyebrow={t("lookBack")} title={t("deeperAnalytics")} description={t("deeperAnalyticsSummary")}>
         <div className="grid gap-4 lg:grid-cols-2">
           <SpendingByCategoryCard transactions={monthTransactions} currency={currency} title={t("whereMoneyWent")} />
           <IncomeVsExpensesCard transactions={transactions} currency={currency} months={4} />
           <SavingsTrendCard transactions={transactions} currency={currency} title={t("savedSoFar")} />
         </div>
-      </DisclosurePanel>
+      </JourneySection>
 
       <DisclosurePanel title={t("paidByFamily")} summary={t("paidByFamilyIntro")}>
         <ParentPaidCard transactions={parentPaid.data ?? []} />

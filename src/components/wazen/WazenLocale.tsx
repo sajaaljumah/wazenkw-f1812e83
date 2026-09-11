@@ -593,6 +593,10 @@ const COPY = {
     netLabel: "Net",
     expensesLabel: "Expenses",
     savingsOverTime: "Savings over time",
+    topSpendingCategory: "Top spending category",
+    ofSpending: "of spending",
+    latestMonthlyNet: "Latest monthly net",
+    savedThisPeriod: "Saved across this period",
     noSavingsYet: "No savings recorded yet",
     noSavingsYetBody: "Every amount you save will build this line.",
 
@@ -1365,6 +1369,10 @@ const COPY = {
     netLabel: "الصافي",
     expensesLabel: "المصروفات",
     savingsOverTime: "المدخرات عبر الوقت",
+    topSpendingCategory: "أعلى فئة إنفاق",
+    ofSpending: "من المصروفات",
+    latestMonthlyNet: "صافي آخر شهر",
+    savedThisPeriod: "المدخر خلال هذه الفترة",
     noSavingsYet: "لا توجد مدخرات مسجلة بعد",
     noSavingsYetBody: "كل مبلغ توفّره سيبني هذا الخط.",
 
