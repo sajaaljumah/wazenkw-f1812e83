@@ -76,11 +76,11 @@ export function BalanceHero({
                 className={cn(
                   "wazen-number mt-2 text-base",
                   item.tone === "positive"
-                    ? "text-chart-2"
+                    ? "wazen-balance-pos"
                     : item.tone === "negative"
-                      ? "text-destructive"
+                      ? "wazen-balance-neg"
                       : item.tone === "gold"
-                        ? "text-gold"
+                        ? "wazen-balance-gold"
                         : "text-primary-foreground",
                 )}
               >
