@@ -6,6 +6,7 @@ import { PremiumIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons"
 import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
 import { LanguageToggle } from "@/components/wazen/LanguageToggle";
+import { ThemeToggle } from "@/components/wazen/ThemeToggle";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { DEMO_ACCESS_ACCOUNTS, DEMO_PASSWORD } from "@/lib/demo-accounts";
 import {
@@ -181,7 +182,8 @@ function AuthPage() {
         <Link to="/">
           <WazenMark />
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <ThemeToggle />
           <LanguageToggle />
           <Link
             to="/auth"

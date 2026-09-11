@@ -1,9 +1,11 @@
 import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useProfile, useSession } from "@/hooks/use-wazen-auth";
 
 export type WazenTheme = "light" | "dark" | "system";
 
 const STORAGE_PREFIX = "wazen-theme:";
+const GUEST_KEY = "wazen-theme:guest";
 
 function resolve(theme: string | null | undefined): "light" | "dark" {
   if (theme === "dark") return "dark";
@@ -41,6 +43,33 @@ function readCachedTheme(userId: string): string | null {
   }
 }
 
+export const resolveTheme = resolve;
+
+/** Theme chosen on the public screens, before anyone is signed in. */
+export function cacheGuestTheme(theme: string) {
+  try {
+    localStorage.setItem(GUEST_KEY, theme);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+export function readGuestTheme(): string | null {
+  try {
+    return localStorage.getItem(GUEST_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function clearGuestTheme() {
+  try {
+    localStorage.removeItem(GUEST_KEY);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 /**
  * Single source of truth for the active theme.
  * The preference belongs to the signed-in account: it is read from that
@@ -57,14 +86,28 @@ export function ThemeSync() {
   useEffect(() => {
     if (loading) return;
     if (!userId) {
-      applyTheme("light");
+      // Signed out: honour the choice made on the public screens, else light.
+      applyTheme(readGuestTheme() ?? "light");
       return;
     }
-    applyTheme(readCachedTheme(userId) ?? "light");
+    applyTheme(readCachedTheme(userId) ?? readGuestTheme() ?? "light");
   }, [userId, loading]);
+
+  // A visitor who picked a theme before signing in keeps it inside the app,
+  // and it becomes that account's saved preference.
+  useEffect(() => {
+    if (!userId) return;
+    const guest = readGuestTheme();
+    if (!guest) return;
+    clearGuestTheme();
+    cacheTheme(userId, guest);
+    applyTheme(guest);
+    void supabase.from("profiles").update({ theme: guest }).eq("id", userId);
+  }, [userId]);
 
   useEffect(() => {
     if (!userId || !profileTheme) return;
+    if (readGuestTheme()) return;
     cacheTheme(userId, profileTheme);
     applyTheme(profileTheme);
   }, [userId, profileTheme]);
