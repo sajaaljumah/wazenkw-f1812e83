@@ -1,6 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { DashboardIcon, PortfolioIcon, PremiumIcon, ProfileIcon, SettingsIcon, SignOutIcon, ZakatIcon, ICON_STROKE } from "@/components/wazen/icons";
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { Button } from "@/components/ui/button";

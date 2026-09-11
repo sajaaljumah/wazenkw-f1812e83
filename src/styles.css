@@ -453,8 +453,20 @@
   --kid-champagne: oklch(0.72 0.075 78);
 }
 
+/* Genuinely dark child experience — same personality, dark surfaces. */
+.dark .kid-theme,
+.dark :is(.kid-theme) {
+  --kid-ivory: oklch(0.262 0.008 70);
+  --kid-tint: oklch(0.232 0.007 70);
+  --kid-soft: oklch(0.355 0.015 78);
+  --kid-mid: oklch(0.6 0.045 78);
+  --kid-deep: oklch(0.9 0.012 80);
+  --kid-champagne: oklch(0.78 0.085 80);
+}
+
 @utility kid-panel {
   background-color: var(--color-kid-ivory);
+  color: var(--color-foreground);
   border: 1px solid var(--color-kid-soft);
   border-radius: calc(var(--radius) + 6px);
   box-shadow: 0 2px 4px oklch(0.3 0.02 70 / 4%), 0 18px 40px oklch(0.3 0.02 70 / 7%);
