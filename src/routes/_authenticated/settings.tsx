@@ -23,6 +23,16 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/settings")({
+  head: () => ({
+    meta: [
+      { title: "Settings — Wazen" },
+      { name: "description", content: "Manage Wazen language, appearance, security and account controls." },
+      { property: "og:title", content: "Settings — Wazen" },
+      { property: "og:description", content: "Manage Wazen language, appearance, security and account controls." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: SettingsPage,
 });
 

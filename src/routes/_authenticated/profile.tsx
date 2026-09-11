@@ -15,6 +15,16 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/profile")({
+  head: () => ({
+    meta: [
+      { title: "Profile — Wazen" },
+      { name: "description", content: "Manage your Wazen identity and personal preferences." },
+      { property: "og:title", content: "Profile — Wazen" },
+      { property: "og:description", content: "Manage your Wazen identity and personal preferences." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: ProfilePage,
 });
 

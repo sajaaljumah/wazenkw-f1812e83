@@ -99,6 +99,8 @@ const COPY = {
     tourGrowYoungBody: "Learn through short activities, practise with games and earn achievements as you grow.",
     documentHistorySummary: "Open your previously saved financial documents",
     inactiveCommitments: "Paused & past commitments",
+    zakatHistory: "Zakat records",
+    zakatHistorySummary: "Payments and saved annual calculations",
 
     // landing
     landingEyebrow: "Personal finance & financial education",
@@ -871,6 +873,8 @@ const COPY = {
     tourGrowYoungBody: "تعلّم بأنشطة قصيرة، وتدرّب بالألعاب، واكسب الإنجازات أثناء تقدّمك.",
     documentHistorySummary: "افتح مستنداتك المالية المحفوظة سابقاً",
     inactiveCommitments: "الالتزامات الموقوفة والسابقة",
+    zakatHistory: "سجلات الزكاة",
+    zakatHistorySummary: "الدفعات والحسابات السنوية المحفوظة",
 
     // landing
     landingEyebrow: "التمويل الشخصي والتعليم المالي",
