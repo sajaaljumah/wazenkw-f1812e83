@@ -81,10 +81,12 @@ function Landing() {
           </div>
         </section>
 
-        <section className="grid sm:grid-cols-3">
+        <section className="grid gap-4 sm:grid-cols-3">
           {PILLARS.map(({ icon: Icon, title, body }) => (
-            <article key={title} className="border-b border-border py-9 sm:border-b-0 sm:border-e sm:px-8 sm:first:ps-0 sm:last:border-e-0 sm:last:pe-0">
-              <Icon className="size-6 text-gold" strokeWidth={1.25} />
+            <article key={title} className="wazen-card">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-accent text-primary">
+                <Icon className="size-5" strokeWidth={1.5} />
+              </span>
               <h2 className="mt-5 text-xl">{t(title)}</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(body)}</p>
             </article>
