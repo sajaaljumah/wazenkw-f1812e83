@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState, type ComponentType, type SVGProps } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LockedIcon, SignOutIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { LockedIcon, PremiumIcon, ProfileIcon, SignOutIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/wazen/AppShell";
 import { useProfile, useSession, useSignOut } from "@/hooks/use-wazen-auth";
@@ -284,6 +284,16 @@ function SettingsPage() {
             {t("signOut")}
           </Button>
         </div>
+      </section>
+
+      <section className="mt-10 max-w-3xl border-t border-border pt-7">
+        <h2 className="text-xl">{t("notifications")}</h2>
+        <p className="mt-3 text-sm text-muted-foreground">{t("notificationsBody")}</p>
+      </section>
+
+      <section className="mt-10 max-w-3xl border-t border-border pt-7">
+        <h2 className="text-xl">{t("privacy")}</h2>
+        <p className="mt-3 text-sm text-muted-foreground">{t("privacyBody")}</p>
       </section>
     </AppShell>
   );
