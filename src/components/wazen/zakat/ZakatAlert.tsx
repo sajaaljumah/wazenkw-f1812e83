@@ -8,6 +8,7 @@ import {
   ZakatIcon,
 } from "@/components/wazen/icons";
 
+import { formatMoney } from "@/lib/finance";
 import type { ZakatResult } from "@/lib/zakat";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +47,7 @@ export function ZakatAlert({
           ? t("zakatBelowNisab")
           : t("zakatHawlIncomplete");
 
-  const Icon = due ? HandCoinsIcon : recorded ? CheckIcon : ScheduledIcon;
+  const Icon = due ? ZakatIcon : recorded ? CheckIcon : ScheduledIcon;
 
   return (
     <div
