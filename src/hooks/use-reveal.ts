@@ -22,15 +22,10 @@ export function useReveal<T extends HTMLElement = HTMLElement>() {
       return;
     }
 
-    // Safety net: never leave content invisible if the observer never fires
-    // (scroll-locked overlays, hidden ancestors, unusual browsers).
-    const fallback = window.setTimeout(() => setRevealed(true), 1200);
-
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            window.clearTimeout(fallback);
             setRevealed(true);
             observer.disconnect();
           }
@@ -40,10 +35,7 @@ export function useReveal<T extends HTMLElement = HTMLElement>() {
     );
 
     observer.observe(node);
-    return () => {
-      window.clearTimeout(fallback);
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
 
   return { ref, revealed };

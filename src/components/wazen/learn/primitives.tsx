@@ -32,13 +32,16 @@ export function LearnProgressBar({
   className?: string;
   tone?: "champagne" | "deep";
 }) {
+  const { ref, revealed } = useReveal<HTMLDivElement>();
   const [width, setWidth] = useState(0);
   useEffect(() => {
-    const timer = window.setTimeout(() => setWidth(Math.max(0, Math.min(100, percent))), 100);
-    return () => window.clearTimeout(timer);
-  }, [percent]);
+    if (!revealed) return;
+    const frame = window.requestAnimationFrame(() => setWidth(Math.max(0, Math.min(100, percent))));
+    return () => window.cancelAnimationFrame(frame);
+  }, [percent, revealed]);
   return (
     <div
+      ref={ref}
       className={cn("wazen-progress-track h-3 w-full overflow-hidden rounded-full bg-kid-soft/70", className)}
       data-complete={percent >= 100 ? "true" : undefined}
       role="progressbar"
