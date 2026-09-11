@@ -354,7 +354,21 @@
   }
 }
 
+/* Legible accent tones on the dark balance surface. */
+@utility wazen-balance-pos {
+  color: oklch(0.84 0.11 165);
+}
+
+@utility wazen-balance-neg {
+  color: oklch(0.78 0.13 25);
+}
+
+@utility wazen-balance-gold {
+  color: oklch(0.87 0.08 85);
+}
+
 @utility wazen-balance-grid {
+
   position: absolute;
   inset: 0;
   pointer-events: none;
