@@ -297,7 +297,7 @@ export function FamilySummaryCard({
                     <p className="truncate text-sm">
                       {item.merchant ?? item.category}
                       <span className="ms-2 text-xs text-muted-foreground">
-                        {t("forFamilyMember")} {nameOf(item.beneficiary_user_id)}
+                        {`${t("forFamilyMember")} ${nameOf(item.beneficiary_user_id)}`}
                       </span>
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
