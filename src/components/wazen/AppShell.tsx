@@ -53,9 +53,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 key={to}
                 to={to}
                 className={cn(
-                  "relative flex h-[4.5rem] items-center gap-2 border-b-2 px-1 text-sm font-medium transition-colors",
+                  "relative flex h-[4.5rem] items-center gap-2 border-b-2 px-1 text-sm font-semibold transition-colors",
                   location.pathname === to
-                    ? "border-foreground text-foreground"
+                    ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
