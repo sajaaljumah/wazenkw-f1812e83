@@ -21,7 +21,7 @@ export function DashboardHeader({
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t("goodMorning") : hour < 18 ? t("goodAfternoon") : t("goodEvening");
   return (
-    <section className="flex flex-col gap-5 border-b border-border pb-8 sm:flex-row sm:items-center sm:pb-10">
+    <section className="wazen-card flex flex-col gap-5 sm:flex-row sm:items-center">
       {avatar ? <div className="shrink-0">{avatar}</div> : null}
       <div className="min-w-0">
         <p className="wazen-label">{today} · {eyebrow}</p>
@@ -60,7 +60,7 @@ export function StatCard({
           ? "text-gold"
           : "text-foreground";
   return (
-    <div className={cn("border-s border-border ps-5 first:border-s-0 first:ps-0 sm:px-5 sm:first:ps-0", className)}>
+    <div className={cn("wazen-card", className)}>
       <div className="flex items-start justify-between gap-3">
         <span className="wazen-label">{label}</span>
         {icon ? <span className="text-muted-foreground">{icon}</span> : null}
@@ -83,7 +83,7 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section className={cn("border-t border-border pt-6", className)}>
+    <section className={cn("wazen-card", className)}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl sm:text-2xl">{title}</h2>
         {action}
@@ -95,7 +95,7 @@ export function Panel({
 
 export function EmptyState({ title, description, icon }: { title: string; description: string; icon?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center border border-dashed border-border bg-secondary/35 px-6 py-10 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-secondary/50 px-6 py-10 text-center">
       {icon ? <span className="mb-3 text-muted-foreground">{icon}</span> : null}
       <p className="text-base">{title}</p>
       <p className="mt-2 max-w-sm text-sm text-muted-foreground">{description}</p>

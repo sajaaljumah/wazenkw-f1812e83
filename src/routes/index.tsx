@@ -37,7 +37,7 @@ function Landing() {
   const { t } = useWazenLocale();
   return (
     <div className="min-h-screen overflow-hidden bg-background">
-      <header className="mx-auto flex h-20 max-w-6xl items-center justify-between border-b border-border px-5 sm:px-8">
+      <header className="sticky top-0 z-20 border-b border-border/70 bg-card/85 backdrop-blur-xl"><div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 sm:px-8">
         <WazenMark />
         <div className="flex items-center gap-1">
           <LanguageToggle />
@@ -47,18 +47,12 @@ function Landing() {
             >{t("signIn")}</Link>
           </Button>
         </div>
-      </header>
+      </div></header>
 
       <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
-        <section className="relative grid min-h-[62vh] items-end border-b border-border py-14 sm:min-h-[68vh] sm:py-20">
-          <div className="absolute inset-y-0 end-0 hidden w-2/5 border-s border-border lg:block" aria-hidden="true">
-            <div className="grid h-full grid-cols-3">
-              <span className="border-e border-border/70" />
-              <span className="border-e border-border/70" />
-            </div>
-            <div className="absolute inset-x-0 top-1/3 border-t border-border/70" />
-            <div className="absolute inset-x-0 top-2/3 border-t border-border/70" />
-            <div className="absolute bottom-10 end-10 font-display text-8xl text-gold/25">W.</div>
+        <section className="relative grid items-center py-14 sm:py-20">
+          <div className="pointer-events-none absolute inset-y-6 end-0 hidden w-2/5 rounded-[2.5rem] bg-accent/60 lg:block" aria-hidden="true">
+            <div className="absolute bottom-12 end-12 font-display text-8xl font-extrabold text-primary/25">W.</div>
           </div>
           <div className="relative max-w-3xl wazen-enter">
           <p className="wazen-label">{t("landingEyebrow")}</p>
@@ -87,10 +81,12 @@ function Landing() {
           </div>
         </section>
 
-        <section className="grid sm:grid-cols-3">
+        <section className="grid gap-4 sm:grid-cols-3">
           {PILLARS.map(({ icon: Icon, title, body }) => (
-            <article key={title} className="border-b border-border py-9 sm:border-b-0 sm:border-e sm:px-8 sm:first:ps-0 sm:last:border-e-0 sm:last:pe-0">
-              <Icon className="size-6 text-gold" strokeWidth={1.25} />
+            <article key={title} className="wazen-card">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-accent text-primary">
+                <Icon className="size-5" strokeWidth={1.5} />
+              </span>
               <h2 className="mt-5 text-xl">{t(title)}</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(body)}</p>
             </article>

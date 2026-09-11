@@ -48,7 +48,7 @@ export function AdultDashboard({
     <>
       <QuickActions userId={userId} currency={currency} goals={goals} />
 
-      <div className="grid grid-cols-2 gap-y-6 border-b border-border pb-7 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           label={t("availableMoney")}
           amount={all.net}
@@ -129,7 +129,7 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
         labels={{ income: t("addMoneyIn"), expense: t("addSpending") }}
       />
 
-      <div className="grid grid-cols-2 gap-y-6 border-b border-border pb-7 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label={t("moneyAvailable")} amount={all.net} currency={currency} icon={<Wallet className="size-4" strokeWidth={1.5} />} />
         <StatCard label={t("allowanceMonth")} amount={allowance} currency={currency} tone="positive" icon={<Coins className="size-4" strokeWidth={1.5} />} />
         <StatCard label={t("spentMonth")} amount={month.expenses} currency={currency} icon={<TrendingDown className="size-4" strokeWidth={1.5} />} />
