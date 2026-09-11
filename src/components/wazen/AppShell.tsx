@@ -10,6 +10,7 @@ import { firstNameOf } from "@/lib/wazen";
 import { canOwnAssets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 import { WazenLogo } from "@/components/wazen/WazenLogo";
+import { ZakatNotificationBell } from "@/components/wazen/zakat/ZakatNotificationBell";
 
 const NAV = [
   { to: "/dashboard", label: "overview", icon: DashboardIcon },
@@ -68,6 +69,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
           <div className="flex items-center gap-2">
             <PlanBadge className="hidden sm:inline-flex" size="sm" />
+            {profile ? (
+              <ZakatNotificationBell lifeStage={profile.life_stage} currency={profile.base_currency} />
+            ) : null}
             {profile ? (
               <Link
                 to="/profile"

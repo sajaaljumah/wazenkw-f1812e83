@@ -2,6 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { SpinnerIcon } from "@/components/wazen/icons";
 import { AppShell } from "@/components/wazen/AppShell";
+import { ZakatAlert } from "@/components/wazen/zakat/ZakatAlert";
+import { useZakat } from "@/hooks/use-wazen-zakat";
+import { canCalculateZakat } from "@/lib/zakat";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { useProfile, useSession } from "@/hooks/use-wazen-auth";
 import {
