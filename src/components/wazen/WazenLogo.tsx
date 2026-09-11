@@ -26,7 +26,7 @@ export function WazenLogo({
         src={logo.url}
         alt="Wazen"
         className="h-full w-full object-contain mix-blend-multiply dark:mix-blend-normal"
-        style={withWordmark ? undefined : { objectPosition: "center 22%", transform: "scale(1.9)" }}
+        style={withWordmark ? undefined : { objectPosition: "center top", transform: "scale(1.6)" }}
         loading="eager"
         decoding="async"
       />

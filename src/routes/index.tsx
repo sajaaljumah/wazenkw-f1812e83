@@ -54,7 +54,7 @@ function Landing() {
         <section className="relative grid items-center py-14 sm:py-20">
           <div className="pointer-events-none absolute inset-y-6 end-0 hidden w-2/5 rounded-[2.5rem] bg-accent/60 lg:block" aria-hidden="true">
             <span className="absolute bottom-10 end-10 opacity-30">
-              <WazenLogo size={120} withWordmark={false} />
+              <WazenLogo size={110} />
             </span>
           </div>
           <div className="relative max-w-3xl wazen-enter">

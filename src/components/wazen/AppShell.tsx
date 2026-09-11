@@ -19,7 +19,7 @@ const NAV = [
   { to: "/settings", label: "settings", icon: SettingsIcon },
 ] as const;
 
-export function WazenMark({ className, size = 34 }: { className?: string; size?: number }) {
+export function WazenMark({ className, size = 40 }: { className?: string; size?: number }) {
   return <WazenLogo size={size} className={cn("transition-opacity hover:opacity-85", className)} />;
 }
 
