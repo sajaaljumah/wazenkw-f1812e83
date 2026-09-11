@@ -261,7 +261,7 @@ function LearnPage() {
         </LearnSection>
 
         {/* C. Games */}
-        <LearnSection collapsible title={lc("games")} caption={lc("gamesCaption")} icon={<GameIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection collapsible defaultOpen title={lc("games")} caption={lc("gamesCaption")} icon={<GameIcon className="size-4" strokeWidth={ICON_STROKE} />}>
           <ul className="grid gap-4 min-[560px]:grid-cols-2 xl:grid-cols-3">
             {GAMES.map((item) => {
               const row = rows.find((entry) => entry.activity_type === "game" && entry.activity_key === item.key);
@@ -293,7 +293,7 @@ function LearnPage() {
         </LearnSection>
 
         {/* D. Quiz */}
-        <LearnSection collapsible title={lc("quiz")} caption={lc("quizCaption")} icon={<QuizIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection collapsible defaultOpen title={lc("quiz")} caption={lc("quizCaption")} icon={<QuizIcon className="size-4" strokeWidth={ICON_STROKE} />}>
           <div className="kid-panel grid gap-4 p-5 sm:p-6 min-[420px]:grid-cols-[minmax(0,1fr)_auto] min-[420px]:items-center">
             <div className="min-w-0">
               <p className="text-sm">{lc("quizIntro")}</p>
@@ -306,7 +306,7 @@ function LearnPage() {
         </LearnSection>
 
         {/* E. Challenges */}
-        <LearnSection collapsible title={lc("challenges")} caption={lc("challengesCaption")} icon={<ChallengesIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection collapsible defaultOpen title={lc("challenges")} caption={lc("challengesCaption")} icon={<ChallengesIcon className="size-4" strokeWidth={ICON_STROKE} />}>
           <ul className="grid gap-4 min-[560px]:grid-cols-2 xl:grid-cols-3">
             {CHALLENGES.map((meta) => {
               const row = challengeRows.find((entry) => entry.challenge_key === meta.key);
@@ -370,6 +370,7 @@ function LearnPage() {
         <div id="learn-achievements">
           <LearnSection
             collapsible
+            defaultOpen
             title={lc("achievements")}
             caption={lc("lockedNote")}
             icon={<RewardsIcon className="size-4" strokeWidth={ICON_STROKE} />}

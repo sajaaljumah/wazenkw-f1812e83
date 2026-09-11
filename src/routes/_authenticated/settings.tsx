@@ -84,6 +84,18 @@ function SettingsPage() {
     await queryClient.invalidateQueries({ queryKey: ["profile"] });
   }
 
+  // Language applies and saves immediately, so the whole account switches at once.
+  async function chooseLanguage(next: string) {
+    setLanguage(next);
+    if (!profile) return;
+    const { error } = await supabase.from("profiles").update({ language: next }).eq("id", profile.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await queryClient.invalidateQueries({ queryKey: ["profile"] });
+  }
+
   if (isLoading || !profile) {
     return (
       <AppShell>
