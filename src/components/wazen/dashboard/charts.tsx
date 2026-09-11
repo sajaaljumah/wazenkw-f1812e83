@@ -167,7 +167,8 @@ export function IncomeVsExpensesCard({
               {latestNet >= 0 ? "+" : "−"}{formatMoney(Math.abs(latestNet), currency)}
             </span>
           </div>
-          <div className="h-52 w-full min-w-0 sm:h-56" role="img" aria-label={`${t("incomeExpenses")}: ${t("latestMonthlyNet")} ${formatMoney(latestNet, currency)}`}>
+          <div ref={ref} className="h-52 w-full min-w-0 sm:h-56" role="img" aria-label={`${t("incomeExpenses")}: ${t("latestMonthlyNet")} ${formatMoney(latestNet, currency)}`}>
+          {revealed ? (
           <ResponsiveContainer width="100%" height="100%">
              <ComposedChart data={series} barGap={3} margin={{ top: 8, right: 2, bottom: 0, left: -28 }}>
               <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.7} strokeDasharray="3 5" />
