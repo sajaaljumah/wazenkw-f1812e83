@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { DashboardIcon, DocumentIcon, PortfolioIcon, PremiumIcon, ProfileIcon, ScheduledIcon, SettingsIcon, SignOutIcon, ZakatIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { DashboardIcon, DocumentIcon, PortfolioIcon, ScheduledIcon, SettingsIcon, SignOutIcon, ZakatIcon, ICON_STROKE } from "@/components/wazen/icons";
 import type { ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -33,6 +33,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useWazenLocale();
   // Assets belong to independent adult accounts only.
   const nav = NAV.filter((item) => !("adultsOnly" in item && item.adultsOnly) || canOwnAssets(profile?.life_stage));
+  // Account pages are reached from Settings, so they keep the Settings tab active.
+  const SETTINGS_GROUP = ["/settings", "/profile", "/subscription"];
+  const isActive = (to: string) =>
+    to === "/settings" ? SETTINGS_GROUP.includes(location.pathname) : location.pathname === to;
 
   // Theme is applied globally by <ThemeSync /> in the root route.
 
