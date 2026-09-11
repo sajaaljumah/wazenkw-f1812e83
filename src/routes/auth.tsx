@@ -145,7 +145,10 @@ function AuthPage() {
     const { data, error } = await supabase.auth.signUp({
       email: parsed.data.email,
       password: parsed.data.password,
-      options: { emailRedirectTo: window.location.origin },
+      options: {
+        emailRedirectTo: window.location.origin,
+        data: { wazen_walkthrough_eligible: true },
+      },
     });
 
     if (error) {
