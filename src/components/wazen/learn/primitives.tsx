@@ -59,12 +59,31 @@ export function LearnSection({
   caption,
   icon,
   children,
+  collapsible = false,
+  defaultOpen = false,
 }: {
   title: string;
   caption?: string;
   icon?: ReactNode;
   children: ReactNode;
+  collapsible?: boolean;
+  defaultOpen?: boolean;
 }) {
+  if (collapsible) {
+    return (
+      <details className="kid-panel group p-5 sm:p-6" open={defaultOpen}>
+        <summary className="flex min-w-0 cursor-pointer list-none items-start gap-3 focus-visible:outline-hidden">
+          {icon ? <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-kid-soft/70 text-kid-deep">{icon}</span> : null}
+          <span className="min-w-0 flex-1">
+            <span className="block text-lg font-semibold sm:text-xl">{title}</span>
+            {caption ? <span className="mt-1 block text-xs text-muted-foreground sm:text-sm">{caption}</span> : null}
+          </span>
+          <span className="mt-2 size-2 shrink-0 rotate-45 border-b border-e border-kid-deep transition-transform group-open:-rotate-135" />
+        </summary>
+        <div className="mt-5 border-t border-kid-soft pt-5">{children}</div>
+      </details>
+    );
+  }
   return (
     <section className="space-y-4">
       <header className="flex min-w-0 items-start gap-3 px-1">

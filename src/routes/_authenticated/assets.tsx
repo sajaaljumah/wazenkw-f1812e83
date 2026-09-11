@@ -17,7 +17,7 @@ import {
   StocksIcon,
   ICON_STROKE,
 } from "@/components/wazen/icons";
-import { EmptyState, Panel, StatCard } from "@/components/wazen/dashboard/primitives";
+import { DisclosurePanel, EmptyState, Panel, StatCard } from "@/components/wazen/dashboard/primitives";
 import { AssetFormDialog } from "@/components/wazen/assets/AssetFormDialog";
 import { useAssetValuations, useAssets, useDeleteAsset } from "@/hooks/use-wazen-assets";
 import { useProfile } from "@/hooks/use-wazen-auth";
@@ -312,7 +312,8 @@ function AssetRow({
         </div>
       </div>
 
-       <dl className="mt-4 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
+      <DisclosurePanel title={t("valueHistory")} summary={formatMoney(marketValue(asset), asset.currency)} className="mt-4">
+       <dl className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
         <Cell label={t("investedAmount")} value={formatMoney(costBasis(asset), asset.currency)} />
         <Cell label={t("totalAssetValue")} value={formatMoney(marketValue(asset), asset.currency)} />
         <Cell
@@ -373,7 +374,8 @@ function AssetRow({
         </div>
       ) : null}
 
-      {asset.notes ? <p className="mt-3 text-xs text-muted-foreground">{asset.notes}</p> : null}
+       {asset.notes ? <p className="mt-3 text-xs text-muted-foreground">{asset.notes}</p> : null}
+      </DisclosurePanel>
     </li>
   );
 }

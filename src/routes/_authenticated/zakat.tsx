@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/wazen/AppShell";
 import { Button } from "@/components/ui/button";
-import { EmptyState, Panel, ProgressBar, StatCard } from "@/components/wazen/dashboard/primitives";
+import { DisclosurePanel, EmptyState, Panel, ProgressBar, StatCard } from "@/components/wazen/dashboard/primitives";
 import { ZakatAlert } from "@/components/wazen/zakat/ZakatAlert";
 import { ZakatPaymentDialog } from "@/components/wazen/zakat/ZakatPaymentDialog";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
@@ -184,7 +184,7 @@ function ZakatPage() {
           />
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
           <Panel title={t("hawl")}>
             {result.startDate ? (
               <div className="space-y-4">
@@ -243,7 +243,7 @@ function ZakatPage() {
             )}
           </Panel>
 
-          <Panel title={t("zakatExplanation")}>
+          <DisclosurePanel title={t("zakatExplanation")} summary={t("zakatReference")}>
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>{t("zakatExplanationBody")}</p>
               <p>{t("zakatSeparateSadaqah")}</p>
@@ -258,24 +258,26 @@ function ZakatPage() {
                 {t("zakatReferenceLink")}
               </a>
             </div>
-          </Panel>
+          </DisclosurePanel>
         </div>
 
         <Panel title={t("zakatBreakdown")}>
           <div className="space-y-6">
             <LineGroup title={t("zakatEligible")} lines={eligible} currency={currency} />
             {review.length > 0 ? (
-              <div>
+              <DisclosurePanel title={t("zakatNeedsReview")} summary={t("zakatNeedsReviewBody")}>
                 <LineGroup title={t("zakatNeedsReview")} lines={review} currency={currency} />
-                <p className="mt-2 text-xs text-muted-foreground">{t("zakatNeedsReviewBody")}</p>
-              </div>
+              </DisclosurePanel>
             ) : null}
             {excluded.length > 0 ? (
-              <LineGroup title={t("zakatExcluded")} lines={excluded} currency={currency} />
+              <DisclosurePanel title={t("zakatExcluded")}>
+                <LineGroup title={t("zakatExcluded")} lines={excluded} currency={currency} />
+              </DisclosurePanel>
             ) : null}
           </div>
         </Panel>
 
+        <DisclosurePanel title={t("zakatHistory")} summary={t("zakatHistorySummary")}>
         <div className="grid gap-5 lg:grid-cols-2">
           <Panel title={t("zakatPaymentHistory")}>
             {payments.length === 0 ? (
@@ -326,6 +328,7 @@ function ZakatPage() {
             )}
           </Panel>
         </div>
+        </DisclosurePanel>
 
         <p className="text-center text-xs text-muted-foreground">
           {t("zakatReference")} ·{" "}

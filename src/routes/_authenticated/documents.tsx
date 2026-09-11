@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/wazen/AppShell";
-import { EmptyState, Panel } from "@/components/wazen/dashboard/primitives";
+import { DisclosurePanel, EmptyState, Panel } from "@/components/wazen/dashboard/primitives";
 import { Button } from "@/components/ui/button";
 import {
   AlertIcon,
@@ -316,7 +316,7 @@ function DocumentsPage() {
           )}
         </Panel>
 
-        <Panel title={t("myDocuments")}>
+        <DisclosurePanel title={t("myDocuments")} summary={t("documentHistorySummary")}>
           {documents.isLoading ? (
             <div className="flex min-h-24 items-center justify-center">
               <SpinnerIcon className="size-5 animate-spin text-muted-foreground" />
@@ -350,7 +350,7 @@ function DocumentsPage() {
               ))}
             </ul>
           )}
-        </Panel>
+        </DisclosurePanel>
       </div>
     </AppShell>
   );

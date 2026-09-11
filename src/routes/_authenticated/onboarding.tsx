@@ -21,6 +21,16 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
+  head: () => ({
+    meta: [
+      { title: "Account setup — Wazen" },
+      { name: "description", content: "Complete your Wazen account setup and preferences." },
+      { property: "og:title", content: "Account setup — Wazen" },
+      { property: "og:description", content: "Complete your Wazen account setup and preferences." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Onboarding,
 });
 

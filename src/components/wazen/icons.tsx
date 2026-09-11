@@ -60,6 +60,8 @@ import {
   ListChecks,
   Sparkles,
   Flame,
+  ChevronDown,
+  MoreHorizontal,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -142,3 +144,5 @@ export const UploadIcon = Upload;
 export const CameraIcon = Camera;
 export const AlertIcon = TriangleAlert;
 export const RetryIcon = RefreshCw;
+export const ExpandIcon = ChevronDown;
+export const MoreIcon = MoreHorizontal;

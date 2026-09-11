@@ -1,5 +1,5 @@
-import { FamilyIcon, GiveIcon, PremiumIcon, StudentIcon, ICON_STROKE } from "@/components/wazen/icons";
-import { BalanceHero, EmptyState, Panel, ProgressBar, percentOf } from "./primitives";
+import { AnalyticsIcon, FamilyIcon, StudentIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { BalanceHero, DisclosurePanel, EmptyState, InsightStrip, JourneySection, Panel, ProgressBar, percentOf } from "./primitives";
 
 import { BudgetCard, EmergencyFundCard, GoalsCard, RecentTransactionsCard, UpcomingCashFlowCard } from "./lists";
 import { IncomeVsExpensesCard, SavingsTrendCard, SpendingByCategoryCard } from "./charts";
@@ -59,8 +59,6 @@ export function AdultDashboard({
 
   return (
     <>
-      <QuickActions userId={userId} currency={currency} goals={goals} />
-
       <BalanceHero
         label={t("availableMoney")}
         amount={all.net}
@@ -74,35 +72,43 @@ export function AdultDashboard({
       />
 
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <BudgetCard budget={budget ? Number(budget.amount) : null} spent={month.expenses} currency={currency} />
-        <EmergencyFundCard goals={goals} transactions={transactions} currency={currency} />
-      </div>
+      <InsightStrip icon={<AnalyticsIcon className="size-5" strokeWidth={ICON_STROKE} />} label={t("dashboardInsight")}>
+        {month.income >= month.expenses ? t("dashboardInsightHealthy") : t("dashboardInsightWatch")}
+      </InsightStrip>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <SpendingByCategoryCard transactions={monthTransactions} currency={currency} />
-        <IncomeVsExpensesCard transactions={transactions} currency={currency} />
-      </div>
+      <QuickActions userId={userId} currency={currency} goals={goals} />
 
-      <SavingsTrendCard transactions={transactions} currency={currency} />
+      <JourneySection title={t("planAhead")} description={t("planAheadBody")} id="planning">
+        <div className="grid gap-4 lg:grid-cols-3">
+          <BudgetCard budget={budget ? Number(budget.amount) : null} spent={month.expenses} currency={currency} />
+          <EmergencyFundCard goals={goals} transactions={transactions} currency={currency} />
+          <GoalsCard goals={goals} transactions={transactions} currency={currency} />
+        </div>
+      </JourneySection>
 
+      <JourneySection title={t("activityAndTrends")} description={t("activityAndTrendsBody")}>
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
+          <RecentTransactionsCard transactions={transactions} currency={currency} limit={6} />
+          <UpcomingCashFlowCard items={recurring} currency={currency} />
+        </div>
+      </JourneySection>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <GoalsCard goals={goals} transactions={transactions} currency={currency} />
-        <UpcomingCashFlowCard items={recurring} currency={currency} />
-      </div>
+      <DisclosurePanel title={t("deeperAnalytics")} summary={t("deeperAnalyticsSummary")}>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <SpendingByCategoryCard transactions={monthTransactions} currency={currency} />
+          <IncomeVsExpensesCard transactions={transactions} currency={currency} />
+        </div>
+        <div className="mt-4"><SavingsTrendCard transactions={transactions} currency={currency} /></div>
+      </DisclosurePanel>
 
-      <PortfolioSummaryCard assets={assets.data ?? []} currency={currency} />
-
-      <RecentTransactionsCard transactions={transactions} currency={currency} limit={8} />
+      <DisclosurePanel title={t("portfolioSummary")} summary={t("notSpendable")}>
+        <PortfolioSummaryCard assets={assets.data ?? []} currency={currency} />
+      </DisclosurePanel>
 
       {focus === "student" ? (
-        <Panel title={t("studyTip")}>
-          <p className="text-sm text-muted-foreground">
-            Support from family and part-time income both count towards your own budget — your
-            account stays entirely private to you.
-          </p>
-        </Panel>
+        <InsightStrip icon={<StudentIcon className="size-5" strokeWidth={ICON_STROKE} />} label={t("studyTip")}>
+          {t("studyTipBody")}
+        </InsightStrip>
       ) : null}
     </>
   );
@@ -120,14 +126,6 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
 
   return (
     <>
-      <QuickActions
-        userId={userId}
-        currency={currency}
-        goals={goals}
-        actions={["expense", "saving", "give", "income", "goal"]}
-      />
-
-
       <BalanceHero
         label={t("moneyAvailable")}
         amount={all.net}
@@ -140,35 +138,36 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
       />
 
 
-      <SavingsTrendCard transactions={transactions} currency={currency} title={t("savedSoFar")} />
+      <InsightStrip icon={<StudentIcon className="size-5" strokeWidth={ICON_STROKE} />} label={t("dashboardInsight")}>
+        {month.income >= month.expenses ? t("dashboardInsightHealthy") : t("dashboardInsightWatch")}
+      </InsightStrip>
 
+      <QuickActions userId={userId} currency={currency} goals={goals} actions={["expense", "saving", "give", "income", "goal"]} />
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <BudgetCard
-          budget={budget ? Number(budget.amount) : null}
-          spent={month.expenses}
-          currency={currency}
-          title={t("spendingLimit")}
-        />
-        <GoalsCard goals={goals} transactions={transactions} currency={currency} title={t("savingFor")} />
-      </div>
+      <JourneySection title={t("planAhead")} description={t("planAheadBody")}>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <GoalsCard goals={goals} transactions={transactions} currency={currency} title={t("savingFor")} />
+          <BudgetCard budget={budget ? Number(budget.amount) : null} spent={month.expenses} currency={currency} title={t("spendingLimit")} />
+        </div>
+      </JourneySection>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <SpendingByCategoryCard transactions={monthTransactions} currency={currency} title={t("whereMoneyWent")} />
-        <UpcomingCashFlowCard items={recurring} currency={currency} title={t("comingUp")} />
-      </div>
+      <JourneySection title={t("latestActivity")} description={t("activityAndTrendsBody")}>
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+          <RecentTransactionsCard transactions={transactions} currency={currency} title={t("latestActivity")} />
+          <UpcomingCashFlowCard items={recurring} currency={currency} title={t("comingUp")} />
+        </div>
+      </JourneySection>
 
-      <RecentTransactionsCard transactions={transactions} currency={currency} title={t("latestActivity")} />
+      <DisclosurePanel title={t("deeperAnalytics")} summary={t("deeperAnalyticsSummary")}>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <SpendingByCategoryCard transactions={monthTransactions} currency={currency} title={t("whereMoneyWent")} />
+          <SavingsTrendCard transactions={transactions} currency={currency} title={t("savedSoFar")} />
+        </div>
+      </DisclosurePanel>
 
-      <ParentPaidCard transactions={parentPaid.data ?? []} />
-
-      <Panel title={t("financialLearning")}>
-        <EmptyState
-          icon={<StudentIcon className="size-5" strokeWidth={ICON_STROKE} />}
-          title={t("lessonsSoon")}
-          description={t("lessonsSoonBody")}
-        />
-      </Panel>
+      <DisclosurePanel title={t("paidByFamily")} summary={t("paidByFamilyIntro")}>
+        <ParentPaidCard transactions={parentPaid.data ?? []} />
+      </DisclosurePanel>
     </>
   );
 }

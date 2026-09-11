@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/finance";
+import { ExpandIcon, ICON_STROKE } from "@/components/wazen/icons";
 
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 
@@ -21,7 +22,7 @@ export function DashboardHeader({
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t("goodMorning") : hour < 18 ? t("goodAfternoon") : t("goodEvening");
   return (
-    <section className="wazen-card relative overflow-hidden">
+    <section className="wazen-masthead relative overflow-hidden" data-tour="welcome">
       {/* Quiet editorial wash keeps the greeting from reading as another generic card. */}
       <div aria-hidden className="wazen-hero-wash" />
       <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center">
@@ -158,6 +159,79 @@ export function Panel({
       </div>
       <div className="mt-6">{children}</div>
     </section>
+  );
+}
+
+export function JourneySection({
+  eyebrow,
+  title,
+  description,
+  action,
+  children,
+  className,
+  id,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+  id?: string;
+}) {
+  return (
+    <section id={id} className={cn("wazen-journey", className)}>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+        <div className="min-w-0">
+          {eyebrow ? <p className="wazen-label">{eyebrow}</p> : null}
+          <h2 className={cn("text-xl sm:text-2xl", eyebrow && "mt-2")}>{title}</h2>
+          {description ? <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{description}</p> : null}
+        </div>
+        {action}
+      </div>
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
+export function InsightStrip({ icon, label, children }: { icon?: ReactNode; label: string; children: ReactNode }) {
+  return (
+    <aside className="wazen-insight" aria-label={label}>
+      {icon ? <span className="shrink-0 text-primary">{icon}</span> : null}
+      <div className="min-w-0">
+        <p className="wazen-label">{label}</p>
+        <div className="mt-1 text-sm leading-relaxed text-foreground">{children}</div>
+      </div>
+    </aside>
+  );
+}
+
+export function DisclosurePanel({
+  title,
+  summary,
+  children,
+  defaultOpen = false,
+  className,
+}: {
+  title: string;
+  summary?: string;
+  children: ReactNode;
+  defaultOpen?: boolean;
+  className?: string;
+}) {
+  return (
+    <details className={cn("wazen-disclosure group", className)} open={defaultOpen}>
+      <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-4 focus-visible:outline-hidden">
+        <span className="min-w-0">
+          <span className="block text-base font-semibold sm:text-lg">{title}</span>
+          {summary ? <span className="mt-1 block text-xs text-muted-foreground sm:text-sm">{summary}</span> : null}
+        </span>
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-transform group-open:rotate-180">
+          <ExpandIcon className="size-4" strokeWidth={ICON_STROKE} />
+        </span>
+      </summary>
+      <div className="mt-5 border-t border-border/70 pt-5">{children}</div>
+    </details>
   );
 }
 
