@@ -7,10 +7,38 @@ const SRC_H = 887;
 /** Bounding box of the red "W" mark inside the artwork. */
 const MARK = { x: 420, y: 130, w: 995, h: 460 };
 
+/** The untouched red "W" mark, cropped out of the original artwork. */
+function Mark({ size, className }: { size: number; className?: string | undefined }) {
+  const scale = size / MARK.h;
+  return (
+    <span
+      className={cn("relative inline-block shrink-0 overflow-hidden", className)}
+      style={{ height: size, width: MARK.w * scale }}
+    >
+      <img
+        src={logo.url}
+        alt=""
+        aria-hidden
+        width={SRC_W}
+        height={SRC_H}
+        className="absolute"
+        style={{
+          width: SRC_W * scale,
+          height: SRC_H * scale,
+          left: -MARK.x * scale,
+          top: -MARK.y * scale,
+        }}
+        loading="eager"
+        decoding="async"
+      />
+    </span>
+  );
+}
+
 /**
- * The official Wazen lockup (red "W" mark above the Wazen wordmark).
- * The source artwork sits on white, so it is blended into the surrounding
- * light surface with `mix-blend-multiply` instead of being redrawn.
+ * The official Wazen lockup: the red "W" mark above the "Wazen" wordmark.
+ * The mark artwork is never redrawn or recoloured. On dark surfaces the logo
+ * sits directly on the background (no plate) and the wordmark is set in white.
  */
 export function WazenLogo({
   size = 40,
@@ -23,57 +51,27 @@ export function WazenLogo({
   /** Crop to the "W" mark only when false. */
   withWordmark?: boolean;
 }) {
-  if (withWordmark) {
-    return (
-      <span
-        className={cn(
-          "inline-flex shrink-0 items-center justify-center",
-          // Dark mode: the printed lockup keeps its dark wordmark, so it sits on a
-          // light plate instead of being recoloured or inverted.
-          "dark:rounded-md dark:bg-[var(--logo-plate)] dark:px-1.5 dark:py-0.5",
-          className,
-        )}
-        style={{ height: size, width: (size * SRC_W) / SRC_H }}
-      >
-        <img
-          src={logo.url}
-          alt="Wazen"
-          width={SRC_W}
-          height={SRC_H}
-          className="h-full w-full object-contain mix-blend-multiply"
-          loading="eager"
-          decoding="async"
-        />
-      </span>
-    );
+  if (!withWordmark) {
+    return <Mark size={size} className={className} />;
   }
 
-  // Crop to the mark: scale the full artwork, then shift the crop into view.
-  const scale = size / MARK.h;
+  const markSize = size * 0.56;
+  const wordSize = size * 0.3;
+
   return (
     <span
-      className={cn(
-        "relative inline-block shrink-0 overflow-hidden",
-        "dark:rounded-md dark:bg-[var(--logo-plate)]",
-        className,
-      )}
-      style={{ height: size, width: MARK.w * scale }}
+      className={cn("inline-flex shrink-0 flex-col items-center justify-center", className)}
+      style={{ height: size, gap: size * 0.06 }}
+      aria-label="Wazen"
+      role="img"
     >
-      <img
-        src={logo.url}
-        alt="Wazen"
-        width={SRC_W}
-        height={SRC_H}
-        className="absolute mix-blend-multiply"
-        style={{
-          width: SRC_W * scale,
-          height: SRC_H * scale,
-          left: -MARK.x * scale,
-          top: -MARK.y * scale,
-        }}
-        loading="eager"
-        decoding="async"
-      />
+      <Mark size={markSize} />
+      <span
+        className="font-display font-semibold leading-none text-foreground"
+        style={{ fontSize: wordSize, letterSpacing: wordSize * 0.02 }}
+      >
+        Wazen
+      </span>
     </span>
   );
 }
