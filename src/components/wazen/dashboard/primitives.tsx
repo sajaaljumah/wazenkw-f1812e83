@@ -21,7 +21,7 @@ export function DashboardHeader({
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t("goodMorning") : hour < 18 ? t("goodAfternoon") : t("goodEvening");
   return (
-    <section className="flex flex-col gap-5 border-b border-border pb-8 sm:flex-row sm:items-center sm:pb-10">
+    <section className="wazen-card flex flex-col gap-5 sm:flex-row sm:items-center">
       {avatar ? <div className="shrink-0">{avatar}</div> : null}
       <div className="min-w-0">
         <p className="wazen-label">{today} · {eyebrow}</p>
