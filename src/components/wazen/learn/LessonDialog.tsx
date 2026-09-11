@@ -20,6 +20,13 @@ export function LessonDialog({
 
   useEffect(() => setStep(0), [lesson?.key]);
 
+  // Close only once the save has settled, so the dialog is never unmounted
+  // from inside a mutation callback (which updates state after unmount).
+  const settled = record.isSuccess || record.isError;
+  useEffect(() => {
+    if (settled) onClose();
+  }, [settled, onClose]);
+
   if (!lesson) return null;
   const total = lesson.steps.length + 1;
   const isTakeaway = step === lesson.steps.length;
