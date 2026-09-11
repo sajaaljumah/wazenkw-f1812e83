@@ -18,9 +18,9 @@ const NAV = [
 
 export function WazenMark({ className }: { className?: string }) {
   return (
-    <span className={cn("font-display text-2xl", className)}>
+    <span className={cn("font-display text-2xl font-extrabold tracking-tight", className)}>
       Wazen
-      <span className="text-gold">.</span>
+      <span className="text-primary">.</span>
     </span>
   );
 }
