@@ -139,6 +139,11 @@ export function ChildDashboard({
   const [action, setAction] = useState<ActionKind | null>(null);
   const parentPaid = useParentPaidForMe();
   const [sheet, setSheet] = useState<Sheet>(null);
+  // Presentation-only scroll reveals for the child sections.
+  const r2 = useReveal<HTMLElement>();
+  const r3 = useReveal<HTMLElement>();
+  const r4 = useReveal<HTMLElement>();
+  const r5 = useReveal<HTMLElement>();
 
   const monthTransactions = useMemo(() => inMonth(transactions, monthKey(new Date())), [transactions]);
   const month = totalsFor(monthTransactions);
