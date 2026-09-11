@@ -321,6 +321,7 @@ export function SavingsTrendCard({
               />
             </ComposedChart>
           </ResponsiveContainer>
+          ) : null}
           </div>
         </>
       )}
