@@ -9,8 +9,9 @@ import {
   formatMoney,
   inMonth,
   monthKey,
-  nextDueDate, savedForGoal,
-  upcomingCashFlow, totalsFor,
+  savedForGoal,
+  totalsFor,
+  upcomingCashFlow,
 } from "@/lib/finance";
 import type { Budget, Goal, RecurringItem, Transaction } from "@/lib/finance";
 import type { FamilyMemberSummary } from "@/hooks/use-wazen-finance";
@@ -56,6 +57,7 @@ export function AdultDashboard({
   const savedTotal = all.savings;
   const { t } = useWazenLocale();
   const assets = useAssets();
+  const nextMovement = upcomingCashFlow(recurring, 7)[0];
 
   return (
     <>
@@ -80,11 +82,11 @@ export function AdultDashboard({
         ) : (
           t("dashboardInsightWatch")
         )}
-        {upcomingCashFlow(recurring, 7).length > 0 && (
+        {nextMovement ? (
           <div className="mt-1 text-xs text-muted-foreground">
-            {t("comingUp")}: {upcomingCashFlow(recurring, 7)[0].name} ({formatMoney(upcomingCashFlow(recurring, 7)[0].amount, currency)})
+            {t("comingUp")}: {nextMovement.name} ({formatMoney(nextMovement.amount, currency)})
           </div>
-        )}
+        ) : null}
       </InsightStrip>
 
       <QuickActions userId={userId} currency={currency} goals={goals} />
@@ -134,6 +136,7 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
     .reduce((sum, t) => sum + Number(t.amount), 0);
   const { t } = useWazenLocale();
   const parentPaid = useParentPaidForMe();
+  const nextMovement = upcomingCashFlow(recurring, 7)[0];
 
   return (
     <>
@@ -157,11 +160,11 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
         ) : (
           t("dashboardInsightWatch")
         )}
-        {upcomingCashFlow(recurring, 7).length > 0 && (
+        {nextMovement ? (
           <div className="mt-1 text-xs text-muted-foreground">
-            {t("comingUp")}: {upcomingCashFlow(recurring, 7)[0].name} ({formatMoney(upcomingCashFlow(recurring, 7)[0].amount, currency)})
+            {t("comingUp")}: {nextMovement.name} ({formatMoney(nextMovement.amount, currency)})
           </div>
-        )}
+        ) : null}
       </InsightStrip>
 
       <QuickActions userId={userId} currency={currency} goals={goals} actions={["expense", "saving", "give", "income", "goal"]} />
@@ -184,8 +187,8 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
         <div className="grid gap-4 lg:grid-cols-2">
           <SpendingByCategoryCard transactions={monthTransactions} currency={currency} title={t("whereMoneyWent")} />
           <IncomeVsExpensesCard transactions={transactions} currency={currency} months={4} />
-          <SavingsTrendCard transactions={transactions} currency={currency} title={t("savedSoFar")} />
         </div>
+        <div className="mt-4"><SavingsTrendCard transactions={transactions} currency={currency} title={t("savedSoFar")} /></div>
       </JourneySection>
 
       <DisclosurePanel title={t("paidByFamily")} summary={t("paidByFamilyIntro")}>
