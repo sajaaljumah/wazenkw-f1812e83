@@ -55,8 +55,6 @@ export function FirstUseWalkthrough({
     setOpen(false);
   };
 
-  const dismissForVerification = () => setOpen(false);
-
   const childLike = lifeStage === "child" || lifeStage === "teenager";
   const steps = [
     { title: t("tourWelcomeTitle"), body: childLike ? t("tourWelcomeYoungBody") : t("tourWelcomeBody"), icon: BudgetIcon },
@@ -69,7 +67,7 @@ export function FirstUseWalkthrough({
   const Icon = current.icon;
 
   return (
-    <Dialog open={open} onOpenChange={(next) => (!next ? dismissForVerification() : undefined)}>
+    <Dialog open={open} onOpenChange={(next) => (!next ? complete() : undefined)}>
       <DialogContent className="max-w-md overflow-hidden p-0" aria-describedby="walkthrough-description">
         <div className="bg-accent/55 px-6 pb-7 pt-8 sm:px-8">
           <div className="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-soft">
