@@ -58,16 +58,19 @@ export function AdultDashboard({
     <>
       <QuickActions userId={userId} currency={currency} goals={goals} />
 
+      <BalanceHero
+        label={t("availableMoney")}
+        amount={all.net}
+        currency={currency}
+        hint={t("afterExpensesHint")}
+        items={[
+          { label: t("incomeMonth"), amount: month.income, tone: "positive" },
+          { label: t("expensesMonth"), amount: month.expenses, tone: "negative" },
+          { label: t("totalSavings"), amount: savedTotal, tone: "gold" },
+        ]}
+      />
+
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard
-          label={t("availableMoney")}
-          amount={all.net}
-          currency={currency}
-          tone={all.net >= 0 ? "neutral" : "negative"}
-          hint={t("afterExpensesHint")}
-          className="col-span-2 lg:col-span-1"
-          icon={<BudgetIcon className="size-4" strokeWidth={ICON_STROKE} />}
-        />
         <StatCard
           label={t("incomeMonth")}
           amount={month.income}
@@ -90,6 +93,13 @@ export function AdultDashboard({
           hint={t("goalsHint")}
           icon={<SavingsIcon className="size-4" strokeWidth={ICON_STROKE} />}
         />
+        <StatCard
+          label={t("availableMoney")}
+          amount={all.net}
+          currency={currency}
+          tone={all.net >= 0 ? "neutral" : "negative"}
+          icon={<BudgetIcon className="size-4" strokeWidth={ICON_STROKE} />}
+        />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
@@ -101,6 +111,9 @@ export function AdultDashboard({
         <SpendingByCategoryCard transactions={monthTransactions} currency={currency} />
         <IncomeVsExpensesCard transactions={transactions} currency={currency} />
       </div>
+
+      <SavingsTrendCard transactions={transactions} currency={currency} />
+
 
       <div className="grid gap-5 lg:grid-cols-2">
         <GoalsCard goals={goals} transactions={transactions} currency={currency} />
