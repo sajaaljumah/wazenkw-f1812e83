@@ -227,7 +227,7 @@ function SettingsPage() {
             <select
               className={cn(inputClass, "mt-2")}
               value={language}
-              onChange={(e) => setLanguage(e.target.value)}
+              onChange={(e) => void chooseLanguage(e.target.value)}
             >
               {labels.languageOptions.map((l) => (
                 <option key={l.value} value={l.value}>
