@@ -6,6 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { setActiveDateLocale } from "@/lib/finance";
 import { useProfile } from "@/hooks/use-wazen-auth";
 
 export type WazenLanguage = "en" | "ar";
@@ -1538,6 +1539,7 @@ export function WazenLocaleProvider({
 }) {
   const parent = useContext(LocaleContext);
   const resolved: WazenLanguage = language === "ar" ? "ar" : language === "en" ? "en" : parent.language;
+  setActiveDateLocale(resolved === "ar" ? "ar-KW" : "en-KW");
   return (
     <LocaleContext.Provider value={{ language: resolved, setLanguage: parent.setLanguage }}>
       {children}

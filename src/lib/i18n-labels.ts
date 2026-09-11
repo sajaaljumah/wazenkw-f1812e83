@@ -149,6 +149,57 @@ export function useWazenLabels() {
     { value: "Apple Pay", label: "Apple Pay" },
   ];
 
+  /**
+   * Seeded/demo category names are stored in English. Translate the known ones
+   * for display only; anything the user typed themselves is left untouched.
+   */
+  const CATEGORY_AR: Record<string, string> = {
+    groceries: "بقالة",
+    dining: "مطاعم",
+    "dining out": "مطاعم",
+    utilities: "فواتير ومرافق",
+    fuel: "وقود",
+    transport: "مواصلات",
+    health: "صحة",
+    clothing: "ملابس",
+    education: "تعليم",
+    "school fees": "رسوم دراسية",
+    school: "مدرسة",
+    salary: "راتب",
+    "monthly salary": "الراتب الشهري",
+    savings: "مدخرات",
+    saving: "ادخار",
+    subscriptions: "اشتراكات",
+    "emergency fund": "صندوق الطوارئ",
+    "emergency fund top up": "تعزيز صندوق الطوارئ",
+    rent: "إيجار",
+    entertainment: "ترفيه",
+    gaming: "ألعاب",
+    activities: "أنشطة",
+    phone: "هاتف",
+    internet: "إنترنت",
+    books: "كتب",
+    sports: "رياضة",
+    allowance: "مصروف",
+    "pocket money": "مصروف الجيب",
+    gifts: "هدايا",
+    giving: "عطاء",
+    charity: "صدقة",
+    sadaqah: "صدقة",
+    zakat: "زكاة",
+    "family support": "دعم عائلي",
+    transfer: "تحويل",
+    "savings transfer": "تحويل ادخاري",
+    investments: "استثمارات",
+    other: "أخرى",
+  };
+
+  const category = (name: string | null | undefined): string => {
+    if (!name) return "";
+    if (language !== "ar") return name;
+    return CATEGORY_AR[name.trim().toLowerCase()] ?? name;
+  };
+
   /** Demo picker notes are stored as codes so both languages read naturally. */
   const demoNote = (note: string): string => {
     const age = note.match(/(\d+)/);
@@ -162,6 +213,7 @@ export function useWazenLabels() {
   };
 
   return {
+    category,
     lifeStage,
     gender,
     accountType,
