@@ -8,7 +8,7 @@ const SRC_H = 887;
 const MARK = { x: 420, y: 130, w: 995, h: 460 };
 
 /** The untouched red "W" mark, cropped out of the original artwork. */
-function Mark({ size, className }: { size: number; className?: string }) {
+function Mark({ size, className }: { size: number; className?: string | undefined }) {
   const scale = size / MARK.h;
   return (
     <span
