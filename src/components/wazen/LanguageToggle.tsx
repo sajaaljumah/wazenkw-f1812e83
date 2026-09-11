@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Language switch for the public screens. Signed-in users change their saved
- * preference in SettingsIcon, which always wins over this device-level choice.
+ * preference in Settings, which always wins over this device-level choice.
  */
 export function LanguageToggle({ className }: { className?: string }) {
   const { language, setLanguage, t } = useWazenLocale();

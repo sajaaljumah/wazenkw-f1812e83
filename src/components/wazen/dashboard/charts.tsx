@@ -1,5 +1,5 @@
 import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
-import { PieChart as PieIcon, TrendChartIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { CategoryChartIcon as PieIcon, TrendChartIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { EmptyState, Panel } from "./primitives";
 import { formatMoney, monthlySeries, spendingByCategory } from "@/lib/finance";
 import type { Transaction } from "@/lib/finance";

@@ -203,7 +203,7 @@ function Onboarding() {
             <>
               <h1 className="text-3xl">Preferences</h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                You can change these at any time in SettingsIcon.
+                You can change these at any time in Settings.
               </p>
               <div className="mt-7 grid gap-5 sm:grid-cols-2">
                 <label className="block">

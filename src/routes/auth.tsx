@@ -150,7 +150,7 @@ function AuthPage() {
 
     if (!data.session) {
       setBusy(false);
-      toast.success("CheckIcon your email to confirm your account, then sign in.");
+      toast.success("Check your email to confirm your account, then sign in.");
       navigate({ to: "/auth", search: { mode: "signin" } });
       return;
     }
