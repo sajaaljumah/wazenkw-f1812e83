@@ -190,13 +190,23 @@ export function formatAmount(amount: number, currency: string): string {
   return formatMoney(amount, currency);
 }
 
+/**
+ * Active locale for date formatting. The locale provider keeps this in sync so
+ * dates read in the chosen language everywhere, including outside React.
+ */
+let activeLocale = "ar-KW";
+
+export function setActiveDateLocale(locale: string): void {
+  activeLocale = locale;
+}
+
 export function formatDate(value: string | Date): string {
   const date = typeof value === "string" ? new Date(`${value.slice(0, 10)}T00:00:00`) : value;
-  return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" }).format(date);
+  return new Intl.DateTimeFormat(activeLocale, { day: "numeric", month: "short" }).format(date);
 }
 
 export function formatToday(date = new Date(), locale?: string): string {
-  return new Intl.DateTimeFormat(locale, {
+  return new Intl.DateTimeFormat(locale ?? activeLocale, {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -213,7 +223,7 @@ export function monthKeyOf(value: string): string {
 }
 
 export function monthLabel(date: Date): string {
-  return new Intl.DateTimeFormat(undefined, { month: "short" }).format(date);
+  return new Intl.DateTimeFormat(activeLocale, { month: "short" }).format(date);
 }
 
 /** Handles 28/29/30/31-day months and leap years. */
