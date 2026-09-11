@@ -20,7 +20,7 @@ export function WazenLogo({
   return (
     <span
       className={cn("inline-flex items-center justify-center overflow-hidden", className)}
-      style={{ height: size, width: withWordmark ? size * 1.62 : size * 0.9 }}
+      style={{ height: size, width: withWordmark ? size * 1.43 : size * 1.05 }}
     >
       <img
         src={logo.url}
