@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
 import { LanguageToggle } from "@/components/wazen/LanguageToggle";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
-import { DEMO_ACCOUNTS, DEMO_PASSWORD } from "@/lib/demo-accounts";
+import { DEMO_ACCESS_ACCOUNTS, DEMO_PASSWORD } from "@/lib/demo-accounts";
 import {
   ADULT_LIFE_STAGES,
   CURRENCIES,
@@ -375,7 +375,7 @@ function AuthPage() {
             Pick a demo account to fill the sign-in form, then press Sign in.
           </p>
           <div className="mt-5 wazen-rule-list border-y border-border">
-            {DEMO_ACCOUNTS.map((account) => (
+            {DEMO_ACCESS_ACCOUNTS.map((account) => (
               <Button
                 key={account.email}
                 type="button"
@@ -390,9 +390,9 @@ function AuthPage() {
                   toast.success(`${account.name} loaded — press Sign in`);
                 }}
                 variant="ghost"
-                className="h-auto w-full justify-between rounded-none px-1 py-3.5 text-start text-sm font-normal"
+                className="h-auto w-full min-w-0 justify-start rounded-none px-1 py-3.5 text-start text-sm font-normal"
               >
-                <span>
+                <span className="min-w-0">
                   {account.name}
                   <span className="block text-xs text-muted-foreground">
                     {LIFE_STAGE_LABELS[account.life_stage]} · {account.note}

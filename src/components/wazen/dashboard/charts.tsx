@@ -58,7 +58,7 @@ export function SpendingByCategoryCard({
         />
       ) : (
         <div className="space-y-5">
-          <div className="flex items-baseline justify-between gap-3 border-b border-border/70 pb-4">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 border-b border-border/70 pb-4">
             <span className="wazen-label">Total</span>
             <span className="wazen-number text-lg">{formatMoney(total, currency)}</span>
           </div>
@@ -69,7 +69,7 @@ export function SpendingByCategoryCard({
               const color = BAR_COLORS[index % BAR_COLORS.length];
               return (
                 <li key={slice.category} className="group">
-                  <div className="flex items-baseline justify-between gap-3 text-sm">
+                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 text-sm">
                     <span className="flex min-w-0 items-center gap-2.5">
                       <span className="size-2 rounded-full" style={{ background: color }} />
                       <span className="truncate">{slice.category}</span>
@@ -125,20 +125,22 @@ export function IncomeVsExpensesCard({
           description="Add income and expenses to see how your months compare."
         />
       ) : (
-        <div className="h-56 w-full">
+         <div className="h-52 w-full min-w-0 sm:h-56">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={series} barGap={3} margin={{ top: 8, right: 4, bottom: 0, left: -18 }}>
+             <ComposedChart data={series} barGap={3} margin={{ top: 8, right: 2, bottom: 0, left: -28 }}>
               <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.7} strokeDasharray="3 5" />
               <XAxis
                 dataKey="label"
                 tickLine={false}
                 axisLine={false}
                 tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                 interval="preserveStartEnd"
+                 minTickGap={18}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                width={54}
+                 width={48}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                 tickFormatter={(value) => Intl.NumberFormat(undefined, { notation: "compact" }).format(Number(value))}
               />
@@ -219,9 +221,9 @@ export function SavingsTrendCard({
           description="Every amount you save will build this line."
         />
       ) : (
-        <div className="h-48 w-full">
+         <div className="h-48 w-full min-w-0">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={series} margin={{ top: 8, right: 4, bottom: 0, left: -18 }}>
+             <ComposedChart data={series} margin={{ top: 8, right: 2, bottom: 0, left: -28 }}>
               <defs>
                 <linearGradient id="wazen-savings-area" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="var(--chart-2)" stopOpacity={0.35} />
@@ -235,11 +237,12 @@ export function SavingsTrendCard({
                 axisLine={false}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                 interval="preserveStartEnd"
+                 minTickGap={18}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                width={54}
+                 width={48}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                 tickFormatter={(value) => Intl.NumberFormat(undefined, { notation: "compact" }).format(Number(value))}
               />

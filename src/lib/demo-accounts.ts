@@ -25,3 +25,15 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
   { email: "deema@wazen.app", name: "Deema", gender: "female", life_stage: "self_employed", note: "Self-employed" },
   { email: "khaled@wazen.app", name: "Khaled", gender: "male", life_stage: "self_employed", note: "Self-employed" },
 ];
+
+/** One clear entry point per life-stage experience; all seeded accounts remain available. */
+export const DEMO_ACCESS_ACCOUNTS = DEMO_ACCOUNTS.filter((account) =>
+  [
+    "mariam@wazen.app",
+    "layan@wazen.app",
+    "reem@wazen.app",
+    "dana@wazen.app",
+    "hessa@wazen.app",
+    "deema@wazen.app",
+  ].includes(account.email),
+);

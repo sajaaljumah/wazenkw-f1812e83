@@ -116,14 +116,14 @@ function ZakatPage() {
   return (
     <AppShell>
       <div className="space-y-7 wazen-enter">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
+        <header className="grid grid-cols-1 items-end gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="min-w-0">
             <p className="wazen-eyebrow">{t("zakat")}</p>
             <h1 className="mt-1 text-3xl">{t("zakatTitle")}</h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t("zakatSubtitle")}</p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={() => setPaymentOpen(true)} variant="outline">
+          <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 md:flex">
+            <Button onClick={() => setPaymentOpen(true)} variant="outline" className="w-full md:w-auto">
               {t("zakatRecordPayment")}
             </Button>
             <Button
@@ -136,6 +136,7 @@ function ZakatPage() {
                 }
               }}
               disabled={saveCalculation.isPending}
+              className="w-full md:w-auto"
             >
               {saveCalculation.isPending ? <SpinnerIcon className="size-4 animate-spin" /> : null}
               {t("zakatSaveCalculation")}
@@ -223,8 +224,8 @@ function ZakatPage() {
               <div className="space-y-3">
                 <p className="text-base font-semibold">{t("zakatSetHawl")}</p>
                 <p className="text-sm text-muted-foreground">{t("zakatSetHawlBody")}</p>
-                <div className="flex flex-wrap items-end gap-3">
-                  <label className="block">
+                <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+                  <label className="block min-w-0">
                     <span className="wazen-label">{t("zakatStartDate")}</span>
                     <input
                       className="wazen-field mt-2"
@@ -233,7 +234,7 @@ function ZakatPage() {
                       onChange={(e) => setStartDate(e.target.value)}
                     />
                   </label>
-                  <Button onClick={submitStartDate} disabled={saveStartDate.isPending}>
+                  <Button onClick={submitStartDate} disabled={saveStartDate.isPending} className="w-full sm:w-auto">
                     {saveStartDate.isPending ? <SpinnerIcon className="size-4 animate-spin" /> : null}
                     {t("zakatSaveStartDate")}
                   </Button>
@@ -282,7 +283,7 @@ function ZakatPage() {
             ) : (
               <ul className="divide-y divide-border/60 text-sm">
                 {payments.map((payment) => (
-                  <li key={payment.id} className="flex items-center justify-between gap-3 py-3">
+                  <li key={payment.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3">
                     <span>
                       <span className="block font-semibold">
                         {formatMoney(Number(payment.amount_kwd), payment.currency)}
@@ -305,7 +306,7 @@ function ZakatPage() {
             ) : (
               <ul className="divide-y divide-border/60 text-sm">
                 {(history.data ?? []).map((row) => (
-                  <li key={row.id} className="flex items-center justify-between gap-3 py-3">
+                  <li key={row.id} className="grid grid-cols-1 gap-1 py-3 min-[420px]:grid-cols-[minmax(0,1fr)_auto] min-[420px]:items-center">
                     <span>
                       <span className="block font-semibold">
                         {formatMoney(Number(row.zakat_due_kwd), currency)}
@@ -365,7 +366,7 @@ function LineGroup({
       <p className="wazen-label">{title}</p>
       <ul className="mt-2 divide-y divide-border/60 text-sm">
         {lines.map((line) => (
-          <li key={line.key} className="flex flex-wrap items-center justify-between gap-3 py-3">
+          <li key={line.key} className="grid grid-cols-1 gap-2 py-3 min-[420px]:grid-cols-[minmax(0,1fr)_auto] min-[420px]:items-center">
             <span className="min-w-0">
               <span className="block font-semibold">
                 {line.type === "cash" || line.type === "savings"
@@ -377,7 +378,7 @@ function LineGroup({
                 {line.detail ? ` · ${line.detail}` : ""}
               </span>
             </span>
-            <span className="text-right">
+            <span className="min-w-0 text-start min-[420px]:text-end">
               <span className="block font-semibold">{formatMoney(line.value, currency)}</span>
               <span className="block text-xs text-muted-foreground">
                 {t(line.method as "zakatMethodFullValue")}
