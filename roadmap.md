@@ -10,3 +10,4 @@
 - [x] Restore visible illustrations (child, games, challenges, badges) without redesign
 - [x] Walkthrough: once per new account, replayed on every demo sign-in
 - [x] Language change in Settings applies instantly across the account (incl. Learn) and persists
+- [ ] Keep financial charts visible and strengthen purposeful chart/progress interactions
