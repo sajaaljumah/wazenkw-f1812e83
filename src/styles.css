@@ -510,6 +510,35 @@
   animation: kid-confetti 1.8s ease-in forwards;
 }
 
+/* Brand gloss: the same dimensional red finish as the Wazen mark, used on
+   primary actions and brand surfaces so the UI reads as one family. */
+@utility gloss-red {
+  position: relative;
+  overflow: hidden;
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 82%, white) 0%,
+    var(--color-primary) 46%,
+    color-mix(in oklab, var(--color-primary) 84%, black) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 42%, transparent),
+    inset 0 -1px 0 color-mix(in oklab, black 18%, transparent),
+    0 6px 16px -8px color-mix(in oklab, var(--color-primary) 60%, transparent);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 55% 0;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, white 30%, transparent) 0%,
+      transparent 100%
+    );
+    pointer-events: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
