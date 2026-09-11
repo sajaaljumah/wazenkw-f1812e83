@@ -19,16 +19,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
 function NotFoundComponent() {
+  const { t } = useWazenLocale();
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md border-y border-border py-12 text-center">
         <p className="wazen-label">404</p>
-        <h1 className="mt-4 text-4xl text-foreground">Page not found</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
+        <h1 className="mt-4 text-4xl text-foreground">{t("notFoundTitle")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("notFoundBody")}</p>
         <div className="mt-6">
-          <Button asChild><Link to="/">Go home</Link></Button>
+          <Button asChild><Link to="/">{t("goHome")}</Link></Button>
         </div>
       </div>
     </div>
@@ -38,6 +37,7 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  const { t } = useWazenLocale();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
@@ -45,12 +45,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md border-y border-border py-12 text-center">
-        <h1 className="text-3xl text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
-        </p>
+        <h1 className="text-3xl text-foreground">{t("pageErrorTitle")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("pageErrorBody")}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <Button
             onClick={() => {
@@ -58,9 +54,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               reset();
             }}
           >
-            Try again
+            {t("tryAgain")}
           </Button>
-          <Button asChild variant="outline"><a href="/">Go home</a></Button>
+          <Button asChild variant="outline"><a href="/">{t("goHome")}</a></Button>
         </div>
       </div>
     </div>
