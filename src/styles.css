@@ -450,9 +450,9 @@
 
 
 @utility kid-panel {
-  background-color: var(--color-kid-ivory);
-  color: var(--color-foreground);
-  border: 1px solid var(--color-kid-soft);
+  background-color: var(--kid-ivory);
+  color: var(--foreground);
+  border: 1px solid var(--kid-soft);
   border-radius: calc(var(--radius) + 6px);
   box-shadow: 0 2px 4px oklch(0.3 0.02 70 / 4%), 0 18px 40px oklch(0.3 0.02 70 / 7%);
 }
