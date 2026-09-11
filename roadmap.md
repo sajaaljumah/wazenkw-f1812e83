@@ -7,3 +7,4 @@
 - [x] Redesign profile, settings, subscription, dialogs, and status states
 - [x] Add English/Arabic presentation support across existing screens
 - [x] Verify all routes, representative roles, mobile/desktop, TypeScript, and production build
+- [ ] Use the uploaded soft cool-white color as the global application background
