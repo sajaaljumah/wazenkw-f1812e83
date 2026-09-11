@@ -60,7 +60,7 @@ export function StatCard({
           ? "text-gold"
           : "text-foreground";
   return (
-    <div className={cn("border-s border-border ps-5 first:border-s-0 first:ps-0 sm:px-5 sm:first:ps-0", className)}>
+    <div className={cn("wazen-card", className)}>
       <div className="flex items-start justify-between gap-3">
         <span className="wazen-label">{label}</span>
         {icon ? <span className="text-muted-foreground">{icon}</span> : null}
