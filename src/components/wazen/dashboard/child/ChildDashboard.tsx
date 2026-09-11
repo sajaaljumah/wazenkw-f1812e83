@@ -1,16 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  CalendarHeart,
-  HandHeart,
-  PiggyBank,
-  Plus,
-  ShoppingBag,
-  Sparkles,
-  Target,
-  Undo2,
-} from "lucide-react";
+import { AddIcon, ExpensesIcon, GiveIcon, GoalsIcon, IncomeIcon, PremiumIcon, RefundIcon, SavingsIcon, ScheduledIcon, SpendIcon, ICON_STROKE } from "@/components/wazen/icons";
 import {
   Dialog,
   DialogContent,
@@ -112,11 +101,11 @@ function ChoiceTile({
   );
 }
 
-const ACTIVITY_ICON: Record<Transaction["kind"], typeof ArrowDownLeft> = {
-  income: ArrowDownLeft,
-  expense: ShoppingBag,
-  saving: PiggyBank,
-  refund: Undo2,
+const ACTIVITY_ICON: Record<Transaction["kind"], typeof IncomeIcon> = {
+  income: IncomeIcon,
+  expense: SpendIcon,
+  saving: SavingsIcon,
+  refund: RefundIcon,
 };
 
 const ACTIVITY_WORD: Record<Transaction["kind"], string> = {
@@ -211,7 +200,7 @@ export function ChildDashboard({
             onClick={() => setAction("saving")}
                className="kid-press sm:ms-auto flex items-center gap-2 rounded-xl bg-kid-deep px-6 py-3 text-sm text-kid-ivory"
           >
-            <Plus className="size-4" strokeWidth={2} />
+            <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
             Save money
           </button>
         </div>
@@ -265,7 +254,7 @@ export function ChildDashboard({
                 {formatMoney(saved, currency)} saved of {formatMoney(target, currency)} — you are {percent}% there!
               </span>
               <span className="mt-4 inline-flex items-center gap-2 text-sm text-kid-deep">
-                <Sparkles className="size-4" strokeWidth={1.6} />
+                <PremiumIcon className="size-4" strokeWidth={ICON_STROKE} />
                 {percent >= 100 ? "You did it!" : "Tap to see your goal"}
               </span>
             </span>
@@ -378,7 +367,7 @@ export function ChildDashboard({
               return (
                 <li key={item.id} className="flex items-center gap-4 rounded-3xl bg-kid-tint/60 p-4">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-kid-soft/80 text-kid-deep">
-                    <Icon className="size-5" strokeWidth={1.6} />
+                    <Icon className="size-5" strokeWidth={ICON_STROKE} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm">
@@ -481,7 +470,7 @@ function SpendSheet({
           {spending.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-3 rounded-2xl bg-secondary/50 px-4 py-3 text-sm">
               <span className="flex min-w-0 items-center gap-2">
-                <ArrowUpRight className="size-4 shrink-0 text-muted-foreground" strokeWidth={1.6} />
+                <ExpensesIcon className="size-4 shrink-0 text-muted-foreground" strokeWidth={ICON_STROKE} />
                 <span className="truncate">{item.merchant ?? item.category}</span>
               </span>
               <span className="shrink-0 tabular-nums">{formatMoney(Number(item.amount), currency)}</span>
@@ -530,13 +519,13 @@ function GiveSheet({
         </div>
         <ul className="space-y-2 text-muted-foreground">
           <li className="flex gap-2">
-            <HandHeart className="mt-0.5 size-4 shrink-0" strokeWidth={1.6} /> Give a small part of your allowance.
+            <GiveIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> Give a small part of your allowance.
           </li>
           <li className="flex gap-2">
-            <CalendarHeart className="mt-0.5 size-4 shrink-0" strokeWidth={1.6} /> Choose one day each month to share.
+            <ScheduledIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> Choose one day each month to share.
           </li>
           <li className="flex gap-2">
-            <Sparkles className="mt-0.5 size-4 shrink-0" strokeWidth={1.6} /> Kind words and help count too.
+            <PremiumIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> Kind words and help count too.
           </li>
         </ul>
       </div>
@@ -579,7 +568,7 @@ function GoalSheet({
           onClick={onAddSaving}
           className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground"
         >
-          <Target className="size-4" strokeWidth={1.6} />
+          <GoalsIcon className="size-4" strokeWidth={ICON_STROKE} />
           Add to this goal
         </button>
       </div>

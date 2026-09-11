@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { SpinnerIcon } from "@/components/wazen/icons";
 import { AppShell } from "@/components/wazen/AppShell";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { useProfile, useSession } from "@/hooks/use-wazen-auth";
@@ -78,7 +78,7 @@ function Dashboard() {
     return (
       <AppShell>
         <div className="flex min-h-[40vh] items-center justify-center">
-          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          <SpinnerIcon className="size-6 animate-spin text-muted-foreground" />
         </div>
       </AppShell>
     );

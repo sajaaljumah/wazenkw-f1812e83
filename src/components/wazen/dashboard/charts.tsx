@@ -1,5 +1,5 @@
 import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
-import { PieChart as PieIcon, BarChart3 } from "lucide-react";
+import { PieChart as PieIcon, TrendChartIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { EmptyState, Panel } from "./primitives";
 import { formatMoney, monthlySeries, spendingByCategory } from "@/lib/finance";
 import type { Transaction } from "@/lib/finance";
@@ -28,7 +28,7 @@ export function SpendingByCategoryCard({
     <Panel title={title}>
       {slices.length === 0 ? (
         <EmptyState
-          icon={<PieIcon className="size-5" strokeWidth={1.5} />}
+          icon={<PieIcon className="size-5" strokeWidth={ICON_STROKE} />}
           title="No spending this month yet"
           description="Once you add expenses, your categories will appear here."
         />
@@ -102,7 +102,7 @@ export function IncomeVsExpensesCard({
     <Panel title="Income vs expenses">
       {!hasData ? (
         <EmptyState
-          icon={<BarChart3 className="size-5" strokeWidth={1.5} />}
+          icon={<TrendChartIcon className="size-5" strokeWidth={ICON_STROKE} />}
           title="Not enough data yet"
           description="Add income and expenses to see how your months compare."
         />

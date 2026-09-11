@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, LineChart, ShieldCheck, Sprout } from "lucide-react";
+import { AnalyticsIcon, EmergencyFundIcon, FamilyIcon, ForwardIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { WazenMark } from "@/components/wazen/AppShell";
 import { LanguageToggle } from "@/components/wazen/LanguageToggle";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
@@ -28,9 +28,9 @@ export const Route = createFileRoute("/")({
 });
 
 const PILLARS = [
-  { icon: Sprout, title: "pillarStagesTitle", body: "pillarStagesBody" },
-  { icon: ShieldCheck, title: "pillarPrivacyTitle", body: "pillarPrivacyBody" },
-  { icon: LineChart, title: "pillarHabitsTitle", body: "pillarHabitsBody" },
+  { icon: FamilyIcon, title: "pillarStagesTitle", body: "pillarStagesBody" },
+  { icon: EmergencyFundIcon, title: "pillarPrivacyTitle", body: "pillarPrivacyBody" },
+  { icon: AnalyticsIcon, title: "pillarHabitsTitle", body: "pillarHabitsBody" },
 ] as const;
 
 function Landing() {
@@ -66,7 +66,7 @@ function Landing() {
               search={{ mode: "signup" as const }}
             >
               {t("createAccount")}
-              <ArrowRight className="size-4" strokeWidth={1.5} />
+              <ForwardIcon className="size-4" strokeWidth={ICON_STROKE} />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
@@ -85,7 +85,7 @@ function Landing() {
           {PILLARS.map(({ icon: Icon, title, body }) => (
             <article key={title} className="wazen-card">
               <span className="flex size-11 items-center justify-center rounded-2xl bg-accent text-primary">
-                <Icon className="size-5" strokeWidth={1.5} />
+                <Icon className="size-5" strokeWidth={ICON_STROKE} />
               </span>
               <h2 className="mt-5 text-xl">{t(title)}</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(body)}</p>

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Lock } from "lucide-react";
+import { LockedIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/wazen/AppShell";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -50,7 +50,7 @@ function ProfilePage() {
   if (isLoading || !profile) {
     return (
       <AppShell>
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        <SpinnerIcon className="size-6 animate-spin text-muted-foreground" />
       </AppShell>
     );
   }
@@ -167,7 +167,7 @@ function ProfilePage() {
             onClick={save}
             disabled={busy}
           >
-            {busy ? <Loader2 className="size-4 animate-spin" /> : null}
+            {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
             {t("saveChanges")}
           </Button>
         </div>
@@ -180,7 +180,7 @@ function LockedField({ label, value }: { label: string; value: string }) {
   return (
     <div className="border-b border-border px-1 py-5 odd:sm:border-e odd:sm:pe-6 even:sm:ps-6 sm:[&:nth-last-child(-n+2)]:border-b-0">
       <span className="wazen-label flex items-center gap-1.5">
-        <Lock className="size-3" strokeWidth={1.75} />
+        <LockedIcon className="size-3" strokeWidth={ICON_STROKE} />
         {label}
       </span>
       <p className="mt-3 text-lg">{value}</p>

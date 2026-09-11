@@ -1,4 +1,4 @@
-import { CircleDashed, Sparkles } from "lucide-react";
+import { FreePlanIcon, PremiumIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ export function PlanBadge({
     return <span className={cn("inline-block h-6 w-16 animate-pulse rounded-md bg-secondary", className)} />;
   }
 
-  const Icon = isPremium ? Sparkles : CircleDashed;
+  const Icon = isPremium ? PremiumIcon : FreePlanIcon;
 
   return (
     <span
@@ -34,7 +34,7 @@ export function PlanBadge({
         className,
       )}
     >
-      <Icon className={size === "sm" ? "size-3" : "size-3.5"} strokeWidth={1.5} />
+      <Icon className={size === "sm" ? "size-3" : "size-3.5"} strokeWidth={ICON_STROKE} />
       {isPremium ? t("premium") : t("free")}
     </span>
   );

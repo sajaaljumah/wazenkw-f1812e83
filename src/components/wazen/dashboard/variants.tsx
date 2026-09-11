@@ -1,4 +1,4 @@
-import { Coins, GraduationCap, HandHeart, PiggyBank, Sparkles, TrendingDown, TrendingUp, Users, Wallet } from "lucide-react";
+import { AllowanceIcon, BudgetIcon, ExpensesIcon, FamilyIcon, GiveIcon, IncomeIcon, PremiumIcon, SavingsIcon, StudentIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { EmptyState, Panel, ProgressBar, StatCard, percentOf } from "./primitives";
 import { BudgetCard, EmergencyFundCard, GoalsCard, RecentTransactionsCard, UpcomingCashFlowCard } from "./lists";
 import { IncomeVsExpensesCard, SpendingByCategoryCard } from "./charts";
@@ -56,21 +56,21 @@ export function AdultDashboard({
           tone={all.net >= 0 ? "neutral" : "negative"}
           hint={t("afterExpensesHint")}
           className="col-span-2 lg:col-span-1"
-          icon={<Wallet className="size-4" strokeWidth={1.5} />}
+          icon={<BudgetIcon className="size-4" strokeWidth={ICON_STROKE} />}
         />
         <StatCard
           label={t("incomeMonth")}
           amount={month.income}
           currency={currency}
           tone="positive"
-          icon={<TrendingUp className="size-4" strokeWidth={1.5} />}
+          icon={<IncomeIcon className="size-4" strokeWidth={ICON_STROKE} />}
         />
         <StatCard
           label={t("expensesMonth")}
           amount={month.expenses}
           currency={currency}
           hint={t("refundsHint")}
-          icon={<TrendingDown className="size-4" strokeWidth={1.5} />}
+          icon={<ExpensesIcon className="size-4" strokeWidth={ICON_STROKE} />}
         />
         <StatCard
           label={t("totalSavings")}
@@ -78,7 +78,7 @@ export function AdultDashboard({
           currency={currency}
           tone="gold"
           hint={t("goalsHint")}
-          icon={<PiggyBank className="size-4" strokeWidth={1.5} />}
+          icon={<SavingsIcon className="size-4" strokeWidth={ICON_STROKE} />}
         />
       </div>
 
@@ -130,10 +130,10 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
       />
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard label={t("moneyAvailable")} amount={all.net} currency={currency} icon={<Wallet className="size-4" strokeWidth={1.5} />} />
-        <StatCard label={t("allowanceMonth")} amount={allowance} currency={currency} tone="positive" icon={<Coins className="size-4" strokeWidth={1.5} />} />
-        <StatCard label={t("spentMonth")} amount={month.expenses} currency={currency} icon={<TrendingDown className="size-4" strokeWidth={1.5} />} />
-        <StatCard label={t("savedSoFar")} amount={all.savings} currency={currency} tone="gold" icon={<PiggyBank className="size-4" strokeWidth={1.5} />} />
+        <StatCard label={t("moneyAvailable")} amount={all.net} currency={currency} icon={<BudgetIcon className="size-4" strokeWidth={ICON_STROKE} />} />
+        <StatCard label={t("allowanceMonth")} amount={allowance} currency={currency} tone="positive" icon={<AllowanceIcon className="size-4" strokeWidth={ICON_STROKE} />} />
+        <StatCard label={t("spentMonth")} amount={month.expenses} currency={currency} icon={<ExpensesIcon className="size-4" strokeWidth={ICON_STROKE} />} />
+        <StatCard label={t("savedSoFar")} amount={all.savings} currency={currency} tone="gold" icon={<SavingsIcon className="size-4" strokeWidth={ICON_STROKE} />} />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
@@ -155,7 +155,7 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
 
       <Panel title={t("financialLearning")}>
         <EmptyState
-          icon={<GraduationCap className="size-5" strokeWidth={1.5} />}
+          icon={<StudentIcon className="size-5" strokeWidth={ICON_STROKE} />}
           title={t("lessonsSoon")}
           description={t("lessonsSoonBody")}
         />
@@ -182,7 +182,7 @@ export function FamilySummaryCard({
         <p className="text-sm text-muted-foreground">{t("loadingFamily")}</p>
       ) : members.length === 0 ? (
         <EmptyState
-          icon={<Users className="size-5" strokeWidth={1.5} />}
+          icon={<FamilyIcon className="size-5" strokeWidth={ICON_STROKE} />}
           title={t("noFamily")}
           description={t("noFamilyDescription")}
         />

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { SpinnerIcon } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
 import { Button } from "@/components/ui/button";
@@ -101,7 +101,7 @@ function ResetPassword() {
               size="lg"
               className="w-full"
             >
-              {busy ? <Loader2 className="size-4 animate-spin" /> : null}
+              {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
               Update password
             </Button>
           </form>
