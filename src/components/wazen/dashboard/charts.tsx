@@ -54,6 +54,7 @@ export function SpendingByCategoryCard({
   const total = slices.reduce((sum, slice) => sum + slice.amount, 0);
   const max = slices.reduce((peak, slice) => Math.max(peak, slice.amount), 0);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const topSlice = slices[0];
 
   return (
     <Panel title={title ?? t("spendingCategory")}>
@@ -68,9 +69,11 @@ export function SpendingByCategoryCard({
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 border-b border-border/70 pb-4">
             <span>
               <span className="wazen-label block">{t("topSpendingCategory")}</span>
-              <span className="mt-1 block text-sm text-muted-foreground">
-                {labels.category(slices[0].category)} · {Math.round((slices[0].amount / total) * 100)}% {t("ofSpending")}
-              </span>
+              {topSlice ? (
+                <span className="mt-1 block text-sm text-muted-foreground">
+                  {labels.category(topSlice.category)} · {Math.round((topSlice.amount / total) * 100)}% {t("ofSpending")}
+                </span>
+              ) : null}
             </span>
             <span className="wazen-number text-lg">{formatMoney(total, currency)}</span>
           </div>
@@ -87,7 +90,7 @@ export function SpendingByCategoryCard({
                   <Button
                     type="button"
                     variant="ghost"
-                    className="wazen-chart-row group w-full rounded-lg px-2 py-1.5 text-start outline-hidden focus-visible:ring-2 focus-visible:ring-ring/60"
+                    className="wazen-chart-row group h-auto w-full justify-stretch rounded-lg px-2 py-1.5 text-start outline-hidden focus-visible:ring-2 focus-visible:ring-ring/60"
                     data-active={selectedCategory === slice.category ? "true" : undefined}
                     aria-pressed={selectedCategory === slice.category}
                     onClick={() => setSelectedCategory((current) => current === slice.category ? null : slice.category)}
