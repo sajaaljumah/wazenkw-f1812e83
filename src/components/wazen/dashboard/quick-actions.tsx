@@ -64,7 +64,7 @@ export function QuickActions({
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-3 border-b border-border pb-6">
+      <div className="wazen-card flex flex-wrap items-center gap-x-2 gap-y-3">
         <span className="wazen-label me-2">{t("quickEntry")}</span>
         {order.map((kind) => {
           const meta = ACTION_META[kind];
@@ -76,7 +76,7 @@ export function QuickActions({
               onClick={() => setOpen(kind)}
               className="h-auto justify-start px-3 py-2 text-start font-medium"
             >
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
                 <Icon className="size-4" strokeWidth={1.6} />
               </span>
               <span className="leading-tight">{labels?.[kind] ?? t(kind === "income" ? "addIncome" : kind === "expense" ? "addExpense" : kind === "saving" ? "addSaving" : "addGoal")}</span>

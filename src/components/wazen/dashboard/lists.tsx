@@ -140,7 +140,7 @@ export function UpcomingCashFlowCard({
           description={t("noScheduledDescription")}
         />
       ) : (
-        <ul className="wazen-rule-list border-y border-border">
+        <ul className="wazen-rule-list">
           {upcoming.map((entry) => (
             <li
               key={entry.id}
