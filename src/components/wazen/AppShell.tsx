@@ -9,6 +9,7 @@ import { PlanBadge } from "@/components/wazen/subscription/PlanBadge";
 import { firstNameOf } from "@/lib/wazen";
 import { canOwnAssets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
+import { WazenLogo } from "@/components/wazen/WazenLogo";
 
 const NAV = [
   { to: "/dashboard", label: "overview", icon: DashboardIcon },
@@ -18,13 +19,8 @@ const NAV = [
   { to: "/settings", label: "settings", icon: SettingsIcon },
 ] as const;
 
-export function WazenMark({ className }: { className?: string }) {
-  return (
-    <span className={cn("font-display text-2xl font-extrabold tracking-tight", className)}>
-      Wazen
-      <span className="text-primary">.</span>
-    </span>
-  );
+export function WazenMark({ className, size = 34 }: { className?: string; size?: number }) {
+  return <WazenLogo size={size} className={cn("transition-opacity hover:opacity-85", className)} />;
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
