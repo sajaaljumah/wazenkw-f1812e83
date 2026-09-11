@@ -67,7 +67,7 @@ export function useSaveAsset() {
   const { user } = useSession();
   const invalidate = useInvalidateAssets();
   return useMutation({
-    mutationFn: async ({ id, input }: { id?: string; input: AssetInput }) => {
+    mutationFn: async ({ id, input }: { id?: string | undefined; input: AssetInput }) => {
       if (id) {
         const { error } = await supabase.from("assets").update(input).eq("id", id);
         if (error) throw error;
