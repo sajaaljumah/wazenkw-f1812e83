@@ -88,7 +88,9 @@ function metaFor(t: (key: never) => string): Record<ActionKind, Meta> {
   };
 }
 
-const GIVING_TYPES = ["givingSadaqah", "givingZakat", "givingGift", "givingSupport"] as const;
+// Zakat is deliberately absent: it is recorded on the Zakat page as its own
+// payment type so sadaqah is never classified as zakat.
+const GIVING_TYPES = ["givingSadaqah", "givingGift", "givingSupport"] as const;
 const PAYMENT_METHODS = ["payCard", "payCash", "payTransfer"] as const;
 
 export function QuickActions({

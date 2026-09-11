@@ -148,24 +148,36 @@ function ZakatPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label={t("nisabValue")}
-            value={result.nisabKwd === null ? t("nisabPending") : formatMoney(result.nisabKwd, currency)}
-            hint={result.nisabMethod === "silver" ? t("nisabSilver") : t("nisabGold")}
+            amount={result.nisabKwd ?? 0}
+            currency={currency}
+            tone="gold"
+            hint={
+              result.nisabKwd === null
+                ? t("nisabPending")
+                : result.nisabMethod === "silver"
+                  ? t("nisabSilver")
+                  : t("nisabGold")
+            }
             icon={<MetalsIcon className="size-4" strokeWidth={ICON_STROKE} />}
           />
           <StatCard
             label={t("zakatableWealth")}
-            value={formatMoney(result.zakatableAmount, currency)}
+            amount={result.zakatableAmount}
+            currency={currency}
             hint={t("zakatRate")}
           />
           <StatCard
             label={t("zakatAmount")}
-            value={formatMoney(result.zakatDue, currency)}
+            amount={result.zakatDue}
+            currency={currency}
             hint={`${t("zakatPaid")}: ${formatMoney(result.paid, currency)}`}
             icon={<ZakatIcon className="size-4" strokeWidth={ICON_STROKE} />}
           />
           <StatCard
             label={t("zakatRemaining")}
-            value={formatMoney(result.remaining, currency)}
+            amount={result.remaining}
+            currency={currency}
+            tone={result.remaining > 0 ? "negative" : "positive"}
             hint={result.dueDate ? `${t("zakatDueDate")}: ${formatDate(result.dueDate)}` : t("zakatNeedsStartDate")}
             icon={<ScheduledIcon className="size-4" strokeWidth={ICON_STROKE} />}
           />
