@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowDownLeft, ArrowUpRight, Loader2, PiggyBank, Target } from "lucide-react";
+import { ExpensesIcon, GoalsIcon, IncomeIcon, SavingsIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
@@ -20,30 +20,30 @@ type ActionKind = "income" | "expense" | "saving" | "goal";
 const inputClass =
   "wazen-field";
 
-const ACTION_META: Record<ActionKind, { label: string; title: string; description: string; icon: typeof ArrowDownLeft }> = {
+const ACTION_META: Record<ActionKind, { label: string; title: string; description: string; icon: typeof IncomeIcon }> = {
   income: {
     label: "Add income",
     title: "Add income",
     description: "Money you received — salary, allowance, support or a side job.",
-    icon: ArrowDownLeft,
+    icon: IncomeIcon,
   },
   expense: {
     label: "Add expense",
     title: "Add expense",
     description: "Something you spent money on.",
-    icon: ArrowUpRight,
+    icon: ExpensesIcon,
   },
   saving: {
     label: "Add saving",
     title: "Move money to savings",
     description: "Savings are set aside, so they are not counted as available money.",
-    icon: PiggyBank,
+    icon: SavingsIcon,
   },
   goal: {
     label: "Add goal",
     title: "Create a savings goal",
     description: "Give it a name and a target amount to save towards.",
-    icon: Target,
+    icon: GoalsIcon,
   },
 };
 
@@ -77,7 +77,7 @@ export function QuickActions({
               className="h-auto justify-start px-3 py-2 text-start font-medium"
             >
               <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-                <Icon className="size-4" strokeWidth={1.6} />
+                <Icon className="size-4" strokeWidth={ICON_STROKE} />
               </span>
               <span className="leading-tight">{labels?.[kind] ?? t(kind === "income" ? "addIncome" : kind === "expense" ? "addExpense" : kind === "saving" ? "addSaving" : "addGoal")}</span>
             </Button>
@@ -199,7 +199,7 @@ export function ActionDialog({
                   <Field label="Goal name">
                     <input className={inputClass} value={goalName} onChange={(e) => setGoalName(e.target.value)} />
                   </Field>
-                  <Field label={`Target amount (${currency})`}>
+                  <Field label={`GoalsIcon amount (${currency})`}>
                     <input
                       className={inputClass}
                       type="number"
@@ -209,7 +209,7 @@ export function ActionDialog({
                       onChange={(e) => setGoalTarget(e.target.value)}
                     />
                   </Field>
-                  <Field label="Target date (optional)">
+                  <Field label="GoalsIcon date (optional)">
                     <input
                       className={inputClass}
                       type="date"
@@ -277,7 +277,7 @@ export function ActionDialog({
                 onClick={submit}
                 disabled={busy}
               >
-                {busy ? <Loader2 className="size-4 animate-spin" /> : null}
+                {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
                 Save
               </Button>
               <Button

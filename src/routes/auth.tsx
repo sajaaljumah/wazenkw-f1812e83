@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2, Sparkles } from "lucide-react";
+import { PremiumIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
 import { LanguageToggle } from "@/components/wazen/LanguageToggle";
@@ -368,7 +368,7 @@ function AuthPage() {
 
         <aside className="py-10 lg:ps-10">
           <div className="flex items-center gap-2">
-            <Sparkles className="size-4 text-gold" strokeWidth={1.5} />
+            <PremiumIcon className="size-4 text-gold" strokeWidth={ICON_STROKE} />
             <h2 className="text-lg">Explore Wazen</h2>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -415,7 +415,7 @@ function SubmitButton({ busy, children }: { busy: boolean; children: React.React
       size="lg"
       className="w-full"
     >
-      {busy ? <Loader2 className="size-4 animate-spin" /> : null}
+      {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
       {children}
     </Button>
   );

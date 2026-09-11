@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { SpinnerIcon } from "@/components/wazen/icons";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
@@ -79,7 +79,7 @@ function ForgotPassword() {
                 size="lg"
                 className="w-full"
               >
-                {busy ? <Loader2 className="size-4 animate-spin" /> : null}
+                {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
                 Send reset link
               </Button>
             </form>

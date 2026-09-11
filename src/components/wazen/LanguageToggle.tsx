@@ -1,4 +1,4 @@
-import { Languages } from "lucide-react";
+import { LanguageIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ export function LanguageToggle({ className }: { className?: string }) {
       onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
       aria-label={t("language")}
     >
-      <Languages className="size-4" strokeWidth={1.5} />
+      <LanguageIcon className="size-4" strokeWidth={ICON_STROKE} />
       {language === "ar" ? t("english") : t("arabic")}
     </Button>
   );

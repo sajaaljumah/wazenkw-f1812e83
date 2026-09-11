@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowDownLeft, ArrowUpRight, CalendarClock, PiggyBank, Receipt, Target, Undo2 } from "lucide-react";
+import { ExpensesIcon, GoalsIcon, IncomeIcon, ReceiptIcon, RefundIcon, SavingsIcon, ScheduledIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { EmptyState, Panel, ProgressBar, percentOf } from "./primitives";
 import {
   TRANSACTION_KIND_LABELS,
@@ -66,7 +66,7 @@ export function RecentTransactionsCard({
     >
       {recent.length === 0 ? (
         <EmptyState
-          icon={<Receipt className="size-5" strokeWidth={1.5} />}
+          icon={<ReceiptIcon className="size-5" strokeWidth={ICON_STROKE} />}
           title={filter === "all" ? t("noTransactions") : t("nothingHere")}
           description={
             filter === "all"
@@ -80,12 +80,12 @@ export function RecentTransactionsCard({
             const isPositive = t.kind === "income" || t.kind === "refund";
             const Icon =
               t.kind === "income"
-                ? ArrowDownLeft
+                ? IncomeIcon
                 : t.kind === "refund"
-                  ? Undo2
+                  ? RefundIcon
                   : t.kind === "saving"
-                    ? PiggyBank
-                    : ArrowUpRight;
+                    ? SavingsIcon
+                    : ExpensesIcon;
             return (
               <li key={t.id} className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0">
                 <span
@@ -94,7 +94,7 @@ export function RecentTransactionsCard({
                     isPositive ? "bg-chart-2/12 text-chart-2" : "bg-secondary text-muted-foreground",
                   )}
                 >
-                  <Icon className="size-4" strokeWidth={1.6} />
+                  <Icon className="size-4" strokeWidth={ICON_STROKE} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm">{t.merchant || t.category}</p>
@@ -135,7 +135,7 @@ export function UpcomingCashFlowCard({
     <Panel title={title}>
       {upcoming.length === 0 ? (
         <EmptyState
-          icon={<CalendarClock className="size-5" strokeWidth={1.5} />}
+          icon={<ScheduledIcon className="size-5" strokeWidth={ICON_STROKE} />}
           title={t("noScheduled")}
           description={t("noScheduledDescription")}
         />
@@ -189,7 +189,7 @@ export function GoalsCard({
     <Panel title={title}>
       {list.length === 0 ? (
         <EmptyState
-          icon={<Target className="size-5" strokeWidth={1.5} />}
+          icon={<GoalsIcon className="size-5" strokeWidth={ICON_STROKE} />}
           title={t("noGoals")}
           description={t("noGoalsDescription")}
         />
@@ -242,7 +242,7 @@ export function EmergencyFundCard({
     <Panel title={t("emergencyFund")}>
       {!fund ? (
         <EmptyState
-          icon={<PiggyBank className="size-5" strokeWidth={1.5} />}
+          icon={<SavingsIcon className="size-5" strokeWidth={ICON_STROKE} />}
           title={t("noEmergency")}
           description={t("emergencyDescription")}
         />
@@ -282,7 +282,7 @@ export function BudgetCard({
     <Panel title={title}>
       {budget === null ? (
         <EmptyState
-          icon={<Receipt className="size-5" strokeWidth={1.5} />}
+          icon={<ReceiptIcon className="size-5" strokeWidth={ICON_STROKE} />}
           title={t("noBudget")}
           description={t("budgetDescription")}
         />

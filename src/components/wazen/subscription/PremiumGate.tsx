@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Lock, Sparkles } from "lucide-react";
+import { LockedIcon, PremiumIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { FEATURE_DESCRIPTIONS, FEATURE_LABELS, type PremiumFeature } from "@/lib/subscription";
@@ -16,7 +16,7 @@ export function PremiumBadge({ className }: { className?: string }) {
         className,
       )}
     >
-      <Sparkles className="size-3.5" strokeWidth={1.5} />
+      <PremiumIcon className="size-3.5" strokeWidth={ICON_STROKE} />
       {t("premium")}
     </span>
   );
@@ -42,7 +42,7 @@ export function UpgradePrompt({
       )}
     >
       <span className="mx-auto flex size-11 items-center justify-center rounded-full bg-gold/15 text-gold">
-        <Lock className="size-5" strokeWidth={1.5} />
+        <LockedIcon className="size-5" strokeWidth={ICON_STROKE} />
       </span>
       <div>
         <p className="text-lg">{title}</p>

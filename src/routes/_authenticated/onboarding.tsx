@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { CheckIcon, ForwardIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
 import { useProfile } from "@/hooks/use-wazen-auth";
@@ -113,7 +113,7 @@ function Onboarding() {
                       : "bg-secondary text-muted-foreground",
                   )}
                 >
-                  {index < step ? <Check className="size-3.5" /> : index + 1}
+                  {index < step ? <CheckIcon className="size-3.5" /> : index + 1}
                 </span>
                 <span className="hidden text-xs text-muted-foreground sm:inline">{label}</span>
                 {index < STEPS.length - 1 ? <span className="h-px flex-1 bg-border" /> : null}
@@ -258,7 +258,7 @@ function Onboarding() {
                 className="mt-9"
               >
                 Go to Dashboard
-                <ArrowRight className="size-4" strokeWidth={1.5} />
+                <ForwardIcon className="size-4" strokeWidth={ICON_STROKE} />
               </Button>
             </div>
           ) : null}
@@ -310,7 +310,7 @@ function NextButton({
       disabled={busy}
       className={cn(inline ? "flex-1" : "mt-8 w-full sm:w-auto")}
     >
-      {busy ? <Loader2 className="size-4 animate-spin" /> : null}
+      {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
       {children}
     </Button>
   );
@@ -331,7 +331,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
 function CenteredSpinner() {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      <SpinnerIcon className="size-6 animate-spin text-muted-foreground" />
     </div>
   );
 }

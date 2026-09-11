@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, LogOut, Settings, Sparkles, User } from "lucide-react";
+import { DashboardIcon, PremiumIcon, ProfileIcon, SettingsIcon, SignOutIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { useEffect, type ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -10,10 +10,10 @@ import { firstNameOf } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/dashboard", label: "overview", icon: LayoutDashboard },
-  { to: "/subscription", label: "plan", icon: Sparkles },
-  { to: "/profile", label: "profile", icon: User },
-  { to: "/settings", label: "settings", icon: Settings },
+  { to: "/dashboard", label: "overview", icon: DashboardIcon },
+  { to: "/subscription", label: "plan", icon: PremiumIcon },
+  { to: "/profile", label: "profile", icon: ProfileIcon },
+  { to: "/settings", label: "settings", icon: SettingsIcon },
 ] as const;
 
 export function WazenMark({ className }: { className?: string }) {
@@ -59,7 +59,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
-                <Icon className="size-4" strokeWidth={1.7} />
+                <Icon className="size-4" strokeWidth={ICON_STROKE} />
                 {t(label)}
               </Link>
             ))}
@@ -89,7 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               title={t("signOut")}
               aria-label={t("signOut")}
             >
-              <LogOut className="size-4" strokeWidth={1.5} />
+              <SignOutIcon className="size-4" strokeWidth={ICON_STROKE} />
             </Button>
           </div>
         </div>
@@ -112,7 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   : "text-muted-foreground",
               )}
             >
-              <Icon className="size-5" strokeWidth={1.5} />
+              <Icon className="size-5" strokeWidth={ICON_STROKE} />
               {t(label)}
             </Link>
           ))}

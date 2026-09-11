@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Lock, LogOut } from "lucide-react";
+import { LockedIcon, SignOutIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/wazen/AppShell";
 import { useProfile, useSession, useSignOut } from "@/hooks/use-wazen-auth";
@@ -65,7 +65,7 @@ function SettingsPage() {
   if (isLoading || !profile) {
     return (
       <AppShell>
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        <SpinnerIcon className="size-6 animate-spin text-muted-foreground" />
       </AppShell>
     );
   }
@@ -221,7 +221,7 @@ function SettingsPage() {
           disabled={busy}
           className="mt-7"
         >
-          {busy ? <Loader2 className="size-4 animate-spin" /> : null}
+          {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
           {t("saveSettings")}
         </Button>
       </section>
@@ -255,14 +255,14 @@ function SettingsPage() {
             onClick={changePassword}
             disabled={pwBusy}
           >
-            {pwBusy ? <Loader2 className="size-4 animate-spin" /> : null}
+            {pwBusy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
             {t("changePassword")}
           </Button>
           <Button
             onClick={signOut}
             variant="outline"
           >
-            <LogOut className="size-4" strokeWidth={1.5} />
+            <SignOutIcon className="size-4" strokeWidth={ICON_STROKE} />
             {t("signOut")}
           </Button>
         </div>
@@ -275,7 +275,7 @@ function Locked({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <span className="wazen-label flex items-center gap-1.5">
-        <Lock className="size-3" strokeWidth={1.75} />
+        <LockedIcon className="size-3" strokeWidth={ICON_STROKE} />
         {label}
       </span>
       <div className="mt-2 rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground">

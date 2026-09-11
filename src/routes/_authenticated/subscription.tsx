@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, Loader2, Sparkles, Users } from "lucide-react";
+import { CheckIcon, FamilyIcon, PremiumIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { toast } from "sonner";
 import { AppShell } from "@/components/wazen/AppShell";
 import { PremiumBadge } from "@/components/wazen/subscription/PremiumGate";
@@ -131,7 +131,7 @@ function SubscriptionPage() {
   if (isLoading) {
     return (
       <AppShell>
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        <SpinnerIcon className="size-6 animate-spin text-muted-foreground" />
       </AppShell>
     );
   }
@@ -202,7 +202,7 @@ function SubscriptionPage() {
                   onClick={handleUpgrade}
                   disabled={busy === "upgrade"}
                 >
-                  <Sparkles className="size-4" strokeWidth={1.5} />
+                  <PremiumIcon className="size-4" strokeWidth={ICON_STROKE} />
                   {busy === "upgrade"
                     ? "…"
                     : `${t("upgrade")} — ${formatMoney(
@@ -218,7 +218,7 @@ function SubscriptionPage() {
         {family ? (
           <section className="border-y border-border py-7">
             <div className="flex items-center gap-3">
-              <Users className="size-4 text-muted-foreground" strokeWidth={1.5} />
+              <FamilyIcon className="size-4 text-muted-foreground" strokeWidth={ICON_STROKE} />
               <p className="wazen-label">Family subscription</p>
             </div>
             <dl className="mt-6 grid gap-5 sm:grid-cols-4">
@@ -270,7 +270,7 @@ function SubscriptionPage() {
             <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
               {FREE_PLAN_HIGHLIGHTS.map((item) => (
                 <li key={item} className="flex gap-3">
-                  <Check className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={1.5} />
+                  <CheckIcon className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={ICON_STROKE} />
                   {item}
                 </li>
               ))}
@@ -286,7 +286,7 @@ function SubscriptionPage() {
             <ul className="mt-5 space-y-4 text-sm">
               {PREMIUM_FEATURES.map((feature) => (
                 <li key={feature} className="flex gap-3">
-                  <Sparkles className="mt-0.5 size-4 shrink-0 text-gold" strokeWidth={1.5} />
+                  <PremiumIcon className="mt-0.5 size-4 shrink-0 text-gold" strokeWidth={ICON_STROKE} />
                   <span>
                     <span className="block">{FEATURE_LABELS[feature]}</span>
                     <span className="block text-muted-foreground">
@@ -310,7 +310,7 @@ function SubscriptionPage() {
               <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
                 {INDIVIDUAL_PLAN_HIGHLIGHTS.map((item) => (
                   <li key={item} className="flex gap-3">
-                    <Check className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={1.5} />
+                    <CheckIcon className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={ICON_STROKE} />
                     {item}
                   </li>
                 ))}
@@ -325,7 +325,7 @@ function SubscriptionPage() {
               <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
                 {FAMILY_PLAN_HIGHLIGHTS.map((item) => (
                   <li key={item} className="flex gap-3">
-                    <Check className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={1.5} />
+                    <CheckIcon className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={ICON_STROKE} />
                     {item}
                   </li>
                 ))}
