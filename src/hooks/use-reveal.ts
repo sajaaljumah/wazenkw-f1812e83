@@ -22,20 +22,28 @@ export function useReveal<T extends HTMLElement = HTMLElement>() {
       return;
     }
 
+    const reveal = () => {
+      node.setAttribute("data-reveal-phase", "entering");
+      setRevealed(true);
+    };
+
     const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setRevealed(true);
-            observer.disconnect();
-          }
-        }
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        reveal();
+        observer.disconnect();
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+      // One visible pixel is enough to start the transition. The lower inset
+      // keeps the reveal tied to an intentional scroll into the viewport.
+      { root: null, rootMargin: "0px 0px -48px 0px", threshold: 0.01 },
     );
 
+    node.setAttribute("data-reveal-phase", "waiting");
     observer.observe(node);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      node.removeAttribute("data-reveal-phase");
+    };
   }, []);
 
   return { ref, revealed };

@@ -24,6 +24,7 @@ import type { Goal } from "@/lib/finance";
 import { firstOfMonth } from "@/lib/finance";
 import { Button } from "@/components/ui/button";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { useReveal } from "@/hooks/use-reveal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -116,10 +117,11 @@ export function QuickActions({
   const [open, setOpen] = useState<ActionKind | null>(null);
   const meta = metaFor(t as never);
   const order: ActionKind[] = actions ?? ["expense", "saving", "give", "income", "budget", "goal"];
+  const { ref, revealed } = useReveal<HTMLElement>();
 
   return (
     <>
-      <section className="wazen-action-dock" data-tour="actions">
+      <section ref={ref} data-revealed={revealed} className="wazen-action-dock wazen-reveal" data-tour="actions">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <span className="min-w-0">
             <span className="wazen-label block">{t("moneyActions" as never)}</span>

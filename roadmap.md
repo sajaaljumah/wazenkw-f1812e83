@@ -12,3 +12,5 @@
 - [x] Language change in Settings applies instantly across the account (incl. Learn) and persists
 - [x] Keep financial charts visible and strengthen purposeful chart/progress interactions
 - [x] Verify scroll-triggered reveals, chart drawing, and progress animation in the live preview
+- [x] Make the live scroll reveal visibly perceptible across existing sections
+- [x] Blend the dashboard greeting area into the page background without a separate rectangle
