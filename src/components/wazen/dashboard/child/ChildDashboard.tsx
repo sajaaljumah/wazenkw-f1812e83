@@ -575,7 +575,15 @@ function GiveSheet({
             <PremiumIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> Kind words and help count too.
           </li>
         </ul>
+        <button
+          type="button"
+          onClick={onAddGiving}
+          className="kid-cta w-full rounded-3xl px-5 py-3 text-center text-sm font-semibold"
+        >
+          I gave something
+        </button>
       </div>
+
     </SheetShell>
   );
 }
