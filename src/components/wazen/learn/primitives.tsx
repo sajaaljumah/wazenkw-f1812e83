@@ -38,7 +38,8 @@ export function LearnProgressBar({
   }, [percent]);
   return (
     <div
-      className={cn("h-3 w-full overflow-hidden rounded-full bg-kid-soft/70", className)}
+      className={cn("wazen-progress-track h-3 w-full overflow-hidden rounded-full bg-kid-soft/70", className)}
+      data-complete={percent >= 100 ? "true" : undefined}
       role="progressbar"
       aria-valuenow={Math.round(percent)}
       aria-valuemin={0}
@@ -46,7 +47,7 @@ export function LearnProgressBar({
     >
       <div
         className={cn(
-          "h-full rounded-full transition-[width] duration-700 ease-out",
+          "wazen-progress-fill h-full rounded-full transition-[width] duration-700 ease-out",
           tone === "deep" ? "bg-kid-deep" : "bg-kid-champagne",
         )}
         style={{ width: `${width}%` }}

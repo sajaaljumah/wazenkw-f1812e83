@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/finance";
 import { ExpandIcon, ICON_STROKE } from "@/components/wazen/icons";
@@ -257,11 +257,26 @@ export function ProgressBar({
   className?: string;
 }) {
   const percent = max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0;
+  const [visiblePercent, setVisiblePercent] = useState(0);
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setVisiblePercent(percent));
+    return () => window.cancelAnimationFrame(frame);
+  }, [percent]);
   const fill =
     tone === "sage" ? "bg-chart-2" : tone === "charcoal" ? "bg-primary" : "bg-gold";
   return (
-    <div className={cn("h-2 w-full overflow-hidden rounded-full bg-secondary", className)} data-complete={percent >= 100 ? "true" : undefined}>
-      <div className={cn("wazen-progress-fill h-full rounded-full transition-[width] duration-700 ease-out", fill)} style={{ width: `${percent}%` }} />
+    <div
+      className={cn("wazen-progress-track h-2 w-full overflow-hidden rounded-full bg-secondary", className)}
+      data-complete={percent >= 100 ? "true" : undefined}
+      role="progressbar"
+      aria-valuenow={Math.round(percent)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      <div
+        className={cn("wazen-progress-fill h-full rounded-full transition-[width] duration-700 ease-out", fill)}
+        style={{ width: `${visiblePercent}%` }}
+      />
     </div>
   );
 }
