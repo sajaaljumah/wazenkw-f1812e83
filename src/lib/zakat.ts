@@ -320,7 +320,7 @@ export function assetLines(assets: Asset[], transactions: Transaction[]): ZakatA
         needsReview: purpose === "personal_use",
         reason: purpose === "personal_use" ? "zakatGoldJewelleryReason" : "zakatGoldReason",
         method: "zakatMethodCurrentMarketValue",
-        detail: `${asset.quantity} g ${asset.purity ?? "24K"} · ${pure} g 24K`,
+        detail: `${asset.quantity} g ${(asset.purity ?? "24k").toUpperCase()} → ${pure} g 24K`,
       });
       continue;
     }

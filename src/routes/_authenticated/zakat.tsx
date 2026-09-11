@@ -301,7 +301,7 @@ function ZakatPage() {
 
           <Panel title={t("zakatCalculationHistory")}>
             {(history.data ?? []).length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t("zakatNoPayments")}</p>
+              <p className="text-sm text-muted-foreground">{t("zakatNoCalculations")}</p>
             ) : (
               <ul className="divide-y divide-border/60 text-sm">
                 {(history.data ?? []).map((row) => (
