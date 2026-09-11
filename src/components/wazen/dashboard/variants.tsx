@@ -11,6 +11,7 @@ import {
   monthKey,
   savedForGoal,
   totalsFor,
+  upcomingCashFlow,
 } from "@/lib/finance";
 import type { Budget, Goal, RecurringItem, Transaction } from "@/lib/finance";
 import type { FamilyMemberSummary } from "@/hooks/use-wazen-finance";
@@ -56,6 +57,7 @@ export function AdultDashboard({
   const savedTotal = all.savings;
   const { t } = useWazenLocale();
   const assets = useAssets();
+  const nextMovement = upcomingCashFlow(recurring, 7)[0];
 
   return (
     <>
@@ -73,7 +75,18 @@ export function AdultDashboard({
 
 
       <InsightStrip icon={<AnalyticsIcon className="size-5" strokeWidth={ICON_STROKE} />} label={t("dashboardInsight")}>
-        {month.income >= month.expenses ? t("dashboardInsightHealthy") : t("dashboardInsightWatch")}
+        {budget && month.expenses > Number(budget.amount) ? (
+          <span className="text-destructive font-semibold">{t("overBudget")}</span>
+        ) : month.income >= month.expenses ? (
+          t("dashboardInsightHealthy")
+        ) : (
+          t("dashboardInsightWatch")
+        )}
+        {nextMovement ? (
+          <div className="mt-1 text-xs text-muted-foreground">
+            {t("comingUp")}: {nextMovement.name} ({formatMoney(nextMovement.amount, currency)})
+          </div>
+        ) : null}
       </InsightStrip>
 
       <QuickActions userId={userId} currency={currency} goals={goals} />
@@ -93,13 +106,13 @@ export function AdultDashboard({
         </div>
       </JourneySection>
 
-      <DisclosurePanel defaultOpen title={t("deeperAnalytics")} summary={t("deeperAnalyticsSummary")}>
+      <JourneySection eyebrow={t("lookBack")} title={t("deeperAnalytics")} description={t("deeperAnalyticsSummary")}>
         <div className="grid gap-4 lg:grid-cols-2">
           <SpendingByCategoryCard transactions={monthTransactions} currency={currency} />
           <IncomeVsExpensesCard transactions={transactions} currency={currency} />
         </div>
         <div className="mt-4"><SavingsTrendCard transactions={transactions} currency={currency} /></div>
-      </DisclosurePanel>
+      </JourneySection>
 
       <DisclosurePanel title={t("portfolioSummary")} summary={t("notSpendable")}>
         <PortfolioSummaryCard assets={assets.data ?? []} currency={currency} />
@@ -123,6 +136,7 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
     .reduce((sum, t) => sum + Number(t.amount), 0);
   const { t } = useWazenLocale();
   const parentPaid = useParentPaidForMe();
+  const nextMovement = upcomingCashFlow(recurring, 7)[0];
 
   return (
     <>
@@ -139,7 +153,18 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
 
 
       <InsightStrip icon={<StudentIcon className="size-5" strokeWidth={ICON_STROKE} />} label={t("dashboardInsight")}>
-        {month.income >= month.expenses ? t("dashboardInsightHealthy") : t("dashboardInsightWatch")}
+        {budget && month.expenses > Number(budget.amount) ? (
+          <span className="text-destructive font-semibold">{t("overBudget")}</span>
+        ) : month.income >= month.expenses ? (
+          t("dashboardInsightHealthy")
+        ) : (
+          t("dashboardInsightWatch")
+        )}
+        {nextMovement ? (
+          <div className="mt-1 text-xs text-muted-foreground">
+            {t("comingUp")}: {nextMovement.name} ({formatMoney(nextMovement.amount, currency)})
+          </div>
+        ) : null}
       </InsightStrip>
 
       <QuickActions userId={userId} currency={currency} goals={goals} actions={["expense", "saving", "give", "income", "goal"]} />
@@ -158,12 +183,13 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
         </div>
       </JourneySection>
 
-      <DisclosurePanel defaultOpen title={t("deeperAnalytics")} summary={t("deeperAnalyticsSummary")}>
+      <JourneySection eyebrow={t("lookBack")} title={t("deeperAnalytics")} description={t("deeperAnalyticsSummary")}>
         <div className="grid gap-4 lg:grid-cols-2">
           <SpendingByCategoryCard transactions={monthTransactions} currency={currency} title={t("whereMoneyWent")} />
-          <SavingsTrendCard transactions={transactions} currency={currency} title={t("savedSoFar")} />
+          <IncomeVsExpensesCard transactions={transactions} currency={currency} months={4} />
         </div>
-      </DisclosurePanel>
+        <div className="mt-4"><SavingsTrendCard transactions={transactions} currency={currency} title={t("savedSoFar")} /></div>
+      </JourneySection>
 
       <DisclosurePanel title={t("paidByFamily")} summary={t("paidByFamilyIntro")}>
         <ParentPaidCard transactions={parentPaid.data ?? []} />

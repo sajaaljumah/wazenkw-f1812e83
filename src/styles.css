@@ -375,13 +375,22 @@ html[dir="rtl"] .wazen-action-dock {
 @utility wazen-chart-row {
   transition: background-color 180ms ease, transform 180ms ease;
   &:hover,
-  &:focus-visible {
+  &:focus-visible,
+  &[data-active="true"] {
     background-color: color-mix(in oklab, var(--color-accent) 48%, transparent);
   }
   &:hover .wazen-chart-bar,
-  &:focus-visible .wazen-chart-bar {
+  &:focus-visible .wazen-chart-bar,
+  &[data-active="true"] .wazen-chart-bar {
     filter: saturate(1.12) brightness(1.03);
   }
+  &[data-active="true"] {
+    box-shadow: inset 3px 0 0 var(--color-primary);
+  }
+}
+
+html[dir="rtl"] .wazen-chart-row[data-active="true"] {
+  box-shadow: inset -3px 0 0 var(--color-primary);
 }
 
 [data-complete="true"] .wazen-progress-fill {
