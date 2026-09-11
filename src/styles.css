@@ -5,13 +5,13 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Wazen design system — Warm Editorial Fintech.
- * Paper-like ivory, ink charcoal, sage, olive, taupe and champagne.
- * Restrained radii and ruled surfaces replace generic card grids.
+ * Wazen design system — Premium Modern Banking.
+ * Ivory/white surfaces, charcoal ink, neutral greys and a single confident
+ * red accent for actions, active states and key financial highlights.
  */
 
 @theme inline {
-  --font-display: "DM Serif Display", "Noto Kufi Arabic", Georgia, serif;
+  --font-display: "Plus Jakarta Sans", "Noto Kufi Arabic", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Manrope", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
