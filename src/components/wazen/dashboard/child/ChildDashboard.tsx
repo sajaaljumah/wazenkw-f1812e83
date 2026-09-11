@@ -535,13 +535,13 @@ function SpendSheet({
 function GiveSheet({
   open,
   onClose,
-  given,
-  currency,
+  onAddGiving,
 }: {
   open: boolean;
   onClose: () => void;
   given: number;
   currency: string;
+  onAddGiving: () => void;
 }) {
   return (
     <SheetShell
@@ -552,6 +552,7 @@ function GiveSheet({
     >
       <div className="space-y-4 text-sm">
         <div className="flex items-center gap-4 rounded-3xl bg-secondary/50 p-4">
+
           <span className="size-14 shrink-0">
             <HeartIllustration />
           </span>
