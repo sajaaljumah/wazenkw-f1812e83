@@ -41,7 +41,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className={cn("min-h-screen bg-background", profile?.life_stage === "teenager" && "stage-teen", profile?.life_stage === "university_student" && "stage-university")}>
-      <header className="sticky top-0 z-30 border-b border-border bg-background/92 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b border-border/70 bg-card/85 shadow-soft backdrop-blur-xl">
         <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-8">
             <Link to="/dashboard" className="shrink-0" aria-label="Wazen overview">
