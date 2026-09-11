@@ -101,6 +101,29 @@ function Landing() {
             </article>
           ))}
         </section>
+
+        <section className="wazen-card wazen-enter" aria-labelledby="future-heading">
+          <div className="flex items-center gap-3">
+            <span className="flex size-11 items-center justify-center rounded-2xl bg-accent text-primary">
+              <BankIcon className="size-5" strokeWidth={ICON_STROKE} />
+            </span>
+            <div className="min-w-0">
+              <p className="wazen-label">{t("futureEyebrow")}</p>
+              <h2 id="future-heading" className="mt-1 text-xl">{t("futureTitle")}</h2>
+            </div>
+          </div>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("futureBody")}</p>
+          <p className="mt-5 wazen-label">{t("futurePlanned")}</p>
+          <ul className="mt-3 grid gap-2.5 sm:grid-cols-2">
+            {[t("futureItem1"), t("futureItem2"), t("futureItem3"), t("futureItem4")].map((item) => (
+              <li key={item} className="flex items-start gap-2.5 text-sm">
+                <CheckIcon className="mt-0.5 size-4 shrink-0 text-primary" strokeWidth={ICON_STROKE} />
+                <span className="text-foreground/90">{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 border-t border-border/70 pt-4 text-xs text-muted-foreground">{t("futureDisclaimer")}</p>
+        </section>
       </main>
     </div>
   );
