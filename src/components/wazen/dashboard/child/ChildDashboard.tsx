@@ -37,13 +37,16 @@ const GIVE_PATTERN = /giv|charity|sadaqah|donat|help/i;
 /** Big soft progress bar that eases up to its value whenever it changes. */
 function KidProgress({ percent, className }: { percent: number; className?: string }) {
   const safePercent = Math.max(0, Math.min(100, percent));
+  const { ref, revealed } = useReveal<HTMLDivElement>();
   const [width, setWidth] = useState(0);
   useEffect(() => {
-    const timer = window.setTimeout(() => setWidth(safePercent), 120);
-    return () => window.clearTimeout(timer);
-  }, [safePercent]);
+    if (!revealed) return;
+    const frame = window.requestAnimationFrame(() => setWidth(safePercent));
+    return () => window.cancelAnimationFrame(frame);
+  }, [safePercent, revealed]);
   return (
     <div
+      ref={ref}
       className={cn("wazen-progress-track h-5 w-full overflow-hidden rounded-full bg-kid-soft/70", className)}
       data-complete={safePercent >= 100 ? "true" : undefined}
       role="progressbar"
@@ -141,10 +144,13 @@ export function ChildDashboard({
   const parentPaid = useParentPaidForMe();
   const [sheet, setSheet] = useState<Sheet>(null);
   // Presentation-only scroll reveals for the child sections.
+  const r1 = useReveal<HTMLElement>();
   const r2 = useReveal<HTMLElement>();
   const r3 = useReveal<HTMLElement>();
   const r4 = useReveal<HTMLElement>();
   const r5 = useReveal<HTMLElement>();
+  const r6 = useReveal<HTMLDetailsElement>();
+  const r7 = useReveal<HTMLDetailsElement>();
 
   const monthTransactions = useMemo(() => inMonth(transactions, monthKey(new Date())), [transactions]);
   const month = totalsFor(monthTransactions);
@@ -246,7 +252,7 @@ export function ChildDashboard({
       </section>
 
       {/* Goal */}
-      <section className="kid-panel relative order-1 overflow-hidden bg-kid-tint/70 p-7 sm:p-9">
+      <section ref={r1.ref} data-revealed={r1.revealed} className="kid-panel wazen-reveal relative order-1 overflow-hidden bg-kid-tint/70 p-7 sm:p-9">
         <Celebration show={celebrate} />
         {goal ? (
           <button
@@ -356,7 +362,7 @@ export function ChildDashboard({
       </div>
 
       {/* Recent activity */}
-      <details open className="kid-panel group order-5 p-6">
+      <details ref={r6.ref} data-revealed={r6.revealed} open className="kid-panel wazen-reveal group order-5 p-6">
         <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-3 focus-visible:outline-hidden">
           <span className="min-w-0">
             <span className="block text-xl font-semibold">{t("kidLately")}</span>
@@ -405,7 +411,7 @@ export function ChildDashboard({
 
       {/* Things a parent paid for this child. Not deducted from their own money
           unless the parent chose to. */}
-      <details className="kid-panel group order-6 p-6">
+      <details ref={r7.ref} data-revealed={r7.revealed} className="kid-panel wazen-reveal group order-6 p-6">
         <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-3 focus-visible:outline-hidden">
           <span className="min-w-0">
             <span className="block text-xl font-semibold">{t("kidPaidByFamily")}</span>

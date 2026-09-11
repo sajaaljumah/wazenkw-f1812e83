@@ -11,3 +11,4 @@
 - [x] Walkthrough: once per new account, replayed on every demo sign-in
 - [x] Language change in Settings applies instantly across the account (incl. Learn) and persists
 - [x] Keep financial charts visible and strengthen purposeful chart/progress interactions
+- [x] Verify scroll-triggered reveals, chart drawing, and progress animation in the live preview
