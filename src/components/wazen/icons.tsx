@@ -41,6 +41,7 @@ import {
   Coins,
   Plus,
   Receipt,
+  Scale,
   RotateCcw,
   Settings,
   ShieldCheck,
@@ -90,6 +91,7 @@ export const EmergencyFundIcon = ShieldCheck;
 export const ScheduledIcon = CalendarDays;
 export const ReceiptIcon = Receipt;
 export const BankIcon = Landmark;
+export const ZakatIcon = Scale;
 
 // Insight
 export const AnalyticsIcon = ChartLine;

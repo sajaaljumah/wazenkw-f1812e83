@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { DashboardIcon, PortfolioIcon, PremiumIcon, ProfileIcon, SettingsIcon, SignOutIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { DashboardIcon, PortfolioIcon, PremiumIcon, ProfileIcon, SettingsIcon, SignOutIcon, ZakatIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { useEffect, type ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -10,10 +10,12 @@ import { firstNameOf } from "@/lib/wazen";
 import { canOwnAssets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 import { WazenLogo } from "@/components/wazen/WazenLogo";
+import { ZakatNotificationBell } from "@/components/wazen/zakat/ZakatNotificationBell";
 
 const NAV = [
   { to: "/dashboard", label: "overview", icon: DashboardIcon },
   { to: "/assets", label: "assets", icon: PortfolioIcon, adultsOnly: true },
+  { to: "/zakat", label: "zakat", icon: ZakatIcon, adultsOnly: true },
   { to: "/subscription", label: "plan", icon: PremiumIcon },
   { to: "/profile", label: "profile", icon: ProfileIcon },
   { to: "/settings", label: "settings", icon: SettingsIcon },
@@ -67,6 +69,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
           <div className="flex items-center gap-2">
             <PlanBadge className="hidden sm:inline-flex" size="sm" />
+            {profile ? (
+              <ZakatNotificationBell lifeStage={profile.life_stage} currency={profile.base_currency} />
+            ) : null}
             {profile ? (
               <Link
                 to="/profile"

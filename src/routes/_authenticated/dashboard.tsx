@@ -2,6 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { SpinnerIcon } from "@/components/wazen/icons";
 import { AppShell } from "@/components/wazen/AppShell";
+import { ZakatAlert } from "@/components/wazen/zakat/ZakatAlert";
+import { useZakat } from "@/hooks/use-wazen-zakat";
+import { canCalculateZakat } from "@/lib/zakat";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { useProfile, useSession } from "@/hooks/use-wazen-auth";
 import {
@@ -66,6 +69,7 @@ function Dashboard() {
   const recurring = useRecurringItems();
   const isParent = profile?.life_stage === "parent";
   const family = useFamilySummary(!!isParent);
+  const zakat = useZakat();
 
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding" });
@@ -134,6 +138,10 @@ function Dashboard() {
             }
           />
         )}
+
+        {canCalculateZakat(profile.life_stage) && zakat.result ? (
+          <ZakatAlert result={zakat.result} currency={profile.base_currency} compact />
+        ) : null}
 
         {profile.life_stage === "child" ? (
           <ChildDashboard
