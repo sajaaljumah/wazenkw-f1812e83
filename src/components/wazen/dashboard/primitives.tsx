@@ -60,7 +60,7 @@ export function BalanceHero({
   action?: ReactNode;
 }) {
   return (
-    <section className="wazen-balance">
+    <section className="wazen-balance" data-tour="balance">
       <div aria-hidden className="wazen-balance-grid" />
       <div className="relative grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] xl:items-end">
         <div className="min-w-0">
