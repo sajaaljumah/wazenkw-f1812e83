@@ -24,6 +24,7 @@ import type { Goal, Transaction } from "@/lib/finance";
 import type { DashboardData } from "../variants";
 import type { Gender } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
+import { useParentPaidForMe } from "@/hooks/use-wazen-finance";
 
 type ActionKind = "income" | "expense" | "saving" | "goal";
 type Sheet = "spend" | "give" | "goal" | null;
