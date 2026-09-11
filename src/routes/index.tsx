@@ -37,7 +37,7 @@ function Landing() {
   const { t } = useWazenLocale();
   return (
     <div className="min-h-screen overflow-hidden bg-background">
-      <header className="mx-auto flex h-20 max-w-6xl items-center justify-between border-b border-border px-5 sm:px-8">
+      <header className="sticky top-0 z-20 border-b border-border/70 bg-card/85 backdrop-blur-xl"><div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 sm:px-8">
         <WazenMark />
         <div className="flex items-center gap-1">
           <LanguageToggle />
@@ -47,7 +47,7 @@ function Landing() {
             >{t("signIn")}</Link>
           </Button>
         </div>
-      </header>
+      </div></header>
 
       <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
         <section className="relative grid items-center py-14 sm:py-20">
