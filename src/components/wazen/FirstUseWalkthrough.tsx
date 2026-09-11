@@ -11,23 +11,44 @@ function keyFor(userId: string) {
   return `wazen.walkthrough.${TOUR_VERSION}.${userId}`;
 }
 
-export function FirstUseWalkthrough({ userId, eligible, lifeStage }: { userId: string; eligible: boolean; lifeStage: LifeStage }) {
+/**
+ * First-use walkthrough.
+ *
+ * Regular accounts see it once — completing or skipping marks it done for that
+ * account. Demo accounts see it on every sign-in (once per browser session) so
+ * it can always be shown during presentations.
+ */
+export function FirstUseWalkthrough({
+  userId,
+  isDemo,
+  lifeStage,
+}: {
+  userId: string;
+  isDemo: boolean;
+  lifeStage: LifeStage;
+}) {
   const { t } = useWazenLocale();
   const [step, setStep] = useState(0);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (!eligible) return;
+    const key = keyFor(userId);
     try {
-      setOpen(localStorage.getItem(keyFor(userId)) !== "done");
+      if (isDemo) {
+        // Per-session for demo accounts: shown again after every fresh sign-in.
+        setOpen(sessionStorage.getItem(key) !== "seen");
+        return;
+      }
+      setOpen(localStorage.getItem(key) !== "done");
     } catch {
       setOpen(true);
     }
-  }, [eligible, userId]);
+  }, [isDemo, userId]);
 
   const complete = () => {
     try {
-      localStorage.setItem(keyFor(userId), "done");
+      if (isDemo) sessionStorage.setItem(keyFor(userId), "seen");
+      else localStorage.setItem(keyFor(userId), "done");
     } catch {
       /* The walkthrough still closes when storage is unavailable. */
     }

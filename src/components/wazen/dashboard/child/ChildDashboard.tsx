@@ -348,7 +348,7 @@ export function ChildDashboard({
       </div>
 
       {/* Recent activity */}
-      <details className="kid-panel group order-5 p-6">
+      <details open className="kid-panel group order-5 p-6">
         <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-3 focus-visible:outline-hidden">
           <span className="min-w-0">
             <span className="block text-xl font-semibold">{t("kidLately")}</span>

@@ -37,3 +37,13 @@ export const DEMO_ACCESS_ACCOUNTS = DEMO_ACCOUNTS.filter((account) =>
     "deema@wazen.app",
   ].includes(account.email),
 );
+
+/**
+ * Demo accounts are used for presentations, so the first-use walkthrough is
+ * replayed on every sign-in instead of being marked as completed.
+ */
+export function isDemoAccount(email: string | null | undefined) {
+  if (!email) return false;
+  const value = email.trim().toLowerCase();
+  return DEMO_ACCOUNTS.some((account) => account.email === value);
+}
