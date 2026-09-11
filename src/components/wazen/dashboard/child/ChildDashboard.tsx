@@ -26,7 +26,7 @@ import type { Gender } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
 import { useParentPaidForMe } from "@/hooks/use-wazen-finance";
 
-type ActionKind = "income" | "expense" | "saving" | "goal";
+type ActionKind = "income" | "expense" | "saving" | "give" | "goal";
 type Sheet = "spend" | "give" | "goal" | null;
 
 const GIVE_PATTERN = /giv|charity|sadaqah|donat|help/i;
@@ -437,7 +437,17 @@ export function ChildDashboard({
           setAction("expense");
         }}
       />
-      <GiveSheet open={sheet === "give"} onClose={() => setSheet(null)} given={give} currency={currency} />
+      <GiveSheet
+        open={sheet === "give"}
+        onClose={() => setSheet(null)}
+        given={give}
+        currency={currency}
+        onAddGiving={() => {
+          setSheet(null);
+          setAction("give");
+        }}
+      />
+
       <GoalSheet
         open={sheet === "goal"}
         onClose={() => setSheet(null)}
