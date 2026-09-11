@@ -1,4 +1,5 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode, type RefObject } from "react";
+import { useReveal } from "@/hooks/use-reveal";
 import {
   Dialog,
   DialogContent,
@@ -71,9 +72,15 @@ export function LearnSection({
   collapsible?: boolean;
   defaultOpen?: boolean;
 }) {
+  const { ref, revealed } = useReveal<HTMLElement>();
   if (collapsible) {
     return (
-      <details className="kid-panel group p-5 sm:p-6" open={defaultOpen}>
+      <details
+        ref={ref as RefObject<HTMLDetailsElement | null>}
+        data-revealed={revealed}
+        className="kid-panel wazen-reveal group p-5 sm:p-6"
+        open={defaultOpen}
+      >
         <summary className="flex min-w-0 cursor-pointer list-none items-start gap-3 focus-visible:outline-hidden">
           {icon ? <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-kid-soft/70 text-kid-deep">{icon}</span> : null}
           <span className="min-w-0 flex-1">
@@ -89,7 +96,7 @@ export function LearnSection({
     );
   }
   return (
-    <section className="space-y-4">
+    <section ref={ref} data-revealed={revealed} className="wazen-reveal space-y-4">
       <header className="flex min-w-0 items-start gap-3 px-1">
         {icon ? (
           <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-2xl bg-kid-soft/70 text-kid-deep">

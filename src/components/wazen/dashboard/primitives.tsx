@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/finance";
+import { useReveal } from "@/hooks/use-reveal";
 import { ExpandIcon, ICON_STROKE } from "@/components/wazen/icons";
 
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
@@ -128,8 +129,9 @@ export function StatCard({
         : tone === "gold"
           ? "before:bg-gold"
           : "before:bg-border";
+  const { ref, revealed } = useReveal<HTMLDivElement>();
   return (
-    <div className={cn("wazen-stat", rule, className)}>
+    <div ref={ref} data-revealed={revealed} className={cn("wazen-stat wazen-reveal", rule, className)}>
       <div className="flex items-start justify-between gap-3">
         <span className="wazen-label">{label}</span>
         {icon ? <span className="text-muted-foreground/80">{icon}</span> : null}
@@ -151,8 +153,9 @@ export function Panel({
   children: ReactNode;
   className?: string;
 }) {
+  const { ref, revealed } = useReveal<HTMLElement>();
   return (
-    <section className={cn("wazen-card min-w-0", className)}>
+    <section ref={ref} data-revealed={revealed} className={cn("wazen-card wazen-reveal min-w-0", className)}>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border/70 pb-4">
         <h2 className="min-w-0 text-xl sm:text-2xl">{title}</h2>
         {action}
@@ -179,8 +182,9 @@ export function JourneySection({
   className?: string;
   id?: string;
 }) {
+  const { ref, revealed } = useReveal<HTMLElement>();
   return (
-    <section id={id} className={cn("wazen-journey", className)}>
+    <section ref={ref} id={id} data-revealed={revealed} className={cn("wazen-journey wazen-reveal", className)}>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
         <div className="min-w-0">
           {eyebrow ? <p className="wazen-label wazen-journey-eyebrow">{eyebrow}</p> : null}
@@ -219,8 +223,14 @@ export function DisclosurePanel({
   defaultOpen?: boolean;
   className?: string;
 }) {
+  const { ref, revealed } = useReveal<HTMLDetailsElement>();
   return (
-    <details className={cn("wazen-disclosure group", className)} open={defaultOpen}>
+    <details
+      ref={ref}
+      data-revealed={revealed}
+      className={cn("wazen-disclosure wazen-reveal group", className)}
+      open={defaultOpen}
+    >
       <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-4 focus-visible:outline-hidden">
         <span className="min-w-0">
           <span className="block text-base font-semibold sm:text-lg">{title}</span>
@@ -257,15 +267,18 @@ export function ProgressBar({
   className?: string;
 }) {
   const percent = max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0;
+  const { ref, revealed } = useReveal<HTMLDivElement>();
   const [visiblePercent, setVisiblePercent] = useState(0);
   useEffect(() => {
+    if (!revealed) return;
     const frame = window.requestAnimationFrame(() => setVisiblePercent(percent));
     return () => window.cancelAnimationFrame(frame);
-  }, [percent]);
+  }, [percent, revealed]);
   const fill =
     tone === "sage" ? "bg-chart-2" : tone === "charcoal" ? "bg-primary" : "bg-gold";
   return (
     <div
+      ref={ref}
       className={cn("wazen-progress-track h-2 w-full overflow-hidden rounded-full bg-secondary", className)}
       data-complete={percent >= 100 ? "true" : undefined}
       role="progressbar"

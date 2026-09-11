@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import { useState } from "react";
+import { useReveal } from "@/hooks/use-reveal";
 import { CategoryChartIcon as CategoryIcon, TrendChartIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { EmptyState, Panel } from "./primitives";
 import { formatMoney, monthKeyOf, monthlySeries, spendingByCategory } from "@/lib/finance";
@@ -55,6 +56,7 @@ export function SpendingByCategoryCard({
   const max = slices.reduce((peak, slice) => Math.max(peak, slice.amount), 0);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const topSlice = slices[0];
+  const { ref, revealed } = useReveal<HTMLUListElement>();
 
   return (
     <Panel title={title ?? t("spendingCategory")}>
@@ -77,7 +79,7 @@ export function SpendingByCategoryCard({
             </span>
             <span className="wazen-number text-lg">{formatMoney(total, currency)}</span>
           </div>
-          <ul className="space-y-4">
+          <ul ref={ref} className="space-y-4">
             {slices.map((slice, index) => {
               const share = total > 0 ? Math.round((slice.amount / total) * 100) : 0;
               const width = max > 0 ? Math.max((slice.amount / max) * 100, 3) : 0;
@@ -110,7 +112,7 @@ export function SpendingByCategoryCard({
                     <div
                       className="wazen-chart-bar h-full rounded-full transition-[width,filter] duration-700 ease-out"
                       style={{
-                        width: `${width}%`,
+                        width: revealed ? `${width}%` : "0%",
                         background: `linear-gradient(90deg, ${color}, color-mix(in oklab, ${color} 62%, var(--chart-fade)))`,
                       }}
                     />
@@ -147,6 +149,7 @@ export function IncomeVsExpensesCard({
   const { t } = useWazenLocale();
   const latest = series.at(-1);
   const latestNet = latest?.net ?? 0;
+  const { ref, revealed } = useReveal<HTMLDivElement>();
 
   return (
     <Panel title={t("incomeExpenses")}>
@@ -164,7 +167,8 @@ export function IncomeVsExpensesCard({
               {latestNet >= 0 ? "+" : "−"}{formatMoney(Math.abs(latestNet), currency)}
             </span>
           </div>
-          <div className="h-52 w-full min-w-0 sm:h-56" role="img" aria-label={`${t("incomeExpenses")}: ${t("latestMonthlyNet")} ${formatMoney(latestNet, currency)}`}>
+          <div ref={ref} className="h-52 w-full min-w-0 sm:h-56" role="img" aria-label={`${t("incomeExpenses")}: ${t("latestMonthlyNet")} ${formatMoney(latestNet, currency)}`}>
+          {revealed ? (
           <ResponsiveContainer width="100%" height="100%">
              <ComposedChart data={series} barGap={3} margin={{ top: 8, right: 2, bottom: 0, left: -28 }}>
               <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.7} strokeDasharray="3 5" />
@@ -204,6 +208,7 @@ export function IncomeVsExpensesCard({
               />
             </ComposedChart>
           </ResponsiveContainer>
+          ) : null}
           </div>
         </>
       )}
@@ -256,6 +261,7 @@ export function SavingsTrendCard({
   });
   const hasData = series.some((point) => point.total > 0);
   const currentTotal = series.at(-1)?.total ?? 0;
+  const { ref, revealed } = useReveal<HTMLDivElement>();
 
   return (
     <Panel title={title ?? t("savingsOverTime")}>
@@ -271,7 +277,8 @@ export function SavingsTrendCard({
             <span className="text-sm text-muted-foreground">{t("savedThisPeriod")}</span>
             <span className="wazen-number text-sm text-chart-2">{formatMoney(currentTotal, currency)}</span>
           </div>
-          <div className="h-48 w-full min-w-0" role="img" aria-label={`${title ?? t("savingsOverTime")}: ${formatMoney(currentTotal, currency)}`}>
+          <div ref={ref} className="h-48 w-full min-w-0" role="img" aria-label={`${title ?? t("savingsOverTime")}: ${formatMoney(currentTotal, currency)}`}>
+          {revealed ? (
           <ResponsiveContainer width="100%" height="100%">
              <ComposedChart data={series} margin={{ top: 8, right: 2, bottom: 0, left: -28 }}>
               <defs>
@@ -314,6 +321,7 @@ export function SavingsTrendCard({
               />
             </ComposedChart>
           </ResponsiveContainer>
+          ) : null}
           </div>
         </>
       )}
