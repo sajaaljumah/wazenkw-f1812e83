@@ -439,33 +439,8 @@
    Child experience — "Playful Luxury"
    Soft pastel surfaces, champagne accents, gentle motion.
    --------------------------------------------------------------- */
-:root {
-  --kid-ivory: oklch(0.992 0.002 85);
-  --kid-tint: oklch(0.965 0.006 85);
-  --kid-soft: oklch(0.925 0.018 82);
-  --kid-mid: oklch(0.78 0.045 78);
-  --kid-deep: oklch(0.32 0.012 30);
-  --kid-champagne: oklch(0.72 0.075 78);
-}
+/* Light child palette lives in :root above; dark values live in .dark. */
 
-.kid-theme {
-  --kid-tint: oklch(0.965 0.006 85);
-  --kid-soft: oklch(0.925 0.018 82);
-  --kid-mid: oklch(0.78 0.045 78);
-  --kid-deep: oklch(0.32 0.012 30);
-  --kid-champagne: oklch(0.72 0.075 78);
-}
-
-/* Genuinely dark child experience — same personality, dark surfaces. */
-.dark .kid-theme,
-.dark :is(.kid-theme) {
-  --kid-ivory: oklch(0.262 0.008 70);
-  --kid-tint: oklch(0.232 0.007 70);
-  --kid-soft: oklch(0.355 0.015 78);
-  --kid-mid: oklch(0.6 0.045 78);
-  --kid-deep: oklch(0.9 0.012 80);
-  --kid-champagne: oklch(0.78 0.085 80);
-}
 
 @utility kid-panel {
   background-color: var(--color-kid-ivory);
