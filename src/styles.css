@@ -306,6 +306,19 @@
   padding-top: 1.5rem;
 }
 
+@utility wazen-journey-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  &::before {
+    content: "";
+    width: 1.5rem;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--color-primary);
+  }
+}
+
 @utility wazen-insight {
   display: flex;
   align-items: flex-start;
@@ -320,11 +333,32 @@
   min-width: 0;
   border-top: 1px solid var(--color-border);
   padding: 1.125rem 0;
+  transition: border-color 180ms ease, background-color 180ms ease;
+  &[open] {
+    border-color: color-mix(in oklab, var(--color-primary) 35%, var(--color-border));
+  }
+  & > summary:hover .wazen-disclosure-control {
+    transform: translateY(-1px);
+  }
 }
 
 @utility wazen-action-dock {
   border-block: 1px solid var(--color-border);
   padding-block: 1rem;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--color-accent) 30%, transparent), transparent 45%);
+}
+
+html[dir="rtl"] .wazen-action-dock {
+  background: linear-gradient(-90deg, color-mix(in oklab, var(--color-accent) 30%, transparent), transparent 45%);
+}
+
+@utility wazen-progress-fill {
+  position: relative;
+  box-shadow: 0 0 0 transparent;
+}
+
+[data-complete="true"] .wazen-progress-fill {
+  box-shadow: 0 0 12px color-mix(in oklab, var(--color-positive) 45%, transparent);
 }
 
 @utility wazen-interactive {
@@ -484,6 +518,14 @@
   border: 1px solid var(--kid-soft);
   border-radius: calc(var(--radius) + 6px);
   box-shadow: 0 2px 4px oklch(0.3 0.02 70 / 4%), 0 18px 40px oklch(0.3 0.02 70 / 7%);
+}
+
+@utility kid-money-tile {
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--kid-mid);
+  }
 }
 
 @utility kid-press {

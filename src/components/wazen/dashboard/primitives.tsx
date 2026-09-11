@@ -183,7 +183,7 @@ export function JourneySection({
     <section id={id} className={cn("wazen-journey", className)}>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
         <div className="min-w-0">
-          {eyebrow ? <p className="wazen-label">{eyebrow}</p> : null}
+          {eyebrow ? <p className="wazen-label wazen-journey-eyebrow">{eyebrow}</p> : null}
           <h2 className={cn("text-xl sm:text-2xl", eyebrow && "mt-2")}>{title}</h2>
           {description ? <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{description}</p> : null}
         </div>
@@ -226,7 +226,7 @@ export function DisclosurePanel({
           <span className="block text-base font-semibold sm:text-lg">{title}</span>
           {summary ? <span className="mt-1 block text-xs text-muted-foreground sm:text-sm">{summary}</span> : null}
         </span>
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-transform group-open:rotate-180">
+        <span className="wazen-disclosure-control flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-muted-foreground transition-all group-open:rotate-180 group-open:bg-accent group-open:text-primary">
           <ExpandIcon className="size-4" strokeWidth={ICON_STROKE} />
         </span>
       </summary>
@@ -260,8 +260,8 @@ export function ProgressBar({
   const fill =
     tone === "sage" ? "bg-chart-2" : tone === "charcoal" ? "bg-primary" : "bg-gold";
   return (
-    <div className={cn("h-2 w-full overflow-hidden rounded-full bg-secondary", className)}>
-      <div className={cn("h-full rounded-full transition-[width] duration-700 ease-out", fill)} style={{ width: `${percent}%` }} />
+    <div className={cn("h-2 w-full overflow-hidden rounded-full bg-secondary", className)} data-complete={percent >= 100 ? "true" : undefined}>
+      <div className={cn("wazen-progress-fill h-full rounded-full transition-[width] duration-700 ease-out", fill)} style={{ width: `${percent}%` }} />
     </div>
   );
 }

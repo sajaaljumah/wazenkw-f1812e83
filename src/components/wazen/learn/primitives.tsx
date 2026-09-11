@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { ExpandIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { LEARN_COPY, type LearnCopyKey, type Text } from "@/lib/learning";
 import { cn } from "@/lib/utils";
 
@@ -78,7 +79,9 @@ export function LearnSection({
             <span className="block text-lg font-semibold sm:text-xl">{title}</span>
             {caption ? <span className="mt-1 block text-xs text-muted-foreground sm:text-sm">{caption}</span> : null}
           </span>
-          <span className="mt-2 size-2 shrink-0 rotate-45 border-b border-e border-kid-deep transition-transform group-open:-rotate-135" />
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-kid-soft/70 text-kid-deep transition-transform group-open:rotate-180">
+            <ExpandIcon className="size-4" strokeWidth={ICON_STROKE} />
+          </span>
         </summary>
         <div className="mt-5 border-t border-kid-soft pt-5">{children}</div>
       </details>

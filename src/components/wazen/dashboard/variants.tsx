@@ -78,7 +78,7 @@ export function AdultDashboard({
 
       <QuickActions userId={userId} currency={currency} goals={goals} />
 
-      <JourneySection title={t("planAhead")} description={t("planAheadBody")} id="planning">
+      <JourneySection eyebrow={t("moneyStory")} title={t("planAhead")} description={t("planAheadBody")} id="planning">
         <div className="grid gap-4 lg:grid-cols-3">
           <BudgetCard budget={budget ? Number(budget.amount) : null} spent={month.expenses} currency={currency} />
           <EmergencyFundCard goals={goals} transactions={transactions} currency={currency} />
@@ -86,7 +86,7 @@ export function AdultDashboard({
         </div>
       </JourneySection>
 
-      <JourneySection title={t("activityAndTrends")} description={t("activityAndTrendsBody")}>
+      <JourneySection eyebrow={t("lookBack")} title={t("activityAndTrends")} description={t("activityAndTrendsBody")}>
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
           <RecentTransactionsCard transactions={transactions} currency={currency} limit={6} />
           <UpcomingCashFlowCard items={recurring} currency={currency} />
@@ -144,14 +144,14 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
 
       <QuickActions userId={userId} currency={currency} goals={goals} actions={["expense", "saving", "give", "income", "goal"]} />
 
-      <JourneySection title={t("planAhead")} description={t("planAheadBody")}>
+      <JourneySection eyebrow={t("moneyStory")} title={t("planAhead")} description={t("planAheadBody")}>
         <div className="grid gap-4 lg:grid-cols-2">
           <GoalsCard goals={goals} transactions={transactions} currency={currency} title={t("savingFor")} />
           <BudgetCard budget={budget ? Number(budget.amount) : null} spent={month.expenses} currency={currency} title={t("spendingLimit")} />
         </div>
       </JourneySection>
 
-      <JourneySection title={t("latestActivity")} description={t("activityAndTrendsBody")}>
+      <JourneySection eyebrow={t("lookBack")} title={t("latestActivity")} description={t("activityAndTrendsBody")}>
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
           <RecentTransactionsCard transactions={transactions} currency={currency} title={t("latestActivity")} />
           <UpcomingCashFlowCard items={recurring} currency={currency} title={t("comingUp")} />
