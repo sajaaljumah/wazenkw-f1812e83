@@ -30,6 +30,7 @@ export function useReveal<T extends HTMLElement = HTMLElement>() {
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
+            window.clearTimeout(fallback);
             setRevealed(true);
             observer.disconnect();
           }
@@ -39,7 +40,10 @@ export function useReveal<T extends HTMLElement = HTMLElement>() {
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+    return () => {
+      window.clearTimeout(fallback);
+      observer.disconnect();
+    };
   }, []);
 
   return { ref, revealed };
