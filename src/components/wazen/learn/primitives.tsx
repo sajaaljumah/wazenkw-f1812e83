@@ -76,7 +76,7 @@ export function LearnSection({
   if (collapsible) {
     return (
       <details
-        ref={ref as React.RefObject<HTMLDetailsElement | null>}
+        ref={ref as RefObject<HTMLDetailsElement | null>}
         data-revealed={revealed}
         className="kid-panel wazen-reveal group p-5 sm:p-6"
         open={defaultOpen}
@@ -96,7 +96,7 @@ export function LearnSection({
     );
   }
   return (
-    <section className="space-y-4">
+    <section ref={ref} data-revealed={revealed} className="wazen-reveal space-y-4">
       <header className="flex min-w-0 items-start gap-3 px-1">
         {icon ? (
           <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-2xl bg-kid-soft/70 text-kid-deep">
