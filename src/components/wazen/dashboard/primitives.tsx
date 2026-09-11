@@ -153,8 +153,9 @@ export function Panel({
   children: ReactNode;
   className?: string;
 }) {
+  const { ref, revealed } = useReveal<HTMLElement>();
   return (
-    <section className={cn("wazen-card min-w-0", className)}>
+    <section ref={ref} data-revealed={revealed} className={cn("wazen-card wazen-reveal min-w-0", className)}>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border/70 pb-4">
         <h2 className="min-w-0 text-xl sm:text-2xl">{title}</h2>
         {action}
