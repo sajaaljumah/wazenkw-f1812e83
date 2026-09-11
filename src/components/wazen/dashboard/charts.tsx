@@ -261,6 +261,7 @@ export function SavingsTrendCard({
   });
   const hasData = series.some((point) => point.total > 0);
   const currentTotal = series.at(-1)?.total ?? 0;
+  const { ref, revealed } = useReveal<HTMLDivElement>();
 
   return (
     <Panel title={title ?? t("savingsOverTime")}>
