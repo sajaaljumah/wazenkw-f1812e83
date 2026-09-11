@@ -382,8 +382,8 @@ function LearnPage() {
                   <li
                     key={badge.key}
                     className={cn(
-                      "flex flex-col items-center gap-2 rounded-3xl border p-4 text-center",
-                      earned ? "border-kid-soft bg-kid-soft/50 kid-pop" : "border-border bg-card",
+                      "flex flex-col items-center gap-2 rounded-3xl border p-4 text-center transition-[border-color,box-shadow,transform] duration-200",
+                      earned ? "kid-earned border-kid-soft bg-kid-soft/50 kid-pop" : "border-border bg-card",
                     )}
                   >
                     <span className={cn("size-12", earned ? "" : "opacity-45")}>

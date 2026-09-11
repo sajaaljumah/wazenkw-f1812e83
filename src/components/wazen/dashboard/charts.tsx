@@ -72,7 +72,13 @@ export function SpendingByCategoryCard({
               const width = max > 0 ? Math.max((slice.amount / max) * 100, 3) : 0;
               const color = BAR_COLORS[index % BAR_COLORS.length];
               return (
-                <li key={slice.category} className="group">
+                <li
+                  key={slice.category}
+                  className="wazen-chart-row group rounded-lg px-2 py-1.5 outline-hidden focus-visible:ring-2 focus-visible:ring-ring/60"
+                  tabIndex={0}
+                  title={`${labels.category(slice.category)}: ${formatMoney(slice.amount, currency)} · ${share}%`}
+                  aria-label={`${labels.category(slice.category)}: ${formatMoney(slice.amount, currency)}, ${share}%`}
+                >
                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 text-sm">
                     <span className="flex min-w-0 items-center gap-2.5">
                       <span className="size-2 rounded-full" style={{ background: color }} />
@@ -84,7 +90,7 @@ export function SpendingByCategoryCard({
                   </div>
                   <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-secondary">
                     <div
-                      className="h-full rounded-full transition-[width] duration-700 ease-out group-hover:opacity-90"
+                      className="wazen-chart-bar h-full rounded-full transition-[width,filter] duration-700 ease-out"
                       style={{
                         width: `${width}%`,
                         background: `linear-gradient(90deg, ${color}, color-mix(in oklab, ${color} 62%, var(--chart-fade)))`,
@@ -153,12 +159,15 @@ export function IncomeVsExpensesCard({
                 cursor={{ fill: "var(--secondary)", opacity: 0.45 }}
                 formatter={(value) => formatMoney(Number(value), currency)}
                 contentStyle={TOOLTIP_STYLE}
+                labelStyle={{ color: "var(--muted-foreground)", marginBottom: "0.35rem" }}
+                itemStyle={{ color: "var(--card-foreground)" }}
               />
-              <Bar dataKey="income" fill="var(--chart-2)" radius={[5, 5, 0, 0]} maxBarSize={16} animationDuration={700} />
-              <Bar dataKey="expenses" fill="var(--chart-1)" radius={[5, 5, 0, 0]} maxBarSize={16} animationDuration={700} />
+              <Bar dataKey="income" name={t("income")} fill="var(--chart-2)" radius={[5, 5, 0, 0]} maxBarSize={16} animationDuration={700} />
+              <Bar dataKey="expenses" name={t("expensesLabel")} fill="var(--chart-1)" radius={[5, 5, 0, 0]} maxBarSize={16} animationDuration={700} />
               <Line
                 type="monotone"
                 dataKey="net"
+                name={t("netLabel")}
                 stroke="var(--foreground)"
                 strokeWidth={1.75}
                 dot={{ r: 2.5, fill: "var(--card)", strokeWidth: 1.5 }}
@@ -252,13 +261,20 @@ export function SavingsTrendCard({
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                 tickFormatter={(value) => Intl.NumberFormat(undefined, { notation: "compact" }).format(Number(value))}
               />
-              <Tooltip formatter={(value) => formatMoney(Number(value), currency)} contentStyle={TOOLTIP_STYLE} />
+              <Tooltip
+                formatter={(value) => formatMoney(Number(value), currency)}
+                contentStyle={TOOLTIP_STYLE}
+                labelStyle={{ color: "var(--muted-foreground)", marginBottom: "0.35rem" }}
+                itemStyle={{ color: "var(--card-foreground)" }}
+              />
               <Area
                 type="monotone"
                 dataKey="total"
+                name={title ?? t("savingsOverTime")}
                 stroke="var(--chart-2)"
                 strokeWidth={2}
                 fill="url(#wazen-savings-area)"
+                activeDot={{ r: 5, fill: "var(--card)", stroke: "var(--chart-2)", strokeWidth: 2 }}
                 animationDuration={900}
               />
             </ComposedChart>

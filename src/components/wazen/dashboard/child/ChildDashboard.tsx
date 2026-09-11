@@ -35,21 +35,23 @@ const GIVE_PATTERN = /giv|charity|sadaqah|donat|help/i;
 
 /** Big soft progress bar that eases up to its value whenever it changes. */
 function KidProgress({ percent, className }: { percent: number; className?: string }) {
+  const safePercent = Math.max(0, Math.min(100, percent));
   const [width, setWidth] = useState(0);
   useEffect(() => {
-    const timer = window.setTimeout(() => setWidth(percent), 120);
+    const timer = window.setTimeout(() => setWidth(safePercent), 120);
     return () => window.clearTimeout(timer);
-  }, [percent]);
+  }, [safePercent]);
   return (
     <div
-      className={cn("h-5 w-full overflow-hidden rounded-full bg-kid-soft/70", className)}
+      className={cn("wazen-progress-track h-5 w-full overflow-hidden rounded-full bg-kid-soft/70", className)}
+      data-complete={safePercent >= 100 ? "true" : undefined}
       role="progressbar"
-      aria-valuenow={percent}
+      aria-valuenow={safePercent}
       aria-valuemin={0}
       aria-valuemax={100}
     >
       <div
-        className="h-full rounded-full bg-kid-champagne transition-[width] duration-1000 ease-out"
+        className="wazen-progress-fill h-full rounded-full bg-kid-champagne transition-[width] duration-1000 ease-out"
         style={{ width: `${width}%` }}
       />
     </div>
@@ -334,7 +336,7 @@ export function ChildDashboard({
                 title={badge.hint}
                 className={cn(
                   "flex flex-col items-center gap-2 rounded-3xl p-3 text-center text-xs",
-                  badge.earned ? "bg-kid-soft/60 kid-pop" : "bg-secondary/50 opacity-55",
+                  badge.earned ? "kid-earned bg-kid-soft/60 kid-pop" : "bg-secondary/50 opacity-55",
                 )}
               >
                 <span className="size-10">
