@@ -3,6 +3,7 @@ import { ReceiptIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { formatDate, formatMoney } from "@/lib/finance";
 import type { Transaction } from "@/lib/finance";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { useWazenLabels } from "@/lib/i18n-labels";
 
 /**
  * Child / teenager view of spending a parent paid for them. Amounts here belong
@@ -11,6 +12,7 @@ import { useWazenLocale } from "@/components/wazen/WazenLocale";
  */
 export function ParentPaidCard({ transactions }: { transactions: Transaction[] }) {
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   return (
     <Panel title={t("paidByFamily")}>
       {transactions.length === 0 ? (
