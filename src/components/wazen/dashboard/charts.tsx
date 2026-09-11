@@ -1,4 +1,4 @@
-import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { CategoryChartIcon as PieIcon, TrendChartIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { EmptyState, Panel } from "./primitives";
 import { formatMoney, monthlySeries, spendingByCategory } from "@/lib/finance";
@@ -45,6 +45,7 @@ export function SpendingByCategoryCard({
                   outerRadius={70}
                   paddingAngle={2}
                   stroke="none"
+                  animationDuration={650}
                 >
                   {slices.map((slice, index) => (
                     <Cell key={slice.category} fill={SLICE_COLORS[index % SLICE_COLORS.length]} />
@@ -53,7 +54,7 @@ export function SpendingByCategoryCard({
                 <Tooltip
                   formatter={(value) => formatMoney(Number(value), currency)}
                   contentStyle={{
-                    borderRadius: "0.625rem",
+                    borderRadius: "0.875rem",
                     border: "1px solid var(--border)",
                     background: "var(--card)",
                     color: "var(--card-foreground)",
@@ -110,6 +111,7 @@ export function IncomeVsExpensesCard({
         <div className="h-44 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={series} barGap={4}>
+              <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.6} />
               <XAxis
                 dataKey="label"
                 tickLine={false}
@@ -117,17 +119,18 @@ export function IncomeVsExpensesCard({
                 tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
               />
               <Tooltip
+                cursor={{ fill: "var(--secondary)", opacity: 0.5 }}
                 formatter={(value) => formatMoney(Number(value), currency)}
                 contentStyle={{
-                    borderRadius: "0.625rem",
+                  borderRadius: "0.875rem",
                   border: "1px solid var(--border)",
                   background: "var(--card)",
                   color: "var(--card-foreground)",
                   fontSize: "0.8rem",
                 }}
               />
-              <Bar dataKey="income" fill="var(--chart-2)" radius={[3, 3, 0, 0]} maxBarSize={16} />
-              <Bar dataKey="expenses" fill="var(--chart-1)" radius={[3, 3, 0, 0]} maxBarSize={16} />
+              <Bar dataKey="income" fill="var(--chart-2)" radius={[4, 4, 0, 0]} maxBarSize={18} animationDuration={650} />
+              <Bar dataKey="expenses" fill="var(--chart-1)" radius={[4, 4, 0, 0]} maxBarSize={18} animationDuration={650} />
             </BarChart>
           </ResponsiveContainer>
         </div>
