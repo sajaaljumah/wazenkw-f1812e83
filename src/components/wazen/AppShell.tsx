@@ -106,8 +106,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               key={to}
               to={to}
               className={cn(
-                "relative flex min-h-16 flex-1 flex-col items-center justify-center gap-1 py-2 text-[0.6875rem] font-medium",
-                location.pathname === to ? "text-foreground after:absolute after:top-0 after:h-0.5 after:w-8 after:bg-foreground" : "text-muted-foreground",
+                "relative flex min-h-16 flex-1 flex-col items-center justify-center gap-1 py-2 text-[0.6875rem] font-semibold transition-colors",
+                location.pathname === to
+                  ? "text-primary after:absolute after:top-0 after:h-0.5 after:w-8 after:rounded-full after:bg-primary"
+                  : "text-muted-foreground",
               )}
             >
               <Icon className="size-5" strokeWidth={1.5} />
