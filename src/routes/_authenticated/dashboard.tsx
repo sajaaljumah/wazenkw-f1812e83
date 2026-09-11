@@ -26,6 +26,7 @@ import { formatToday } from "@/lib/finance";
 import { firstNameOf } from "@/lib/wazen";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { FirstUseWalkthrough } from "@/components/wazen/FirstUseWalkthrough";
+import { JourneySection } from "@/components/wazen/dashboard/primitives";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -167,12 +168,14 @@ function Dashboard() {
         )}
 
         {isParent ? (
-          <FamilySummaryCard
-            members={family.data ?? []}
-            isLoading={family.isLoading}
-            currency={profile.base_currency}
-            transactions={transactions.data ?? []}
-          />
+          <JourneySection title={t("familyFinances")} description={t("noFamilyDescription")}>
+            <FamilySummaryCard
+              members={family.data ?? []}
+              isLoading={family.isLoading}
+              currency={profile.base_currency}
+              transactions={transactions.data ?? []}
+            />
+          </JourneySection>
         ) : null}
       </div>
     </AppShell>

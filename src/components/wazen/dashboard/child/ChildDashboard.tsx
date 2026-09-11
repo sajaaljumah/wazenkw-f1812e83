@@ -185,9 +185,9 @@ export function ChildDashboard({
   const recent = transactions.slice(0, 5);
 
   return (
-    <div className="kid-theme space-y-6">
+    <div className="kid-theme flex flex-col gap-6">
       {/* Welcome */}
-      <section className="kid-panel relative overflow-hidden bg-kid-tint p-7 sm:p-9">
+      <section className="kid-panel relative order-0 overflow-hidden bg-kid-tint p-7 sm:p-9">
         <KidDecorations />
         <div className="relative grid grid-cols-1 items-center gap-5 text-center sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-7 sm:text-start">
           <span className="kid-float rounded-full bg-kid-soft/70 p-2">
@@ -210,7 +210,7 @@ export function ChildDashboard({
       </section>
 
       {/* My money */}
-      <section className="space-y-4">
+      <section className="order-3 space-y-4">
         <h2 className="px-1 text-xl">{t("kidMyMoney")}</h2>
         <div className="grid gap-4 min-[520px]:grid-cols-3">
           <MoneyTile
@@ -238,7 +238,7 @@ export function ChildDashboard({
       </section>
 
       {/* Goal */}
-      <section className="kid-panel relative overflow-hidden bg-kid-tint/70 p-7 sm:p-9">
+      <section className="kid-panel relative order-1 overflow-hidden bg-kid-tint/70 p-7 sm:p-9">
         <Celebration show={celebrate} />
         {goal ? (
           <button
@@ -281,7 +281,7 @@ export function ChildDashboard({
       </section>
 
       {/* Save / Spend / Give */}
-      <section className="space-y-4">
+      <section className="order-2 space-y-4">
         <h2 className="px-1 text-xl">{t("kidWhatDo")}</h2>
         <div className="grid gap-4 min-[520px]:grid-cols-3">
           <ChoiceTile
@@ -306,7 +306,7 @@ export function ChildDashboard({
       </section>
 
       {/* Allowance + badges */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="order-4 grid gap-4 lg:grid-cols-2">
         <section className="kid-panel relative overflow-hidden p-6">
           <div className="flex items-center gap-4">
             <span className="size-14 kid-float">
@@ -348,8 +348,9 @@ export function ChildDashboard({
       </div>
 
       {/* Recent activity */}
-      <section className="kid-panel p-6">
-        <h2 className="text-xl">{t("kidLately")}</h2>
+      <details className="kid-panel group order-5 p-6">
+        <summary className="cursor-pointer list-none text-xl font-semibold">{t("kidLately")}</summary>
+        <div className="mt-5 border-t border-kid-soft pt-5">
         {recent.length === 0 ? (
           <div className="mt-5 flex flex-col items-center gap-3 rounded-3xl bg-kid-tint/70 p-8 text-center">
             <span className="size-20">
@@ -383,12 +384,14 @@ export function ChildDashboard({
             })}
           </ul>
         )}
-      </section>
+        </div>
+      </details>
 
       {/* Things a parent paid for this child. Not deducted from their own money
           unless the parent chose to. */}
-      <section className="kid-panel p-6">
-        <h2 className="text-xl">{t("kidPaidByFamily")}</h2>
+      <details className="kid-panel group order-6 p-6">
+        <summary className="cursor-pointer list-none text-xl font-semibold">{t("kidPaidByFamily")}</summary>
+        <div className="mt-5 border-t border-kid-soft pt-5">
         {(parentPaid.data ?? []).length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">{t("kidPaidByFamilyBody")}</p>
         ) : (
@@ -412,7 +415,8 @@ export function ChildDashboard({
             ))}
           </ul>
         )}
-      </section>
+        </div>
+      </details>
 
       <ActionDialog
         kind={action}
