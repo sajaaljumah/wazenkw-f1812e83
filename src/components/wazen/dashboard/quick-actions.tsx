@@ -9,6 +9,7 @@ import {
   IncomeIcon,
   SavingsIcon,
   SpinnerIcon,
+  MoreIcon,
   ICON_STROKE,
 } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +24,12 @@ import type { Goal } from "@/lib/finance";
 import { firstOfMonth } from "@/lib/finance";
 import { Button } from "@/components/ui/button";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /**
  * Wazen's money actions. Every action writes a real row through the existing
@@ -112,36 +119,49 @@ export function QuickActions({
 
   return (
     <>
-      <section className="wazen-card">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <section className="wazen-action-dock" data-tour="actions">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <span className="wazen-label">{t("moneyActions" as never)}</span>
+          {order.some((kind) => !meta[kind].primary) ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <MoreIcon className="size-4" strokeWidth={ICON_STROKE} />
+                  {t("moreActions")}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-52 p-2">
+                {order.filter((kind) => !meta[kind].primary).map((kind) => {
+                  const item = meta[kind];
+                  const Icon = item.icon;
+                  return (
+                    <DropdownMenuItem key={kind} onSelect={() => setOpen(kind)} className="min-h-11 gap-3 px-3">
+                      <Icon className="size-4" strokeWidth={ICON_STROKE} />
+                      {item.label}
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
         </div>
-        <div className="mt-4 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
-          {order.map((kind) => {
+        <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+          {order.filter((kind) => meta[kind].primary).map((kind) => {
             const item = meta[kind];
             const Icon = item.icon;
             return (
-              <button
+              <Button
                 key={kind}
                 type="button"
+                variant="outline"
                 onClick={() => setOpen(kind)}
-                className={
-                  item.primary
-                    ? "group flex items-center gap-3 rounded-xl border border-primary/25 bg-primary/[0.06] px-3 py-3 text-start transition-colors hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:outline-hidden"
-                    : "group flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-3 text-start transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:outline-hidden"
-                }
+                className="group h-auto min-h-20 min-w-0 flex-col gap-2 border-primary/15 bg-card px-2 py-3 text-center hover:border-primary/35 hover:bg-accent/45 sm:min-h-16 sm:flex-row sm:justify-start sm:px-4 sm:text-start"
               >
-                <span
-                  className={
-                    item.primary
-                      ? "flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/12 text-primary transition-transform group-active:scale-95"
-                      : "flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-foreground transition-transform group-active:scale-95"
-                  }
-                >
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform group-active:scale-95">
                   <Icon className="size-4" strokeWidth={ICON_STROKE} />
                 </span>
-                 <span className="min-w-0 text-sm font-medium leading-tight">{item.label}</span>
-              </button>
+                <span className="min-w-0 text-xs font-semibold leading-tight sm:text-sm">{item.label}</span>
+              </Button>
             );
           })}
         </div>
