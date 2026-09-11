@@ -130,6 +130,7 @@ export function ChildDashboard({
 }) {
   const { currency, transactions, goals, userId } = data;
   const [action, setAction] = useState<ActionKind | null>(null);
+  const parentPaid = useParentPaidForMe();
   const [sheet, setSheet] = useState<Sheet>(null);
 
   const monthTransactions = useMemo(() => inMonth(transactions, monthKey(new Date())), [transactions]);
@@ -382,6 +383,37 @@ export function ChildDashboard({
                 </li>
               );
             })}
+          </ul>
+        )}
+      </section>
+
+      {/* Things a parent paid for this child. Not deducted from their own money
+          unless the parent chose to. */}
+      <section className="kid-panel p-6">
+        <h2 className="text-xl">Paid by your family</h2>
+        {(parentPaid.data ?? []).length === 0 ? (
+          <p className="mt-4 text-sm text-muted-foreground">
+            When a grown-up pays for something for you, it will show up here.
+          </p>
+        ) : (
+          <ul className="mt-5 space-y-3">
+            {(parentPaid.data ?? []).slice(0, 5).map((item) => (
+              <li key={item.id} className="flex items-center gap-4 rounded-3xl bg-kid-tint/60 p-4">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-kid-soft/80 text-kid-deep">
+                  <GiveIcon className="size-5" strokeWidth={ICON_STROKE} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm">{item.merchant ?? item.category}</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {formatDate(item.occurred_on)} ·{" "}
+                    {item.deducted_from_child ? "from your money" : "your family paid this"}
+                  </span>
+                </span>
+                <span className="shrink-0 text-sm tabular-nums">
+                  {formatMoney(Number(item.amount), item.currency)}
+                </span>
+              </li>
+            ))}
           </ul>
         )}
       </section>
