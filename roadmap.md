@@ -7,4 +7,8 @@
 - [x] Redesign profile, settings, subscription, dialogs, and status states
 - [x] Add English/Arabic presentation support across existing screens
 - [x] Verify all routes, representative roles, mobile/desktop, TypeScript, and production build
-- [ ] Use the uploaded soft cool-white color as the global application background
+- [x] Use the uploaded soft cool-white color as the global application background
+- [x] Remove gender-based child styling and replace portrait fallbacks with life-stage identity seals
+- [x] Correct 320px-to-wide responsive behavior for navigation, dashboards, charts, Assets, and Zakat
+- [x] Simplify demo access while preserving all 12 accounts and seed missing Give/Zakat histories
+- [ ] Complete final representative life-stage and route verification
