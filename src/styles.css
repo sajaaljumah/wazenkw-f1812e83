@@ -675,6 +675,10 @@ html[dir="rtl"] .wazen-chart-row[data-active="true"] {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+  .wazen-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
   .wazen-enter,
   .kid-float,
   .kid-twinkle,
