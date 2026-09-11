@@ -69,6 +69,7 @@ function Dashboard() {
   const recurring = useRecurringItems();
   const isParent = profile?.life_stage === "parent";
   const family = useFamilySummary(!!isParent);
+  const zakat = useZakat();
 
   useEffect(() => {
     if (profile && !profile.onboarding_completed) navigate({ to: "/onboarding" });
@@ -137,6 +138,10 @@ function Dashboard() {
             }
           />
         )}
+
+        {canCalculateZakat(profile.life_stage) && zakat.result ? (
+          <ZakatAlert result={zakat.result} currency={profile.base_currency} compact />
+        ) : null}
 
         {profile.life_stage === "child" ? (
           <ChildDashboard
