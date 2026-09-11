@@ -35,7 +35,7 @@ export function RecurringFormDialog({
   const [kind, setKind] = useState<RecurringKind>("expense");
   const [name, setName] = useState("");
   const [merchant, setMerchant] = useState("");
-  const [category, setCategory] = useState(t("subscriptionsCategory"));
+  const [category, setCategory] = useState<string>(t("subscriptionsCategory"));
   const [amount, setAmount] = useState("");
   const [itemCurrency, setItemCurrency] = useState(currency);
   const [frequency, setFrequency] = useState<RecurringFrequency>("monthly");
@@ -49,7 +49,7 @@ export function RecurringFormDialog({
     setKind(item?.kind ?? "expense");
     setName(item?.name ?? "");
     setMerchant(item?.merchant ?? "");
-    setCategory(item?.category ?? t("subscriptionsCategory"));
+    setCategory(item?.category ?? (t("subscriptionsCategory") as string));
     setAmount(item ? String(item.amount) : "");
     setItemCurrency(item?.currency ?? currency);
     setFrequency(item?.frequency ?? "monthly");

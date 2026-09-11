@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { WazenFooter } from "@/components/wazen/WazenFooter";
 import { AppLocaleProvider } from "@/components/wazen/WazenLocale";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { ThemeSync } from "@/components/wazen/WazenTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";

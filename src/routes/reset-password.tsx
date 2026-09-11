@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { SpinnerIcon } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/reset-password")({
