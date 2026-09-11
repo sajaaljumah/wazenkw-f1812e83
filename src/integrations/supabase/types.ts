@@ -51,6 +51,7 @@ export type Database = {
           created_at: string
           currency: string
           current_unit_value: number
+          holding_purpose: string | null
           id: string
           kind: Database["public"]["Enums"]["asset_kind"]
           monthly_rent: number
@@ -64,11 +65,13 @@ export type Database = {
           unit_cost: number
           updated_at: string
           user_id: string
+          zakat_treatment: string | null
         }
         Insert: {
           created_at?: string
           currency?: string
           current_unit_value: number
+          holding_purpose?: string | null
           id?: string
           kind: Database["public"]["Enums"]["asset_kind"]
           monthly_rent?: number
@@ -82,11 +85,13 @@ export type Database = {
           unit_cost: number
           updated_at?: string
           user_id: string
+          zakat_treatment?: string | null
         }
         Update: {
           created_at?: string
           currency?: string
           current_unit_value?: number
+          holding_purpose?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["asset_kind"]
           monthly_rent?: number
@@ -100,6 +105,7 @@ export type Database = {
           unit_cost?: number
           updated_at?: string
           user_id?: string
+          zakat_treatment?: string | null
         }
         Relationships: []
       }
@@ -280,6 +286,36 @@ export type Database = {
           target_date?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      metal_rates: {
+        Row: {
+          as_of: string
+          created_at: string
+          currency: string
+          id: string
+          metal: string
+          price_per_gram: number
+          source: string
+        }
+        Insert: {
+          as_of?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          metal: string
+          price_per_gram: number
+          source?: string
+        }
+        Update: {
+          as_of?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          metal?: string
+          price_per_gram?: number
+          source?: string
         }
         Relationships: []
       }
@@ -588,6 +624,212 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      zakat_assets: {
+        Row: {
+          asset_id: string | null
+          asset_type: string
+          calculation_date: string
+          calculation_id: string | null
+          calculation_method: string | null
+          created_at: string
+          eligibility_reason: string | null
+          eligible: boolean
+          id: string
+          user_id: string
+          value_kwd: number
+        }
+        Insert: {
+          asset_id?: string | null
+          asset_type: string
+          calculation_date?: string
+          calculation_id?: string | null
+          calculation_method?: string | null
+          created_at?: string
+          eligibility_reason?: string | null
+          eligible?: boolean
+          id?: string
+          user_id: string
+          value_kwd?: number
+        }
+        Update: {
+          asset_id?: string | null
+          asset_type?: string
+          calculation_date?: string
+          calculation_id?: string | null
+          calculation_method?: string | null
+          created_at?: string
+          eligibility_reason?: string | null
+          eligible?: boolean
+          id?: string
+          user_id?: string
+          value_kwd?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zakat_assets_calculation_id_fkey"
+            columns: ["calculation_id"]
+            isOneToOne: false
+            referencedRelation: "zakat_calculations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      zakat_calculations: {
+        Row: {
+          breakdown: Json
+          calculation_date: string
+          created_at: string
+          deductions_kwd: number
+          eligible_assets_total_kwd: number
+          hawl_status: string
+          id: string
+          methodology_reference: string
+          nisab_value_kwd: number
+          user_id: string
+          zakat_due_kwd: number
+          zakat_rate: number
+          zakatable_amount_kwd: number
+        }
+        Insert: {
+          breakdown?: Json
+          calculation_date?: string
+          created_at?: string
+          deductions_kwd?: number
+          eligible_assets_total_kwd?: number
+          hawl_status?: string
+          id?: string
+          methodology_reference?: string
+          nisab_value_kwd?: number
+          user_id: string
+          zakat_due_kwd?: number
+          zakat_rate?: number
+          zakatable_amount_kwd?: number
+        }
+        Update: {
+          breakdown?: Json
+          calculation_date?: string
+          created_at?: string
+          deductions_kwd?: number
+          eligible_assets_total_kwd?: number
+          hawl_status?: string
+          id?: string
+          methodology_reference?: string
+          nisab_value_kwd?: number
+          user_id?: string
+          zakat_due_kwd?: number
+          zakat_rate?: number
+          zakatable_amount_kwd?: number
+        }
+        Relationships: []
+      }
+      zakat_payments: {
+        Row: {
+          amount_kwd: number
+          calculation_id: string | null
+          created_at: string
+          currency: string
+          id: string
+          notes: string | null
+          payment_date: string
+          payment_type: string
+          recipient: string | null
+          status: string
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_kwd: number
+          calculation_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_type?: string
+          recipient?: string | null
+          status?: string
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_kwd?: number
+          calculation_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_type?: string
+          recipient?: string | null
+          status?: string
+          transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zakat_payments_calculation_id_fkey"
+            columns: ["calculation_id"]
+            isOneToOne: false
+            referencedRelation: "zakat_calculations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zakat_payments_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      zakat_profiles: {
+        Row: {
+          created_at: string
+          current_nisab_kwd: number | null
+          gold_nisab_grams: number
+          hawl_status: string
+          hijri_due_date: string | null
+          hijri_start_date: string | null
+          nisab_method: string
+          silver_nisab_grams: number
+          status: string
+          updated_at: string
+          user_id: string
+          zakat_due_date: string | null
+          zakat_start_date: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_nisab_kwd?: number | null
+          gold_nisab_grams?: number
+          hawl_status?: string
+          hijri_due_date?: string | null
+          hijri_start_date?: string | null
+          nisab_method?: string
+          silver_nisab_grams?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+          zakat_due_date?: string | null
+          zakat_start_date?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_nisab_kwd?: number | null
+          gold_nisab_grams?: number
+          hawl_status?: string
+          hijri_due_date?: string | null
+          hijri_start_date?: string | null
+          nisab_method?: string
+          silver_nisab_grams?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+          zakat_due_date?: string | null
+          zakat_start_date?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
