@@ -121,7 +121,10 @@ export function QuickActions({
     <>
       <section className="wazen-action-dock" data-tour="actions">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-          <span className="wazen-label">{t("moneyActions" as never)}</span>
+          <span className="min-w-0">
+            <span className="wazen-label block">{t("moneyActions" as never)}</span>
+            <span className="mt-1 block text-xs text-muted-foreground">{t("moneyActionsHint" as never)}</span>
+          </span>
           {order.some((kind) => !meta[kind].primary) ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

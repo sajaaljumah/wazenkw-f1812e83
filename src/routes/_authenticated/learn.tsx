@@ -177,7 +177,7 @@ function LearnPage() {
           <div className="mt-6 rounded-2xl border border-kid-soft bg-card p-4 sm:p-5">
             <p className="flex items-center gap-2 text-xs text-kid-deep">
               <RecommendIcon className="size-4" strokeWidth={ICON_STROKE} />
-              {lc("recommended")}
+              {lc("nextUp")}
             </p>
             <div className="mt-3 grid gap-3 min-[420px]:grid-cols-[minmax(0,1fr)_auto] min-[420px]:items-center">
               <div className="min-w-0">
@@ -193,7 +193,7 @@ function LearnPage() {
         </section>
 
         {/* A. Learning progress */}
-        <LearnSection title={lc("progressTitle")} icon={<LearnIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection title={lc("progressTitle")} caption={lc("progressCaption")} icon={<LearnIcon className="size-4" strokeWidth={ICON_STROKE} />}>
           <div className="kid-panel space-y-4 p-5 sm:p-6">
             <div>
               <div className="flex items-center justify-between text-sm">
@@ -226,7 +226,7 @@ function LearnPage() {
         </LearnSection>
 
         {/* B. Lessons */}
-        <LearnSection title={lc("lessons")} icon={<LearnIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection title={lc("lessons")} caption={lc("lessonsCaption")} icon={<LearnIcon className="size-4" strokeWidth={ICON_STROKE} />}>
           <ul className="grid gap-4 min-[560px]:grid-cols-2 xl:grid-cols-3">
             {LESSONS.map((item) => {
               const done = doneLessons.some((row) => row.activity_key === item.key);
@@ -261,7 +261,7 @@ function LearnPage() {
         </LearnSection>
 
         {/* C. Games */}
-        <LearnSection collapsible title={lc("games")} icon={<GameIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection collapsible title={lc("games")} caption={lc("gamesCaption")} icon={<GameIcon className="size-4" strokeWidth={ICON_STROKE} />}>
           <ul className="grid gap-4 min-[560px]:grid-cols-2 xl:grid-cols-3">
             {GAMES.map((item) => {
               const row = rows.find((entry) => entry.activity_type === "game" && entry.activity_key === item.key);
@@ -293,7 +293,7 @@ function LearnPage() {
         </LearnSection>
 
         {/* D. Quiz */}
-        <LearnSection collapsible title={lc("quiz")} icon={<QuizIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection collapsible title={lc("quiz")} caption={lc("quizCaption")} icon={<QuizIcon className="size-4" strokeWidth={ICON_STROKE} />}>
           <div className="kid-panel grid gap-4 p-5 sm:p-6 min-[420px]:grid-cols-[minmax(0,1fr)_auto] min-[420px]:items-center">
             <div className="min-w-0">
               <p className="text-sm">{lc("quizIntro")}</p>
@@ -306,7 +306,7 @@ function LearnPage() {
         </LearnSection>
 
         {/* E. Challenges */}
-        <LearnSection collapsible title={lc("challenges")} icon={<ChallengesIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection collapsible title={lc("challenges")} caption={lc("challengesCaption")} icon={<ChallengesIcon className="size-4" strokeWidth={ICON_STROKE} />}>
           <ul className="grid gap-4 min-[560px]:grid-cols-2 xl:grid-cols-3">
             {CHALLENGES.map((meta) => {
               const row = challengeRows.find((entry) => entry.challenge_key === meta.key);

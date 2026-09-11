@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AddIcon, ExpensesIcon, GiveIcon, GoalsIcon, IncomeIcon, PremiumIcon, RefundIcon, SavingsIcon, ScheduledIcon, SpendIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { AddIcon, ExpensesIcon, ExpandIcon, GiveIcon, GoalsIcon, IncomeIcon, PremiumIcon, RefundIcon, SavingsIcon, ScheduledIcon, SpendIcon, ICON_STROKE } from "@/components/wazen/icons";
 import {
   Dialog,
   DialogContent,
@@ -70,7 +70,7 @@ function MoneyTile({
   helper: string;
 }) {
   return (
-    <div className="kid-panel relative overflow-hidden p-6">
+    <div className="kid-panel kid-money-tile relative overflow-hidden p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm text-kid-deep">{label}</p>
@@ -349,7 +349,15 @@ export function ChildDashboard({
 
       {/* Recent activity */}
       <details className="kid-panel group order-5 p-6">
-        <summary className="cursor-pointer list-none text-xl font-semibold">{t("kidLately")}</summary>
+        <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-3 focus-visible:outline-hidden">
+          <span className="min-w-0">
+            <span className="block text-xl font-semibold">{t("kidLately")}</span>
+            <span className="mt-1 block text-xs font-normal text-muted-foreground">{t("kidLatelyHint")}</span>
+          </span>
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-kid-soft/70 text-kid-deep transition-transform group-open:rotate-180">
+            <ExpandIcon className="size-4" strokeWidth={ICON_STROKE} />
+          </span>
+        </summary>
         <div className="mt-5 border-t border-kid-soft pt-5">
         {recent.length === 0 ? (
           <div className="mt-5 flex flex-col items-center gap-3 rounded-3xl bg-kid-tint/70 p-8 text-center">
@@ -390,7 +398,15 @@ export function ChildDashboard({
       {/* Things a parent paid for this child. Not deducted from their own money
           unless the parent chose to. */}
       <details className="kid-panel group order-6 p-6">
-        <summary className="cursor-pointer list-none text-xl font-semibold">{t("kidPaidByFamily")}</summary>
+        <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-3 focus-visible:outline-hidden">
+          <span className="min-w-0">
+            <span className="block text-xl font-semibold">{t("kidPaidByFamily")}</span>
+            <span className="mt-1 block text-xs font-normal text-muted-foreground">{t("kidPaidByFamilyHint")}</span>
+          </span>
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-kid-soft/70 text-kid-deep transition-transform group-open:rotate-180">
+            <ExpandIcon className="size-4" strokeWidth={ICON_STROKE} />
+          </span>
+        </summary>
         <div className="mt-5 border-t border-kid-soft pt-5">
         {(parentPaid.data ?? []).length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">{t("kidPaidByFamilyBody")}</p>
