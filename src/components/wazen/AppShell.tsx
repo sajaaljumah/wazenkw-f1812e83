@@ -12,14 +12,13 @@ import { cn } from "@/lib/utils";
 import { WazenLogo } from "@/components/wazen/WazenLogo";
 import { ZakatNotificationBell } from "@/components/wazen/zakat/ZakatNotificationBell";
 
+// Core areas only. Account management (profile, subscription) lives in Settings.
 const NAV = [
   { to: "/dashboard", label: "overview", icon: DashboardIcon },
   { to: "/recurring", label: "recurringNav", icon: ScheduledIcon },
   { to: "/documents", label: "documentsNav", icon: DocumentIcon },
   { to: "/assets", label: "assets", icon: PortfolioIcon, adultsOnly: true },
   { to: "/zakat", label: "zakat", icon: ZakatIcon, adultsOnly: true },
-  { to: "/subscription", label: "plan", icon: PremiumIcon },
-  { to: "/profile", label: "profile", icon: ProfileIcon },
   { to: "/settings", label: "settings", icon: SettingsIcon },
 ] as const;
 
