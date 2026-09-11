@@ -26,7 +26,7 @@ import type { Gender } from "@/lib/wazen";
 import { cn } from "@/lib/utils";
 import { useParentPaidForMe } from "@/hooks/use-wazen-finance";
 
-type ActionKind = "income" | "expense" | "saving" | "goal";
+type ActionKind = "income" | "expense" | "saving" | "give" | "goal";
 type Sheet = "spend" | "give" | "goal" | null;
 
 const GIVE_PATTERN = /giv|charity|sadaqah|donat|help/i;
@@ -437,7 +437,17 @@ export function ChildDashboard({
           setAction("expense");
         }}
       />
-      <GiveSheet open={sheet === "give"} onClose={() => setSheet(null)} given={give} currency={currency} />
+      <GiveSheet
+        open={sheet === "give"}
+        onClose={() => setSheet(null)}
+        given={give}
+        currency={currency}
+        onAddGiving={() => {
+          setSheet(null);
+          setAction("give");
+        }}
+      />
+
       <GoalSheet
         open={sheet === "goal"}
         onClose={() => setSheet(null)}
@@ -527,11 +537,13 @@ function GiveSheet({
   onClose,
   given,
   currency,
+  onAddGiving,
 }: {
   open: boolean;
   onClose: () => void;
   given: number;
   currency: string;
+  onAddGiving: () => void;
 }) {
   return (
     <SheetShell
@@ -542,6 +554,8 @@ function GiveSheet({
     >
       <div className="space-y-4 text-sm">
         <div className="flex items-center gap-4 rounded-3xl bg-secondary/50 p-4">
+
+
           <span className="size-14 shrink-0">
             <HeartIllustration />
           </span>
@@ -561,7 +575,15 @@ function GiveSheet({
             <PremiumIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> Kind words and help count too.
           </li>
         </ul>
+        <button
+          type="button"
+          onClick={onAddGiving}
+          className="kid-press w-full rounded-xl bg-kid-deep px-6 py-3 text-sm text-kid-ivory"
+        >
+          I gave something
+        </button>
       </div>
+
     </SheetShell>
   );
 }

@@ -139,8 +139,9 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
         userId={userId}
         currency={currency}
         goals={goals}
-        labels={{ income: t("addMoneyIn"), expense: t("addSpending") }}
+        actions={["expense", "saving", "give", "income", "goal"]}
       />
+
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label={t("moneyAvailable")} amount={all.net} currency={currency} icon={<BudgetIcon className="size-4" strokeWidth={ICON_STROKE} />} />
