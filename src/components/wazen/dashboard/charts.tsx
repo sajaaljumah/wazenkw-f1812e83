@@ -112,7 +112,7 @@ export function SpendingByCategoryCard({
                     <div
                       className="wazen-chart-bar h-full rounded-full transition-[width,filter] duration-700 ease-out"
                       style={{
-                        width: `${width}%`,
+                        width: revealed ? `${width}%` : "0%",
                         background: `linear-gradient(90deg, ${color}, color-mix(in oklab, ${color} 62%, var(--chart-fade)))`,
                       }}
                     />
