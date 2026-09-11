@@ -186,14 +186,40 @@ export { ChildDashboard } from "./child/ChildDashboard";
 export function FamilySummaryCard({
   members,
   isLoading,
+  currency,
+  transactions = [],
 }: {
   members: FamilyMemberSummary[];
   isLoading: boolean;
+  currency: string;
+  /** The parent's own transactions — used to list parent-paid expenses. */
+  transactions?: Transaction[];
 }) {
   const { t } = useWazenLocale();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const parentPaid = transactions
+    .filter((item) => item.paid_by_parent && item.beneficiary_user_id && item.beneficiary_user_id !== item.user_id)
+    .slice(0, 8);
+  const nameOf = (id: string | null | undefined) => {
+    const member = members.find((entry) => entry.profile.id === id);
+    return member ? firstNameOf(member.profile.full_name) : "—";
+  };
+
   return (
-    <Panel title={t("familySummary")}>
+    <>
+    <Panel
+      title={t("familySummary")}
+      action={
+        members.length > 0 ? (
+          <Button size="sm" onClick={() => setDialogOpen(true)}>
+            <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
+            {t("addExpenseForChild")}
+          </Button>
+        ) : null
+      }
+    >
       {isLoading ? (
+
         <p className="text-sm text-muted-foreground">{t("loadingFamily")}</p>
       ) : members.length === 0 ? (
         <EmptyState
