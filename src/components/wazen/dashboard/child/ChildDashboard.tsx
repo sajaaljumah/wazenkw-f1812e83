@@ -24,6 +24,7 @@ import type { Goal, Transaction } from "@/lib/finance";
 import type { DashboardData } from "../variants";
 import type { Gender } from "@/lib/wazen";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { useWazenLabels } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { useParentPaidForMe } from "@/hooks/use-wazen-finance";
 
@@ -131,6 +132,7 @@ export function ChildDashboard({
   avatarUrl: string | null;
 }) {
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   const { currency, transactions, goals, userId } = data;
   const [action, setAction] = useState<ActionKind | null>(null);
   const parentPaid = useParentPaidForMe();
@@ -368,7 +370,7 @@ export function ChildDashboard({
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm">
-                      {t(ACTIVITY_KEY[item.kind])} — {item.merchant ?? item.category}
+                      {t(ACTIVITY_KEY[item.kind])} — {item.merchant ?? labels.category(item.category)}
                     </span>
                     <span className="block text-xs text-muted-foreground">{formatDate(item.occurred_on)}</span>
                   </span>

@@ -14,6 +14,7 @@ import { EmptyState, Panel } from "./primitives";
 import { formatMoney, monthKeyOf, monthlySeries, spendingByCategory } from "@/lib/finance";
 import type { Transaction } from "@/lib/finance";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { useWazenLabels } from "@/lib/i18n-labels";
 
 const BAR_COLORS = [
   "var(--chart-1)",
@@ -46,6 +47,7 @@ export function SpendingByCategoryCard({
   title?: string;
 }) {
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   const slices = spendingByCategory(transactions).slice(0, 6);
   const total = slices.reduce((sum, slice) => sum + slice.amount, 0);
   const max = slices.reduce((peak, slice) => Math.max(peak, slice.amount), 0);
@@ -74,7 +76,7 @@ export function SpendingByCategoryCard({
                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 text-sm">
                     <span className="flex min-w-0 items-center gap-2.5">
                       <span className="size-2 rounded-full" style={{ background: color }} />
-                      <span className="truncate">{slice.category}</span>
+                      <span className="truncate">{labels.category(slice.category)}</span>
                     </span>
                     <span className="shrink-0 tabular-nums text-muted-foreground">
                       {share}% · <span className="text-foreground">{formatMoney(slice.amount, currency)}</span>
