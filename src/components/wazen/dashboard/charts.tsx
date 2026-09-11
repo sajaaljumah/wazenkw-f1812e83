@@ -277,7 +277,8 @@ export function SavingsTrendCard({
             <span className="text-sm text-muted-foreground">{t("savedThisPeriod")}</span>
             <span className="wazen-number text-sm text-chart-2">{formatMoney(currentTotal, currency)}</span>
           </div>
-          <div className="h-48 w-full min-w-0" role="img" aria-label={`${title ?? t("savingsOverTime")}: ${formatMoney(currentTotal, currency)}`}>
+          <div ref={ref} className="h-48 w-full min-w-0" role="img" aria-label={`${title ?? t("savingsOverTime")}: ${formatMoney(currentTotal, currency)}`}>
+          {revealed ? (
           <ResponsiveContainer width="100%" height="100%">
              <ComposedChart data={series} margin={{ top: 8, right: 2, bottom: 0, left: -28 }}>
               <defs>
