@@ -22,6 +22,7 @@ export const Route = createFileRoute("/forgot-password")({
 });
 
 function ForgotPassword() {
+  const { t } = useWazenLocale();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -30,7 +31,7 @@ function ForgotPassword() {
     event.preventDefault();
     const parsed = z.string().trim().email().safeParse(email);
     if (!parsed.success) {
-      toast.error("Enter a valid email address");
+      toast.error(t("invalidEmail"));
       return;
     }
     setBusy(true);
@@ -54,16 +55,13 @@ function ForgotPassword() {
       </header>
       <main className="mx-auto max-w-md px-4 pb-20 sm:px-6">
         <section className="border-y border-border py-9">
-          <h1 className="text-3xl">Forgot your password?</h1>
+          <h1 className="text-3xl">{t("forgotTitle")}</h1>
           {sent ? (
-            <p className="mt-4 text-sm text-muted-foreground">
-              If an account exists for {email}, a reset link is on its way. Open it to choose a new
-              password.
-            </p>
+            <p className="mt-4 text-sm text-muted-foreground">{t("forgotSent")}</p>
           ) : (
             <form onSubmit={handleSubmit} className="mt-6 space-y-5">
               <label className="block">
-                <span className="wazen-label">Email</span>
+                <span className="wazen-label">{t("email")}</span>
                 <input
                   type="email"
                   autoComplete="email"
@@ -80,7 +78,7 @@ function ForgotPassword() {
                 className="w-full"
               >
                 {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
-                Send reset link
+                {t("sendResetLink")}
               </Button>
             </form>
           )}
@@ -89,7 +87,7 @@ function ForgotPassword() {
             search={{ mode: "signin" as const }}
             className="mt-6 inline-block text-sm text-muted-foreground underline-offset-4 hover:underline"
           >
-            Back to sign in
+            {t("backToSignIn")}
           </Link>
         </section>
       </main>
