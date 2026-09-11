@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState, type ComponentType, type SVGProps } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LockedIcon, SignOutIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { LockedIcon, PremiumIcon, ProfileIcon, SignOutIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/wazen/AppShell";
 import { useProfile, useSession, useSignOut } from "@/hooks/use-wazen-auth";
@@ -129,6 +129,23 @@ function SettingsPage() {
         <h1 className="wazen-page-title">{t("settings")}</h1>
         <PlanBadge />
       </div>
+
+      <section className="mt-8 max-w-3xl divide-y divide-border border-y border-border">
+        <SettingsLink
+          to="/profile"
+          icon={ProfileIcon}
+          title={t("personalInformation")}
+          body={t("personalInformationBody")}
+          action={t("openLabel")}
+        />
+        <SettingsLink
+          to="/subscription"
+          icon={PremiumIcon}
+          title={t("subscriptionSection")}
+          body={t("subscriptionSectionBody")}
+          action={t("openLabel")}
+        />
+      </section>
 
       <section className="mt-8 max-w-3xl border-t border-border pt-7">
         <h2 className="text-xl">{t("account")}</h2>
@@ -268,9 +285,48 @@ function SettingsPage() {
           </Button>
         </div>
       </section>
+
+      <section className="mt-10 max-w-3xl border-t border-border pt-7">
+        <h2 className="text-xl">{t("notifications")}</h2>
+        <p className="mt-3 text-sm text-muted-foreground">{t("notificationsBody")}</p>
+      </section>
+
+      <section className="mt-10 max-w-3xl border-t border-border pt-7">
+        <h2 className="text-xl">{t("privacy")}</h2>
+        <p className="mt-3 text-sm text-muted-foreground">{t("privacyBody")}</p>
+      </section>
     </AppShell>
   );
 }
+
+function SettingsLink({
+  to,
+  icon: Icon,
+  title,
+  body,
+  action,
+}: {
+  to: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  title: string;
+  body: string;
+  action: string;
+}) {
+  return (
+    <Link
+      to={to}
+      className="flex items-center gap-4 px-1 py-5 transition-colors hover:bg-secondary/50"
+    >
+      <Icon className="size-5 shrink-0 text-primary" strokeWidth={ICON_STROKE} />
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-semibold">{title}</span>
+        <span className="mt-1 block text-xs text-muted-foreground">{body}</span>
+      </span>
+      <span className="shrink-0 text-xs font-semibold text-primary">{action}</span>
+    </Link>
+  );
+}
+
 
 function Locked({ label, value }: { label: string; value: string }) {
   return (

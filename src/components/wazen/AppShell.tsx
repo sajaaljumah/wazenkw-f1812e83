@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { DashboardIcon, DocumentIcon, PortfolioIcon, PremiumIcon, ProfileIcon, ScheduledIcon, SettingsIcon, SignOutIcon, ZakatIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { DashboardIcon, DocumentIcon, PortfolioIcon, ScheduledIcon, SettingsIcon, SignOutIcon, ZakatIcon, ICON_STROKE } from "@/components/wazen/icons";
 import type { ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -12,14 +12,13 @@ import { cn } from "@/lib/utils";
 import { WazenLogo } from "@/components/wazen/WazenLogo";
 import { ZakatNotificationBell } from "@/components/wazen/zakat/ZakatNotificationBell";
 
+// Core areas only. Account management (profile, subscription) lives in Settings.
 const NAV = [
   { to: "/dashboard", label: "overview", icon: DashboardIcon },
   { to: "/recurring", label: "recurringNav", icon: ScheduledIcon },
   { to: "/documents", label: "documentsNav", icon: DocumentIcon },
   { to: "/assets", label: "assets", icon: PortfolioIcon, adultsOnly: true },
   { to: "/zakat", label: "zakat", icon: ZakatIcon, adultsOnly: true },
-  { to: "/subscription", label: "plan", icon: PremiumIcon },
-  { to: "/profile", label: "profile", icon: ProfileIcon },
   { to: "/settings", label: "settings", icon: SettingsIcon },
 ] as const;
 
@@ -34,6 +33,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useWazenLocale();
   // Assets belong to independent adult accounts only.
   const nav = NAV.filter((item) => !("adultsOnly" in item && item.adultsOnly) || canOwnAssets(profile?.life_stage));
+  // Account pages are reached from Settings, so they keep the Settings tab active.
+  const SETTINGS_GROUP = ["/settings", "/profile", "/subscription"];
+  const isActive = (to: string) =>
+    to === "/settings" ? SETTINGS_GROUP.includes(location.pathname) : location.pathname === to;
 
   // Theme is applied globally by <ThemeSync /> in the root route.
 
@@ -55,7 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 to={to}
                 className={cn(
                   "relative flex h-[4.5rem] min-w-0 items-center gap-1.5 border-b-2 px-1 text-xs font-semibold transition-colors xl:gap-2 xl:text-sm",
-                  location.pathname === to
+                  isActive(to)
                     ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
@@ -104,14 +107,17 @@ export function AppShell({ children }: { children: ReactNode }) {
       </WazenLocaleProvider>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lifted backdrop-blur-xl sm:hidden" aria-label={t("mobileNav")}>
-        <div className="mx-auto grid max-w-md grid-cols-6 items-stretch">
+        <div
+          className="mx-auto grid max-w-md items-stretch"
+          style={{ gridTemplateColumns: `repeat(${nav.length}, minmax(0, 1fr))` }}
+        >
           {nav.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}
               className={cn(
                 "relative flex min-h-[4.25rem] min-w-0 flex-col items-center justify-center gap-1 px-0.5 py-2 text-center text-[0.625rem] font-semibold leading-tight transition-colors",
-                location.pathname === to
+                isActive(to)
                   ? "text-primary after:absolute after:top-0 after:h-0.5 after:w-8 after:rounded-full after:bg-primary"
                   : "text-muted-foreground",
               )}
