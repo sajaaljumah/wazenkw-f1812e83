@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/finance";
+import { useReveal } from "@/hooks/use-reveal";
 import { ExpandIcon, ICON_STROKE } from "@/components/wazen/icons";
 
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
