@@ -51,10 +51,9 @@ export function useUploadDocument() {
     }): Promise<FinancialDocument> => {
       const extension = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
       const path = `${user!.id}/${crypto.randomUUID()}.${extension}`;
-      const upload = await supabase.storage.from(BUCKET).upload(path, file, {
-        contentType: file.type || undefined,
-        upsert: false,
-      });
+      const upload = await supabase.storage
+        .from(BUCKET)
+        .upload(path, file, file.type ? { contentType: file.type, upsert: false } : { upsert: false });
       if (upload.error) throw upload.error;
 
       const { data, error } = await supabase
@@ -95,11 +94,15 @@ export function useUpdateDocument() {
       errorMessage?: string | null;
     }) => {
       const patch: Record<string, unknown> = {};
+      // Columns are validated by the database; the generated types are stricter than needed here.
       if (status) patch["status"] = status;
       if (extracted) patch["extracted"] = extracted;
       if (extractionSource) patch["extraction_source"] = extractionSource;
       if (errorMessage !== undefined) patch["error_message"] = errorMessage;
-      const { error } = await supabase.from("financial_documents").update(patch).eq("id", id);
+      const { error } = await supabase
+        .from("financial_documents")
+        .update(patch as never)
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: invalidate,

@@ -23,7 +23,7 @@ export function useAllRecurringItems() {
 }
 
 export type RecurringInput = {
-  id?: string;
+  id?: string | undefined;
   kind: RecurringKind;
   name: string;
   merchant: string | null;
