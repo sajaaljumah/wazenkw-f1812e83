@@ -97,6 +97,8 @@ const COPY = {
     tourGrowTitle: "Make money work for you",
     tourGrowBody: "Review what is coming, learn from trends and make your next decision with confidence.",
     tourGrowYoungBody: "Learn through short activities, practise with games and earn achievements as you grow.",
+    documentHistorySummary: "Open your previously saved financial documents",
+    inactiveCommitments: "Paused & past commitments",
 
     // landing
     landingEyebrow: "Personal finance & financial education",
@@ -867,6 +869,8 @@ const COPY = {
     tourGrowTitle: "اجعل المال يعمل لصالحك",
     tourGrowBody: "راجع ما هو قادم، وتعلّم من الاتجاهات، واتخذ قرارك التالي بثقة.",
     tourGrowYoungBody: "تعلّم بأنشطة قصيرة، وتدرّب بالألعاب، واكسب الإنجازات أثناء تقدّمك.",
+    documentHistorySummary: "افتح مستنداتك المالية المحفوظة سابقاً",
+    inactiveCommitments: "الالتزامات الموقوفة والسابقة",
 
     // landing
     landingEyebrow: "التمويل الشخصي والتعليم المالي",

@@ -41,7 +41,8 @@ export function FirstUseWalkthrough({ userId, eligible, lifeStage }: { userId: s
     { title: t("tourPlanTitle"), body: childLike ? t("tourPlanYoungBody") : t("tourPlanBody"), icon: GoalsIcon },
     { title: t("tourGrowTitle"), body: childLike ? t("tourGrowYoungBody") : t("tourGrowBody"), icon: SavingsIcon },
   ];
-  const current = steps[step];
+  const current = steps[step] ?? steps[0];
+  if (!current) return null;
   const Icon = current.icon;
 
   return (

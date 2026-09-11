@@ -118,7 +118,7 @@ function Dashboard() {
     <AppShell>
       <FirstUseWalkthrough
         userId={user.id}
-        eligible={user.user_metadata?.wazen_walkthrough_eligible === true}
+        eligible={user.user_metadata?.["wazen_walkthrough_eligible"] === true}
         lifeStage={profile.life_stage}
       />
       <div className={`space-y-8 wazen-enter ${profile.life_stage === "teenager" ? "stage-teen" : profile.life_stage === "university_student" ? "stage-university" : ""}`}>
