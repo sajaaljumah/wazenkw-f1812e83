@@ -23,6 +23,7 @@ import { formatDate, formatMoney, inMonth, monthKey, savedForGoal, totalsFor } f
 import type { Goal, Transaction } from "@/lib/finance";
 import type { DashboardData } from "../variants";
 import type { Gender } from "@/lib/wazen";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { cn } from "@/lib/utils";
 import { useParentPaidForMe } from "@/hooks/use-wazen-finance";
 
@@ -109,11 +110,11 @@ const ACTIVITY_ICON: Record<Transaction["kind"], typeof IncomeIcon> = {
   refund: RefundIcon,
 };
 
-const ACTIVITY_WORD: Record<Transaction["kind"], string> = {
-  income: "You got money",
-  expense: "You spent",
-  saving: "You saved",
-  refund: "Money came back",
+const ACTIVITY_KEY: Record<Transaction["kind"], "kidGotMoney" | "kidSpentWord" | "kidSavedMoneyWord" | "kidMoneyBack"> = {
+  income: "kidGotMoney",
+  expense: "kidSpentWord",
+  saving: "kidSavedMoneyWord",
+  refund: "kidMoneyBack",
 };
 
 export function ChildDashboard({
@@ -129,6 +130,7 @@ export function ChildDashboard({
   gender: Gender;
   avatarUrl: string | null;
 }) {
+  const { t } = useWazenLocale();
   const { currency, transactions, goals, userId } = data;
   const [action, setAction] = useState<ActionKind | null>(null);
   const parentPaid = useParentPaidForMe();
@@ -171,10 +173,10 @@ export function ChildDashboard({
   }, [percent]);
 
   const badges = [
-    { label: "First saving", earned: all.savings > 0, hint: "You saved money once" },
-    { label: "Goal started", earned: !!goal, hint: "You made a savings goal" },
-    { label: "Halfway hero", earned: percent >= 50, hint: "Half of your goal saved" },
-    { label: "Kind heart", earned: give > 0, hint: "You gave to someone" },
+    { label: t("kidBadgeFirstSaving"), earned: all.savings > 0, hint: t("kidBadgeFirstSavingHint") },
+    { label: t("kidBadgeGoalStarted"), earned: !!goal, hint: t("kidBadgeGoalStartedHint") },
+    { label: t("kidBadgeHalfway"), earned: percent >= 50, hint: t("kidBadgeHalfwayHint") },
+    { label: t("kidBadgeKind"), earned: give > 0, hint: t("kidBadgeKindHint") },
   ];
   const earnedCount = badges.filter((b) => b.earned).length;
 
@@ -190,11 +192,9 @@ export function ChildDashboard({
             <WazenAvatar fullName={fullName} gender={gender} lifeStage="child" avatarUrl={avatarUrl} size={84} />
           </span>
           <div className="min-w-0">
-            <p className="text-sm text-kid-deep">Hi {firstName}!</p>
-            <h1 className="mt-2 text-3xl sm:text-4xl">This is your money world</h1>
-            <p className="mt-2 max-w-md text-sm text-muted-foreground">
-              Save a little, spend wisely, and share some kindness.
-            </p>
+            <p className="text-sm text-kid-deep">{t("kidHi")} {firstName}!</p>
+            <h1 className="mt-2 text-3xl sm:text-4xl">{t("kidWorldTitle")}</h1>
+            <p className="mt-2 max-w-md text-sm text-muted-foreground">{t("kidWorldBody")}</p>
           </div>
           <button
             type="button"
@@ -202,34 +202,34 @@ export function ChildDashboard({
              className="kid-press flex w-full items-center justify-center gap-2 rounded-xl bg-kid-deep px-6 py-3 text-sm text-kid-ivory sm:w-auto"
           >
             <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
-            Save money
+            {t("kidSaveMoney")}
           </button>
         </div>
       </section>
 
       {/* My money */}
       <section className="space-y-4">
-        <h2 className="px-1 text-xl">My money</h2>
+        <h2 className="px-1 text-xl">{t("kidMyMoney")}</h2>
         <div className="grid gap-4 min-[520px]:grid-cols-3">
           <MoneyTile
-            label="Money I got"
+            label={t("kidGot")}
             amount={month.income}
             currency={currency}
-            helper="This month"
+            helper={t("kidThisMonth")}
             illustration={<CoinIllustration />}
           />
           <MoneyTile
-            label="Money I spent"
+            label={t("kidSpentLabel")}
             amount={month.expenses}
             currency={currency}
-            helper="This month"
+            helper={t("kidThisMonth")}
             illustration={<GiftIllustration />}
           />
           <MoneyTile
-            label="Money I saved"
+            label={t("kidSavedLabel")}
             amount={all.savings}
             currency={currency}
-            helper="Kept safe for later"
+            helper={t("kidKeptSafe")}
             illustration={<SavingsJarIllustration />}
           />
         </div>
@@ -248,15 +248,15 @@ export function ChildDashboard({
               <GoalArt />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-sm text-kid-deep">My big goal</span>
+              <span className="block text-sm text-kid-deep">{t("kidBigGoal")}</span>
               <span className="mt-1 block text-2xl sm:text-3xl">{goal.name}</span>
               <KidProgress percent={percent} className="mt-5" />
               <span className="mt-3 block text-sm text-muted-foreground">
-                {formatMoney(saved, currency)} saved of {formatMoney(target, currency)} — you are {percent}% there!
+                {formatMoney(saved, currency)} {t("kidGoalSavedOf")} {formatMoney(target, currency)} — {t("kidGoalThere")} {percent}% {t("kidGoalThereEnd")}
               </span>
               <span className="mt-4 inline-flex items-center gap-2 text-sm text-kid-deep">
                 <PremiumIcon className="size-4" strokeWidth={ICON_STROKE} />
-                {percent >= 100 ? "You did it!" : "Tap to see your goal"}
+                {percent >= 100 ? t("kidYouDidIt") : t("kidTapGoal")}
               </span>
             </span>
           </button>
@@ -265,16 +265,14 @@ export function ChildDashboard({
             <span className="size-32 kid-float">
               <SavingsJarIllustration />
             </span>
-            <p className="text-2xl">Pick something to save for</p>
-            <p className="max-w-sm text-sm text-muted-foreground">
-              A bike, a game, a trip — choose your dream and watch your jar fill up.
-            </p>
+            <p className="text-2xl">{t("kidPickGoal")}</p>
+            <p className="max-w-sm text-sm text-muted-foreground">{t("kidPickGoalBody")}</p>
             <button
               type="button"
               onClick={() => setAction("goal")}
                className="kid-press rounded-xl bg-kid-deep px-6 py-3 text-sm text-kid-ivory"
             >
-              Make a goal
+              {t("kidMakeGoal")}
             </button>
           </div>
         )}
@@ -282,23 +280,23 @@ export function ChildDashboard({
 
       {/* Save / Spend / Give */}
       <section className="space-y-4">
-        <h2 className="px-1 text-xl">What do you want to do?</h2>
+        <h2 className="px-1 text-xl">{t("kidWhatDo")}</h2>
         <div className="grid gap-4 min-[520px]:grid-cols-3">
           <ChoiceTile
-            title="Save"
-            caption={`${formatMoney(all.savings, currency)} saved`}
+            title={t("kidSave")}
+            caption={`${formatMoney(all.savings, currency)} ${t("kidSavedCaption")}`}
             illustration={<SavingsJarIllustration />}
             onClick={() => setAction("saving")}
           />
           <ChoiceTile
-            title="Spend"
-            caption={`${formatMoney(month.expenses, currency)} this month`}
+            title={t("kidSpend")}
+            caption={`${formatMoney(month.expenses, currency)} ${t("kidThisMonthCaption")}`}
             illustration={<GiftIllustration />}
             onClick={() => setSheet("spend")}
           />
           <ChoiceTile
-            title="Give"
-            caption={give > 0 ? `${formatMoney(give, currency)} shared` : "Learn about sharing"}
+            title={t("kidGive")}
+            caption={give > 0 ? `${formatMoney(give, currency)} ${t("kidSharedCaption")}` : t("kidLearnSharing")}
             illustration={<HeartIllustration />}
             onClick={() => setSheet("give")}
           />
@@ -313,18 +311,18 @@ export function ChildDashboard({
               <CoinIllustration />
             </span>
             <div>
-              <p className="text-sm text-kid-deep">My allowance</p>
+              <p className="text-sm text-kid-deep">{t("kidAllowance")}</p>
               <p className="mt-1 text-2xl tabular-nums">{formatMoney(allowance, currency)}</p>
-              <p className="mt-1 text-xs text-muted-foreground">Pocket money this month</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("kidPocketMoney")}</p>
             </div>
           </div>
         </section>
 
         <section className="kid-panel p-6">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-sm text-kid-deep">My stars</p>
+            <p className="text-sm text-kid-deep">{t("kidMyStars")}</p>
             <p className="text-xs text-muted-foreground">
-              {earnedCount} of {badges.length}
+              {earnedCount} {t("ofWord")} {badges.length}
             </p>
           </div>
           <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -349,16 +347,14 @@ export function ChildDashboard({
 
       {/* Recent activity */}
       <section className="kid-panel p-6">
-        <h2 className="text-xl">What happened lately</h2>
+        <h2 className="text-xl">{t("kidLately")}</h2>
         {recent.length === 0 ? (
           <div className="mt-5 flex flex-col items-center gap-3 rounded-3xl bg-kid-tint/70 p-8 text-center">
             <span className="size-20">
               <SavingsJarIllustration />
             </span>
-            <p>Nothing here yet</p>
-            <p className="max-w-xs text-sm text-muted-foreground">
-              When you get, spend or save money, it will show up here.
-            </p>
+            <p>{t("kidNothingYet")}</p>
+            <p className="max-w-xs text-sm text-muted-foreground">{t("kidNothingYetBody")}</p>
           </div>
         ) : (
           <ul className="mt-5 space-y-3">
@@ -372,7 +368,7 @@ export function ChildDashboard({
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm">
-                      {ACTIVITY_WORD[item.kind]} — {item.merchant ?? item.category}
+                      {t(ACTIVITY_KEY[item.kind])} — {item.merchant ?? item.category}
                     </span>
                     <span className="block text-xs text-muted-foreground">{formatDate(item.occurred_on)}</span>
                   </span>
@@ -390,11 +386,9 @@ export function ChildDashboard({
       {/* Things a parent paid for this child. Not deducted from their own money
           unless the parent chose to. */}
       <section className="kid-panel p-6">
-        <h2 className="text-xl">Paid by your family</h2>
+        <h2 className="text-xl">{t("kidPaidByFamily")}</h2>
         {(parentPaid.data ?? []).length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">
-            When a grown-up pays for something for you, it will show up here.
-          </p>
+          <p className="mt-4 text-sm text-muted-foreground">{t("kidPaidByFamilyBody")}</p>
         ) : (
           <ul className="mt-5 space-y-3">
             {(parentPaid.data ?? []).slice(0, 5).map((item) => (
@@ -406,7 +400,7 @@ export function ChildDashboard({
                   <span className="block truncate text-sm">{item.merchant ?? item.category}</span>
                   <span className="block text-xs text-muted-foreground">
                     {formatDate(item.occurred_on)} ·{" "}
-                    {item.deducted_from_child ? "from your money" : "your family paid this"}
+                    {item.deducted_from_child ? t("kidFromYourMoney") : t("kidFamilyPaid")}
                   </span>
                 </span>
                 <span className="col-start-2 text-sm tabular-nums min-[420px]:col-start-3">
@@ -502,11 +496,12 @@ function SpendSheet({
   currency: string;
   onAddExpense: () => void;
 }) {
-  const spending = transactions.filter((t) => t.kind === "expense");
+  const { t } = useWazenLocale();
+  const spending = transactions.filter((item) => item.kind === "expense");
   return (
-    <SheetShell open={open} onClose={onClose} title="What I spent" description="Everything you spent this month.">
+    <SheetShell open={open} onClose={onClose} title={t("kidSpendSheetTitle")} description={t("kidSpendSheetBody")}>
       {spending.length === 0 ? (
-        <p className="text-sm text-muted-foreground">You haven't spent anything this month.</p>
+        <p className="text-sm text-muted-foreground">{t("kidNoSpending")}</p>
       ) : (
         <ul className="max-h-72 space-y-2 overflow-y-auto">
           {spending.map((item) => (
@@ -525,7 +520,7 @@ function SpendSheet({
         onClick={onAddExpense}
         className="mt-2 w-full rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground"
       >
-        Add something I spent
+        {t("kidAddSpent")}
       </button>
     </SheetShell>
   );
@@ -544,12 +539,13 @@ function GiveSheet({
   currency: string;
   onAddGiving: () => void;
 }) {
+  const { t } = useWazenLocale();
   return (
     <SheetShell
       open={open}
       onClose={onClose}
-      title="Giving & kindness"
-      description="Sadaqah means sharing a little of what you have to help others."
+      title={t("kidGiveTitle")}
+      description={t("kidGiveBody")}
     >
       <div className="space-y-4 text-sm">
         <div className="flex items-center gap-4 rounded-3xl bg-secondary/50 p-4">
@@ -559,19 +555,19 @@ function GiveSheet({
             <HeartIllustration />
           </span>
           <p>
-            You shared <span className="tabular-nums">{formatMoney(given, currency)}</span> this month. Every small
-            amount counts.
+            {t("kidGiveSummaryStart")} <span className="tabular-nums">{formatMoney(given, currency)}</span>{" "}
+            {t("kidGiveSummaryEnd")}
           </p>
         </div>
         <ul className="space-y-2 text-muted-foreground">
           <li className="flex gap-2">
-            <GiveIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> Give a small part of your allowance.
+            <GiveIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> {t("kidGiveTip1")}
           </li>
           <li className="flex gap-2">
-            <ScheduledIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> Choose one day each month to share.
+            <ScheduledIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> {t("kidGiveTip2")}
           </li>
           <li className="flex gap-2">
-            <PremiumIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> Kind words and help count too.
+            <PremiumIcon className="mt-0.5 size-4 shrink-0" strokeWidth={ICON_STROKE} /> {t("kidGiveTip3")}
           </li>
         </ul>
         <button
@@ -579,7 +575,7 @@ function GiveSheet({
           onClick={onAddGiving}
           className="kid-press w-full rounded-xl bg-kid-deep px-6 py-3 text-sm text-kid-ivory"
         >
-          I gave something
+          {t("kidGaveSomething")}
         </button>
       </div>
 
@@ -604,18 +600,20 @@ function GoalSheet({
   currency: string;
   onAddSaving: () => void;
 }) {
+  const { t } = useWazenLocale();
   if (!goal) return null;
   const Art = illustrationForGoal(goal.name);
   const left = Math.max(Number(goal.target_amount) - saved, 0);
   return (
-    <SheetShell open={open} onClose={onClose} title={goal.name} description="Here is how your goal is going.">
+    <SheetShell open={open} onClose={onClose} title={goal.name} description={t("kidGoalSheetBody")}>
       <div className="space-y-5 text-sm">
         <span className="mx-auto block size-28">
           <Art />
         </span>
         <KidProgress percent={percent} />
         <p className="text-center">
-          {formatMoney(saved, currency)} saved — {left > 0 ? `${formatMoney(left, currency)} to go!` : "Goal complete!"}
+          {formatMoney(saved, currency)} {t("kidSavedCaption")} —{" "}
+          {left > 0 ? `${formatMoney(left, currency)} ${t("kidToGo")}` : t("kidGoalComplete")}
         </p>
         <button
           type="button"
@@ -623,7 +621,7 @@ function GoalSheet({
           className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm text-primary-foreground"
         >
           <GoalsIcon className="size-4" strokeWidth={ICON_STROKE} />
-          Add to this goal
+          {t("kidAddToGoal")}
         </button>
       </div>
     </SheetShell>
