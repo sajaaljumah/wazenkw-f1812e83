@@ -190,6 +190,7 @@ export function FamilySummaryCard({
   transactions?: Transaction[];
 }) {
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   const [dialogOpen, setDialogOpen] = useState(false);
   const parentPaid = transactions
     .filter((item) => item.paid_by_parent && item.beneficiary_user_id && item.beneficiary_user_id !== item.user_id)
