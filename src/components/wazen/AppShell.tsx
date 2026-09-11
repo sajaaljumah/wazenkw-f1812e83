@@ -50,7 +50,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 
   return (
-    <div className={cn("min-h-screen bg-background", profile?.life_stage === "teenager" && "stage-teen", profile?.life_stage === "university_student" && "stage-university")}>
+    <div className={cn("wazen-app-canvas min-h-screen", profile?.life_stage === "teenager" && "stage-teen", profile?.life_stage === "university_student" && "stage-university")}>
       <header className="sticky top-0 z-30 border-b border-border/70 bg-card/85 shadow-soft backdrop-blur-xl">
         <div className="mx-auto grid h-[4.5rem] max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3 lg:gap-8">
