@@ -52,12 +52,18 @@ function Landing() {
       <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
         <section className="relative grid items-center py-14 sm:py-20">
           <div className="pointer-events-none absolute inset-y-6 end-0 hidden w-2/5 rounded-[2.5rem] bg-accent/60 lg:block" aria-hidden="true">
-            <div className="absolute bottom-12 end-12 font-display text-8xl font-extrabold text-primary/25">W.</div>
+            <span className="absolute bottom-10 end-10 opacity-30">
+              <WazenLogo size={120} withWordmark={false} />
+            </span>
           </div>
           <div className="relative max-w-3xl wazen-enter">
           <p className="wazen-label">{t("landingEyebrow")}</p>
-          <h1 className="mt-5 text-6xl leading-[0.92] sm:text-8xl">Wazen.</h1>
+          <h1 className="mt-5">
+            <WazenLogo size={92} />
+            <span className="sr-only">Wazen</span>
+          </h1>
           <p className="mt-6 max-w-2xl font-display text-3xl leading-tight sm:text-5xl">{t("landingTagline")}</p>
+
           <p className="mt-6 max-w-xl text-lg text-muted-foreground">{t("landingBody")}</p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Button asChild size="lg">
