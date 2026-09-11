@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/subscription")({
         content: "Manage your Wazen subscription, family seats and premium access.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });
