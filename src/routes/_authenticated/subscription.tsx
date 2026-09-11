@@ -10,19 +10,13 @@ import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { cancelPremiumSubscription, startPremiumUpgrade } from "@/lib/subscription.functions";
 import {
-  FAMILY_PLAN_HIGHLIGHTS,
-  FEATURE_DESCRIPTIONS,
-  FEATURE_LABELS,
-  FREE_PLAN_HIGHLIGHTS,
-  INDIVIDUAL_PLAN_HIGHLIGHTS,
-  KIND_LABELS,
-  PERIOD_LABELS,
   PREMIUM_FEATURES,
   computeFamilyTotal,
   findPrice,
   formatMoney,
   formatPlanDate,
 } from "@/lib/subscription";
+import { useWazenLabels } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -47,27 +41,11 @@ export const Route = createFileRoute("/_authenticated/subscription")({
   }),
 });
 
-type Translate = (key: "statusActive" | "statusInactive" | "statusCancelled" | "statusPastDue" | "statusTrialing") => string;
-
-function statusLabel(status: string, t: Translate): string {
-  switch (status) {
-    case "active":
-      return t("statusActive");
-    case "trialing":
-      return t("statusTrialing");
-    case "cancelled":
-      return t("statusCancelled");
-    case "past_due":
-      return t("statusPastDue");
-    default:
-      return t("statusInactive");
-  }
-}
-
 function SubscriptionPage() {
   const { entitlements, isPremium, isLoading, refetch, canSubscribe, canManageBilling, family } =
     useSubscriptionAccess();
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   const upgrade = useServerFn(startPremiumUpgrade);
   const cancel = useServerFn(cancelPremiumSubscription);
   const queryClient = useQueryClient();
@@ -102,11 +80,9 @@ function SubscriptionPage() {
         window.location.assign(result.url);
         return;
       }
-      toast.success("Premium is active", {
-        description: "Your account has been upgraded from Free to Premium.",
-      });
+      toast.success(t("premiumActiveToast"), { description: t("premiumActiveToastBody") });
     } catch {
-      toast.error("Could not start the upgrade. Please try again.");
+      toast.error(t("upgradeFailed"));
     } finally {
       setBusy(null);
       await refreshPlanEverywhere();
@@ -117,11 +93,9 @@ function SubscriptionPage() {
     setBusy("manage");
     try {
       await cancel({ data: undefined });
-      toast.success("Premium cancelled", {
-        description: "Your account is back on the Free plan.",
-      });
+      toast.success(t("premiumCancelledToast"), { description: t("premiumCancelledToastBody") });
     } catch {
-      toast.error("Could not update your subscription. Please try again.");
+      toast.error(t("cancelFailed"));
     } finally {
       setBusy(null);
       await refreshPlanEverywhere();
@@ -152,24 +126,24 @@ function SubscriptionPage() {
                   : "bg-secondary text-muted-foreground",
               )}
             >
-              {statusLabel(entitlements.status, t)}
+              {labels.subscriptionStatus(entitlements.status)}
             </span>
             {entitlements.subscriptionKind ? (
               <span className="rounded-md bg-secondary px-2.5 py-1 text-xs text-muted-foreground">
-                {KIND_LABELS[entitlements.subscriptionKind]}
+                {labels.subscriptionKind(entitlements.subscriptionKind)}
               </span>
             ) : null}
           </div>
           <p className="mt-3 max-w-xl text-muted-foreground">
             {!canSubscribe
               ? isPremium
-                ? "Your access is included in your family's subscription — nothing to pay and nothing to manage."
-                : "Your access is managed by your parent or guardian."
+                ? t("familyCoveredBody")
+                : t("guardianManagedBody")
               : isPremium
                 ? entitlements.isCancelling
-                  ? "Premium stays available until the end of your current period."
-                  : "You have full access to every Wazen premium feature."
-                : "You're on the free plan. Premium unlocks Wazen's deeper financial tools."}
+                  ? t("cancellingBody")
+                  : t("premiumFullBody")
+                : t("freePlanBody")}
           </p>
           <dl className="mt-7 grid gap-5 sm:grid-cols-3">
             <div>
@@ -208,7 +182,7 @@ function SubscriptionPage() {
                     : `${t("upgrade")} — ${formatMoney(
                         isFamily ? familyMoney.total : (individualPrice?.amount ?? 0),
                         isFamily ? familyMoney.currency : (individualPrice?.currency ?? "KWD"),
-                      )}/${PERIOD_LABELS[entitlements.billingPeriod ?? "monthly"]}`}
+                      )}/${labels.billingPeriod(entitlements.billingPeriod ?? "monthly")}`}
                 </Button>
               )}
             </div>
@@ -219,44 +193,44 @@ function SubscriptionPage() {
           <section className="border-y border-border py-7">
             <div className="flex items-center gap-3">
               <FamilyIcon className="size-4 text-muted-foreground" strokeWidth={ICON_STROKE} />
-              <p className="wazen-label">Family subscription</p>
+              <p className="wazen-label">{t("familySubscriptionLabel")}</p>
             </div>
             <dl className="mt-6 grid gap-5 sm:grid-cols-4">
               <div>
-                <dt className="wazen-label">Parents</dt>
+                <dt className="wazen-label">{t("parentsLabel")}</dt>
                 <dd className="mt-2 text-sm">
-                  {family.parentCount} of {family.includedParentCount} included
+                  {family.parentCount} {t("ofWord")} {family.includedParentCount} {t("includedWord")}
                 </dd>
               </div>
               <div>
-                <dt className="wazen-label">Children & teens</dt>
+                <dt className="wazen-label">{t("childrenTeensLabel")}</dt>
                 <dd className="mt-2 text-sm">
-                  {family.childCount} of {family.includedChildCount} included
+                  {family.childCount} {t("ofWord")} {family.includedChildCount} {t("includedWord")}
                 </dd>
               </div>
               <div>
-                <dt className="wazen-label">Extra children</dt>
+                <dt className="wazen-label">{t("extraChildrenLabel")}</dt>
                 <dd className="mt-2 text-sm">{family.additionalChildCount}</dd>
               </div>
               <div>
-                <dt className="wazen-label">Free places left</dt>
+                <dt className="wazen-label">{t("freePlacesLeft")}</dt>
                 <dd className="mt-2 text-sm">{family.remainingIncludedChildSeats}</dd>
               </div>
             </dl>
             {canManageBilling ? (
               <div className="mt-6 space-y-1 border-t border-border pt-6 text-sm text-muted-foreground">
                 <p>
-                  Base family subscription —{" "}
-                  {formatMoney(familyMoney.base, familyMoney.currency)}/month
+                  {t("baseFamilySubscription")} —{" "}
+                  {formatMoney(familyMoney.base, familyMoney.currency)}{t("perMonth")}
                 </p>
                 <p>
-                  {additionalChildren} extra{" "}
-                  {additionalChildren === 1 ? "child" : "children"} ×{" "}
+                  {additionalChildren}{" "}
+                  {additionalChildren === 1 ? t("extraChildWord") : t("extraChildrenWord")} ×{" "}
                   {formatMoney(familyPrice?.additional_child_amount ?? 0, familyMoney.currency)} —{" "}
-                  {formatMoney(familyMoney.additional, familyMoney.currency)}/month
+                  {formatMoney(familyMoney.additional, familyMoney.currency)}{t("perMonth")}
                 </p>
                 <p className="text-foreground">
-                  Total — {formatMoney(familyMoney.total, familyMoney.currency)}/month
+                  {t("totalLabel")} — {formatMoney(familyMoney.total, familyMoney.currency)}{t("perMonth")}
                 </p>
               </div>
             ) : null}
@@ -266,9 +240,9 @@ function SubscriptionPage() {
         <div className="grid border-y border-border lg:grid-cols-2">
           <section className="border-b border-border py-7 lg:border-b-0 lg:border-e lg:pe-8">
             <p className="wazen-label">{t("free")}</p>
-            <h2 className="mt-3 text-xl">Everything you use today</h2>
+            <h2 className="mt-3 text-xl">{t("freePlanTitle")}</h2>
             <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
-              {FREE_PLAN_HIGHLIGHTS.map((item) => (
+              {labels.freeHighlights.map((item) => (
                 <li key={item} className="flex gap-3">
                   <CheckIcon className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={ICON_STROKE} />
                   {item}
@@ -282,15 +256,15 @@ function SubscriptionPage() {
               <p className="wazen-label">{t("premium")}</p>
               <PremiumBadge />
             </div>
-            <h2 className="mt-3 text-xl">Wazen at full depth</h2>
+            <h2 className="mt-3 text-xl">{t("premiumPlanTitle")}</h2>
             <ul className="mt-5 space-y-4 text-sm">
               {PREMIUM_FEATURES.map((feature) => (
                 <li key={feature} className="flex gap-3">
                   <PremiumIcon className="mt-0.5 size-4 shrink-0 text-gold" strokeWidth={ICON_STROKE} />
                   <span>
-                    <span className="block">{FEATURE_LABELS[feature]}</span>
+                    <span className="block">{labels.featureLabel(feature)}</span>
                     <span className="block text-muted-foreground">
-                      {FEATURE_DESCRIPTIONS[feature]}
+                      {labels.featureDescription(feature)}
                     </span>
                   </span>
                 </li>
@@ -302,13 +276,13 @@ function SubscriptionPage() {
         {canSubscribe ? (
           <div className="grid border-y border-border lg:grid-cols-2">
             <section className="border-b border-border py-7 lg:border-b-0 lg:border-e lg:pe-8">
-              <p className="wazen-label">Individual</p>
+              <p className="wazen-label">{t("individualLabel")}</p>
               <h2 className="mt-3 text-xl">
                 {formatMoney(individualPrice?.amount ?? 0, individualPrice?.currency ?? "KWD")}
-                <span className="text-muted-foreground"> /month</span>
+                <span className="text-muted-foreground"> {t("perMonth")}</span>
               </h2>
               <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
-                {INDIVIDUAL_PLAN_HIGHLIGHTS.map((item) => (
+                {labels.individualHighlights.map((item) => (
                   <li key={item} className="flex gap-3">
                     <CheckIcon className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={ICON_STROKE} />
                     {item}
@@ -317,13 +291,13 @@ function SubscriptionPage() {
               </ul>
             </section>
             <section className="py-7 lg:ps-8">
-              <p className="wazen-label">Family</p>
+              <p className="wazen-label">{t("familyLabel")}</p>
               <h2 className="mt-3 text-xl">
                 {formatMoney(familyPrice?.amount ?? 0, familyPrice?.currency ?? "KWD")}
-                <span className="text-muted-foreground"> /month</span>
+                <span className="text-muted-foreground"> {t("perMonth")}</span>
               </h2>
               <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
-                {FAMILY_PLAN_HIGHLIGHTS.map((item) => (
+                {labels.familyHighlights.map((item) => (
                   <li key={item} className="flex gap-3">
                     <CheckIcon className="mt-0.5 size-4 shrink-0 text-chart-2" strokeWidth={ICON_STROKE} />
                     {item}
@@ -331,13 +305,13 @@ function SubscriptionPage() {
                 ))}
               </ul>
               <p className="mt-5 text-xs text-muted-foreground">
-                Each child or teenager beyond{" "}
-                {familyPrice?.included_child_count ?? 4} costs{" "}
+                {t("extraChildNoteStart")} {familyPrice?.included_child_count ?? 4}{" "}
+                {t("extraChildNoteMiddle")}{" "}
                 {formatMoney(
                   familyPrice?.additional_child_amount ?? 0,
                   familyPrice?.currency ?? "KWD",
-                )}
-                /month.
+                )}{" "}
+                {t("extraChildNoteEnd")}
               </p>
             </section>
           </div>
