@@ -129,8 +129,9 @@ export function StatCard({
         : tone === "gold"
           ? "before:bg-gold"
           : "before:bg-border";
+  const { ref, revealed } = useReveal<HTMLDivElement>();
   return (
-    <div className={cn("wazen-stat", rule, className)}>
+    <div ref={ref} data-revealed={revealed} className={cn("wazen-stat wazen-reveal", rule, className)}>
       <div className="flex items-start justify-between gap-3">
         <span className="wazen-label">{label}</span>
         {icon ? <span className="text-muted-foreground/80">{icon}</span> : null}
