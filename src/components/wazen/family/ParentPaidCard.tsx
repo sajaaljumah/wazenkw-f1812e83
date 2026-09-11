@@ -26,7 +26,7 @@ export function ParentPaidCard({ transactions }: { transactions: Transaction[] }
           {transactions.slice(0, 8).map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-4 py-3">
               <div className="min-w-0">
-                <p className="truncate text-sm">{item.merchant ?? labels.category(item.category)}</p>
+                <p className="truncate text-sm">{labels.merchant(item.merchant) || labels.category(item.category)}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {labels.category(item.category)} · {formatDate(item.occurred_on)} ·{" "}
                   {item.deducted_from_child ? t("deductedFromYou") : t("coveredByParent")}

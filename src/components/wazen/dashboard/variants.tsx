@@ -290,13 +290,13 @@ export function FamilySummaryCard({
                 <li key={item.id} className="flex items-center justify-between gap-4 py-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm">
-                      {item.merchant ?? item.category}
+                      {labels.merchant(item.merchant) || labels.category(item.category)}
                       <span className="ms-2 text-xs text-muted-foreground">
                         {`${t("forFamilyMember")} ${nameOf(item.beneficiary_user_id)}`}
                       </span>
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {item.category} · {formatDate(item.occurred_on)}
+                      {labels.category(item.category)} · {formatDate(item.occurred_on)}
                       {item.payment_method ? ` · ${item.payment_method}` : ""}
                       {item.deducted_from_child ? ` · ${t("deductFromChild")}` : ""}
                     </p>
