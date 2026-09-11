@@ -208,6 +208,7 @@ export function IncomeVsExpensesCard({
               />
             </ComposedChart>
           </ResponsiveContainer>
+          ) : null}
           </div>
         </>
       )}
