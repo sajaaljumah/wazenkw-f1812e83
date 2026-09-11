@@ -3,6 +3,7 @@ import { AnalyticsIcon, EmergencyFundIcon, FamilyIcon, ForwardIcon, ICON_STROKE 
 import { WazenMark } from "@/components/wazen/AppShell";
 import { WazenLogo } from "@/components/wazen/WazenLogo";
 import { LanguageToggle } from "@/components/wazen/LanguageToggle";
+import { ThemeToggle } from "@/components/wazen/ThemeToggle";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { Button } from "@/components/ui/button";
 
@@ -41,6 +42,7 @@ function Landing() {
       <header className="sticky top-0 z-20 border-b border-border/70 bg-card/85 backdrop-blur-xl"><div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 sm:px-8">
         <WazenMark />
         <div className="flex items-center gap-1">
+          <ThemeToggle />
           <LanguageToggle />
           <Button asChild variant="ghost">
             <Link to="/auth"
