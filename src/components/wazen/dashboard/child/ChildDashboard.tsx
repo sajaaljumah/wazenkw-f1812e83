@@ -578,7 +578,7 @@ function GiveSheet({
         <button
           type="button"
           onClick={onAddGiving}
-          className="kid-cta w-full rounded-3xl px-5 py-3 text-center text-sm font-semibold"
+          className="kid-press w-full rounded-xl bg-kid-deep px-6 py-3 text-sm text-kid-ivory"
         >
           I gave something
         </button>
