@@ -1,44 +1,19 @@
-import logo from "@/assets/wazen-logo.png.asset.json";
+import darkLogo from "@/assets/wazen-logo-dark.png.asset.json";
+import lightLogo from "@/assets/wazen-logo-light.png.asset.json";
 import { cn } from "@/lib/utils";
 
-/** Intrinsic size of the source artwork. */
-const SRC_W = 1774;
-const SRC_H = 887;
+/** Intrinsic size of both source artworks (they share the same canvas). */
+const SRC_W = 1920;
+const SRC_H = 1279;
 /** Bounding box of the red "W" mark inside the artwork. */
-const MARK = { x: 420, y: 130, w: 995, h: 460 };
-
-/** The untouched red "W" mark, cropped out of the original artwork. */
-function Mark({ size, className }: { size: number; className?: string | undefined }) {
-  const scale = size / MARK.h;
-  return (
-    <span
-      className={cn("relative inline-block shrink-0 overflow-hidden", className)}
-      style={{ height: size, width: MARK.w * scale }}
-    >
-      <img
-        src={logo.url}
-        alt=""
-        aria-hidden
-        width={SRC_W}
-        height={SRC_H}
-        className="absolute"
-        style={{
-          width: SRC_W * scale,
-          height: SRC_H * scale,
-          left: -MARK.x * scale,
-          top: -MARK.y * scale,
-        }}
-        loading="eager"
-        decoding="async"
-      />
-    </span>
-  );
-}
+const MARK = { x: 298, y: 199, w: 1416, h: 643 };
+/** Visible bounds of the full lockup (mark + wordmark). */
+const FULL = { x: 253, y: 199, w: 1461, h: 951 };
 
 /**
- * The official Wazen lockup: the red "W" mark above the "Wazen" wordmark.
- * The mark artwork is never redrawn or recoloured. On dark surfaces the logo
- * sits directly on the background (no plate) and the wordmark is set in white.
+ * The official Wazen lockup. Two finalised files are supplied — the dark
+ * wordmark for light mode and the white wordmark for dark mode — and both are
+ * used exactly as delivered: transparent, never recoloured, never plated.
  */
 export function WazenLogo({
   size = 40,
@@ -51,27 +26,38 @@ export function WazenLogo({
   /** Crop to the "W" mark only when false. */
   withWordmark?: boolean;
 }) {
-  if (!withWordmark) {
-    return <Mark size={size} className={className} />;
-  }
-
-  const markSize = size * 0.56;
-  const wordSize = size * 0.3;
+  const box = withWordmark ? FULL : MARK;
+  const scale = size / box.h;
 
   return (
     <span
-      className={cn("inline-flex shrink-0 flex-col items-center justify-center", className)}
-      style={{ height: size, gap: size * 0.06 }}
-      aria-label="Wazen"
+      className={cn("relative inline-block shrink-0 overflow-hidden", className)}
+      style={{ height: size, width: box.w * scale }}
       role="img"
+      aria-label="Wazen"
     >
-      <Mark size={markSize} />
-      <span
-        className="font-display font-semibold leading-none text-foreground"
-        style={{ fontSize: wordSize, letterSpacing: wordSize * 0.02 }}
-      >
-        Wazen
-      </span>
+      {([
+        [lightLogo.url, "dark:hidden"],
+        [darkLogo.url, "hidden dark:block"],
+      ] as const).map(([url, visibility]) => (
+        <img
+          key={url}
+          src={url}
+          alt=""
+          aria-hidden
+          width={SRC_W}
+          height={SRC_H}
+          className={cn("absolute", visibility)}
+          style={{
+            width: SRC_W * scale,
+            height: SRC_H * scale,
+            left: -box.x * scale,
+            top: -box.y * scale,
+          }}
+          loading="eager"
+          decoding="async"
+        />
+      ))}
     </span>
   );
 }
