@@ -126,6 +126,7 @@
   --avatar-adult-plate: oklch(0.7 0.018 55);
   --avatar-adult-field: oklch(0.95 0.007 65);
   --avatar-adult-accent: oklch(0.28 0.012 30);
+  --logo-plate: transparent;
 }
 
 .dark {
