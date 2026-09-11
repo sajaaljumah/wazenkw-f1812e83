@@ -361,6 +361,129 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_challenges: {
+        Row: {
+          challenge_key: string
+          completed_on: string | null
+          created_at: string
+          days_completed: number
+          id: string
+          last_checkin_on: string | null
+          started_on: string
+          status: string
+          target_days: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_key: string
+          completed_on?: string | null
+          created_at?: string
+          days_completed?: number
+          id?: string
+          last_checkin_on?: string | null
+          started_on?: string
+          status?: string
+          target_days?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_key?: string
+          completed_on?: string | null
+          created_at?: string
+          days_completed?: number
+          id?: string
+          last_checkin_on?: string | null
+          started_on?: string
+          status?: string
+          target_days?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      learning_profiles: {
+        Row: {
+          created_at: string
+          current_streak: number
+          last_activity_on: string | null
+          longest_streak: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number
+          last_activity_on?: string | null
+          longest_streak?: number
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number
+          last_activity_on?: string | null
+          longest_streak?: number
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
+      learning_progress: {
+        Row: {
+          activity_key: string
+          activity_type: string
+          attempts: number
+          best_score: number
+          created_at: string
+          difficulty: string | null
+          id: string
+          last_activity_at: string
+          max_score: number
+          score: number
+          status: string
+          topic: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_key: string
+          activity_type: string
+          attempts?: number
+          best_score?: number
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          last_activity_at?: string
+          max_score?: number
+          score?: number
+          status?: string
+          topic?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_key?: string
+          activity_type?: string
+          attempts?: number
+          best_score?: number
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          last_activity_at?: string
+          max_score?: number
+          score?: number
+          status?: string
+          topic?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       metal_rates: {
         Row: {
           as_of: string
