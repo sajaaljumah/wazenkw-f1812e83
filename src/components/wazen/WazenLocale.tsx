@@ -456,6 +456,7 @@ const COPY = {
 
     // documents & future AI extraction
     documentsNav: "Documents",
+    learnNav: "Learn",
     documentsTitle: "Financial documents",
     documentsSubtitle: "Upload an invoice, contract or screenshot and review its details before saving.",
     chooseDocType: "Choose the document type",
@@ -1190,6 +1191,7 @@ const COPY = {
 
     // documents & future AI extraction
     documentsNav: "المستندات",
+    learnNav: "تعلّم",
     documentsTitle: "المستندات المالية",
     documentsSubtitle: "ارفع فاتورة أو عقداً أو لقطة شاشة، وراجع تفاصيلها قبل الحفظ.",
     chooseDocType: "اختر نوع المستند",

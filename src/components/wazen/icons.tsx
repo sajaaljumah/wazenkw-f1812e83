@@ -55,6 +55,11 @@ import {
   Camera,
   TriangleAlert,
   RefreshCw,
+  BookOpen,
+  Gamepad2,
+  ListChecks,
+  Sparkles,
+  Flame,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -112,6 +117,12 @@ export const LossIcon = ArrowDownRight;
 
 // Engagement & plans
 export const ChallengesIcon = Flag;
+// Learning
+export const LearnIcon = BookOpen;
+export const GameIcon = Gamepad2;
+export const QuizIcon = ListChecks;
+export const RecommendIcon = Sparkles;
+export const StreakIcon = Flame;
 export const RewardsIcon = Award;
 export const PremiumIcon = BadgeCheck;
 export const FreePlanIcon = Circle;
