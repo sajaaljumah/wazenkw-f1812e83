@@ -240,7 +240,7 @@ export type ZakatAssetLine = {
   needsReview: boolean;
   reason: string;
   method: string;
-  detail?: string;
+  detail?: string | undefined;
 };
 
 /** Purposes a holding can be kept for; drives its zakat treatment. */
