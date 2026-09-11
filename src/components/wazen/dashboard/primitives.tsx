@@ -83,7 +83,7 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section className={cn("border-t border-border pt-6", className)}>
+    <section className={cn("wazen-card", className)}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl sm:text-2xl">{title}</h2>
         {action}
@@ -95,7 +95,7 @@ export function Panel({
 
 export function EmptyState({ title, description, icon }: { title: string; description: string; icon?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center border border-dashed border-border bg-secondary/35 px-6 py-10 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-secondary/50 px-6 py-10 text-center">
       {icon ? <span className="mb-3 text-muted-foreground">{icon}</span> : null}
       <p className="text-base">{title}</p>
       <p className="mt-2 max-w-sm text-sm text-muted-foreground">{description}</p>
