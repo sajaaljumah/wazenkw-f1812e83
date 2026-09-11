@@ -57,11 +57,22 @@ function SettingsPage() {
     setTheme(profile.theme);
   }, [profile]);
 
-  // Live preview while choosing; the saved profile value stays authoritative.
-  useEffect(() => {
-    applyTheme(theme);
-    if (user?.id) cacheTheme(user.id, theme);
-  }, [theme, user?.id]);
+  // Appearance applies and saves immediately — no Save button needed for it.
+  async function chooseTheme(next: "light" | "dark") {
+    setTheme(next);
+    applyTheme(next);
+    if (user?.id) cacheTheme(user.id, next);
+    if (!profile) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ theme: next })
+      .eq("id", profile.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await queryClient.invalidateQueries({ queryKey: ["profile"] });
+  }
 
   if (isLoading || !profile) {
     return (
@@ -224,7 +235,7 @@ function SettingsPage() {
                 <Button
                   key={value}
                   type="button"
-                  onClick={() => setTheme(value)}
+                  onClick={() => void chooseTheme(value)}
                   variant={theme === value ? "default" : "outline"}
                   className="flex-1"
                 >
