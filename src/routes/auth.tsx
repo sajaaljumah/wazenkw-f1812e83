@@ -8,12 +8,10 @@ import { WazenMark } from "@/components/wazen/AppShell";
 import { LanguageToggle } from "@/components/wazen/LanguageToggle";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { DEMO_ACCESS_ACCOUNTS, DEMO_PASSWORD } from "@/lib/demo-accounts";
+import { useWazenLabels } from "@/lib/i18n-labels";
 import {
   ADULT_LIFE_STAGES,
-  CURRENCIES,
   DEFAULT_LANGUAGE,
-  LANGUAGES,
-  LIFE_STAGE_LABELS,
   accountTypeFor,
   calculateAge,
   firstNameOf,
@@ -43,21 +41,27 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const signInSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
+type Tr = (key: never) => string;
 
-const signUpSchema = z.object({
-  full_name: z.string().trim().min(2, "Enter your first name").max(80),
-  email: z.string().trim().email("Enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  date_of_birth: z.string().min(1, "Select your date of birth"),
-  gender: z.enum(["female", "male"], { message: "Select a gender" }),
-  life_stage: z.string().min(1, "Select your life stage"),
-  language: z.string().min(1),
-  base_currency: z.string().min(1),
-});
+/** Schemas are built per render so validation messages follow the chosen language. */
+function makeSchemas(t: Tr) {
+  const tr = t as unknown as (key: string) => string;
+  const email = z.string().trim().email(tr("invalidEmail"));
+  const password = z.string().min(8, tr("passwordMin"));
+  return {
+    signIn: z.object({ email, password }),
+    signUp: z.object({
+      full_name: z.string().trim().min(2, tr("enterFirstNameError")).max(80),
+      email,
+      password,
+      date_of_birth: z.string().min(1, tr("selectDobError")),
+      gender: z.enum(["female", "male"], { message: tr("selectGenderError") }),
+      life_stage: z.string().min(1, tr("selectLifeStage")),
+      language: z.string().min(1),
+      base_currency: z.string().min(1),
+    }),
+  };
+}
 
 const inputClass =
   "wazen-field placeholder:text-muted-foreground/70";
@@ -84,6 +88,8 @@ function AuthPage() {
   const { mode } = Route.useSearch();
   const navigate = useNavigate();
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
+  const { signIn: signInSchema, signUp: signUpSchema } = makeSchemas(t as unknown as Tr);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
@@ -130,7 +136,7 @@ function AuthPage() {
       return;
     }
     if (age !== null && age < 3) {
-      setErrors({ date_of_birth: "Please enter a valid date of birth" });
+      setErrors({ date_of_birth: t("invalidDob") });
       return;
     }
     setErrors({});
@@ -150,7 +156,7 @@ function AuthPage() {
 
     if (!data.session) {
       setBusy(false);
-      toast.success("Check your email to confirm your account, then sign in.");
+      toast.success(t("confirmEmailSent"));
       navigate({ to: "/auth", search: { mode: "signin" } });
       return;
     }
@@ -243,11 +249,11 @@ function AuthPage() {
                   className={inputClass}
                   value={form.full_name}
                   onChange={(e) => set("full_name", e.target.value)}
-                  placeholder="Mariam"
+                  placeholder={t("firstNamePlaceholder")}
                 />
               </Field>
               <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Email" error={errors['email']}>
+                <Field label={t("email")} error={errors['email']}>
                   <input
                     type="email"
                     autoComplete="email"
@@ -257,7 +263,7 @@ function AuthPage() {
                     placeholder="you@example.com"
                   />
                 </Field>
-                <Field label="Password" error={errors['password']}>
+                <Field label={t("password")} error={errors['password']}>
                   <input
                     type="password"
                     autoComplete="new-password"
@@ -308,7 +314,7 @@ function AuthPage() {
               <Field label={t("lifeStageField")} error={errors['life_stage']}>
                 {autoStage ? (
                   <div className="rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm">
-                    {LIFE_STAGE_LABELS[autoStage]} — {t("setFromAge")}
+                    {labels.lifeStage(autoStage)} — {t("setFromAge")}
                     <span className="mt-1 block text-xs text-muted-foreground">
                       {t("guardianNote")}
                     </span>
@@ -325,7 +331,7 @@ function AuthPage() {
                     </option>
                     {ADULT_LIFE_STAGES.map((stage) => (
                       <option key={stage} value={stage}>
-                        {LIFE_STAGE_LABELS[stage]}
+                        {labels.lifeStage(stage)}
                       </option>
                     ))}
                   </select>
@@ -339,7 +345,7 @@ function AuthPage() {
                     value={form.language}
                     onChange={(e) => set("language", e.target.value)}
                   >
-                    {LANGUAGES.map((l) => (
+                    {labels.languageOptions.map((l) => (
                       <option key={l.value} value={l.value}>
                         {l.label}
                       </option>
@@ -352,7 +358,7 @@ function AuthPage() {
                     value={form.base_currency}
                     onChange={(e) => set("base_currency", e.target.value)}
                   >
-                    {CURRENCIES.map((c) => (
+                    {labels.currencyOptions.map((c) => (
                       <option key={c.value} value={c.value}>
                         {c.label}
                       </option>
@@ -369,11 +375,9 @@ function AuthPage() {
         <aside className="py-10 lg:ps-10">
           <div className="flex items-center gap-2">
             <PremiumIcon className="size-4 text-gold" strokeWidth={ICON_STROKE} />
-            <h2 className="text-lg">Explore Wazen</h2>
+            <h2 className="text-lg">{t("exploreWazen")}</h2>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Pick a demo account to fill the sign-in form, then press Sign in.
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("demoPickerHint")}</p>
           <div className="mt-5 wazen-rule-list border-y border-border">
             {DEMO_ACCESS_ACCOUNTS.map((account) => (
               <Button
@@ -387,7 +391,7 @@ function AuthPage() {
                   }));
                   setErrors({});
                   if (mode !== "signin") navigate({ to: "/auth", search: { mode: "signin" } });
-                  toast.success(`${account.name} loaded — press Sign in`);
+                  toast.success(`${account.name} — ${t("demoLoaded")}`);
                 }}
                 variant="ghost"
                 className="h-auto w-full min-w-0 justify-start rounded-none px-1 py-3.5 text-start text-sm font-normal"
@@ -395,7 +399,7 @@ function AuthPage() {
                 <span className="min-w-0">
                   {account.name}
                   <span className="block text-xs text-muted-foreground">
-                    {LIFE_STAGE_LABELS[account.life_stage]} · {account.note}
+                    {labels.lifeStage(account.life_stage)} · {labels.demoNote(account.note)}
                   </span>
                 </span>
               </Button>
