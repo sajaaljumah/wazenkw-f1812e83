@@ -50,6 +50,7 @@ export type AssetInput = {
   purity: string | null;
   property_type: string | null;
   monthly_rent: number;
+  holding_purpose: string | null;
   notes: string | null;
 };
 

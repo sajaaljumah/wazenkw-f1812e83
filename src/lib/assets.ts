@@ -25,6 +25,9 @@ export type Asset = {
   purity: string | null;
   property_type: string | null;
   monthly_rent: number;
+  /** Why the holding is kept — drives its zakat treatment. */
+  holding_purpose?: string | null;
+  zakat_treatment?: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
