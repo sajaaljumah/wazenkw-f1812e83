@@ -15,6 +15,15 @@ import type { FamilyMemberSummary } from "@/hooks/use-wazen-finance";
 import { LIFE_STAGE_LABELS, calculateAge, firstNameOf } from "@/lib/wazen";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { PortfolioSummaryCard } from "@/components/wazen/assets/PortfolioSummaryCard";
+import { ParentPaidCard } from "@/components/wazen/family/ParentPaidCard";
+import { ParentPaidExpenseDialog } from "@/components/wazen/family/ParentPaidExpenseDialog";
+import { useAssets } from "@/hooks/use-wazen-assets";
+import { useParentPaidForMe } from "@/hooks/use-wazen-finance";
+import { AddIcon, ReceiptIcon } from "@/components/wazen/icons";
+import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/finance";
+import { useState } from "react";
 
 export type DashboardData = {
   userId: string;
@@ -43,6 +52,7 @@ export function AdultDashboard({
   const { monthTransactions, month, all } = useMonthTotals(transactions);
   const savedTotal = all.savings;
   const { t } = useWazenLocale();
+  const assets = useAssets();
 
   return (
     <>
@@ -97,6 +107,8 @@ export function AdultDashboard({
         <UpcomingCashFlowCard items={recurring} currency={currency} />
       </div>
 
+      <PortfolioSummaryCard assets={assets.data ?? []} currency={currency} />
+
       <RecentTransactionsCard transactions={transactions} currency={currency} limit={8} />
 
       {focus === "student" ? (
@@ -119,6 +131,7 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
     .filter((t) => t.kind === "income" && /allowance/i.test(t.category))
     .reduce((sum, t) => sum + Number(t.amount), 0);
   const { t } = useWazenLocale();
+  const parentPaid = useParentPaidForMe();
 
   return (
     <>
@@ -152,6 +165,8 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
       </div>
 
       <RecentTransactionsCard transactions={transactions} currency={currency} title={t("latestActivity")} />
+
+      <ParentPaidCard transactions={parentPaid.data ?? []} />
 
       <Panel title={t("financialLearning")}>
         <EmptyState
