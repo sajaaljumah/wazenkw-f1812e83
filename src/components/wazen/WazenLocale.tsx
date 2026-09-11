@@ -1508,6 +1508,9 @@ export function AppLocaleProvider({ children }: { children: ReactNode }) {
   const language: WazenLanguage =
     profile?.language === "en" ? "en" : profile?.language === "ar" ? "ar" : local;
 
+  // Dates formatted outside React (helpers) follow the chosen language too.
+  setActiveDateLocale(language === "ar" ? "ar-KW" : "en-KW");
+
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, language);
