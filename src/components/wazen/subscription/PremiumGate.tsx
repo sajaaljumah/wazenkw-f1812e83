@@ -3,7 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { LockedIcon, PremiumIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
-import { FEATURE_DESCRIPTIONS, FEATURE_LABELS, type PremiumFeature } from "@/lib/subscription";
+import type { PremiumFeature } from "@/lib/subscription";
+import { useWazenLabels } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -34,6 +35,8 @@ export function UpgradePrompt({
   compact?: boolean | undefined;
   hideCta?: boolean | undefined;
 }) {
+  const { t } = useWazenLocale();
+  const ctaLabel = t("seePremium");
   return (
     <div
       className={cn(
@@ -49,7 +52,7 @@ export function UpgradePrompt({
         <p className="mt-2 text-sm text-muted-foreground">{description}</p>
       </div>
       {hideCta ? null : (
-        <Button asChild className="mx-auto"><Link to="/subscription">See Premium</Link></Button>
+        <Button asChild className="mx-auto"><Link to="/subscription">{ctaLabel}</Link></Button>
       )}
     </div>
   );
@@ -72,6 +75,8 @@ export function PremiumGate({
   compact?: boolean | undefined;
 }) {
   const { can, isLoading, canSubscribe } = useSubscriptionAccess();
+  const { t } = useWazenLocale();
+  const labels = useWazenLabels();
 
   if (isLoading) {
     return <div className="wazen-panel h-32 animate-pulse bg-secondary/40" />;
@@ -81,12 +86,8 @@ export function PremiumGate({
 
   return (
     <UpgradePrompt
-      title={`${FEATURE_LABELS[feature]} is a Premium feature`}
-      description={
-        canSubscribe
-          ? FEATURE_DESCRIPTIONS[feature]
-          : "Ask your parent or guardian — this comes with the family subscription."
-      }
+      title={`${labels.featureLabel(feature)} — ${t("premiumFeatureSuffix")}`}
+      description={canSubscribe ? labels.featureDescription(feature) : t("askGuardian")}
       compact={compact}
       hideCta={!canSubscribe}
     />

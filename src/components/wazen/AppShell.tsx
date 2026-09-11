@@ -45,10 +45,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 border-b border-border/70 bg-card/85 shadow-soft backdrop-blur-xl">
         <div className="mx-auto grid h-[4.5rem] max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3 lg:gap-8">
-            <Link to="/dashboard" className="shrink-0" aria-label="Wazen overview">
+            <Link to="/dashboard" className="shrink-0" aria-label={t("overviewAria")}>
               <WazenMark />
             </Link>
-            <nav className="hidden min-w-0 items-center gap-2 lg:flex xl:gap-6" aria-label="Primary navigation">
+            <nav className="hidden min-w-0 items-center gap-2 lg:flex xl:gap-6" aria-label={t("primaryNav")}>
             {nav.map(({ to, label, icon: Icon }) => (
               <Link
                 key={to}
@@ -74,7 +74,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {profile ? (
               <Link
                 to="/profile"
-                title={`${firstNameOf(profile.full_name)} — view profile`}
+                title={`${firstNameOf(profile.full_name)} — ${t("viewProfileTitle")}`}
                 className="wazen-interactive rounded-full outline-hidden hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
               >
                 <WazenAvatar
@@ -103,7 +103,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <main className="mx-auto max-w-6xl px-3 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-6 min-[375px]:px-4 sm:px-6 sm:pb-14 sm:pt-9 lg:px-8">{children}</main>
       </WazenLocaleProvider>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lifted backdrop-blur-xl sm:hidden" aria-label="Mobile navigation">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lifted backdrop-blur-xl sm:hidden" aria-label={t("mobileNav")}>
         <div className="mx-auto grid max-w-md grid-cols-6 items-stretch">
           {nav.map(({ to, label, icon: Icon }) => (
             <Link

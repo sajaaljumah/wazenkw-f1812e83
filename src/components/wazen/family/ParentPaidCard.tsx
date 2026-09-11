@@ -3,6 +3,7 @@ import { ReceiptIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { formatDate, formatMoney } from "@/lib/finance";
 import type { Transaction } from "@/lib/finance";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { useWazenLabels } from "@/lib/i18n-labels";
 
 /**
  * Child / teenager view of spending a parent paid for them. Amounts here belong
@@ -11,6 +12,7 @@ import { useWazenLocale } from "@/components/wazen/WazenLocale";
  */
 export function ParentPaidCard({ transactions }: { transactions: Transaction[] }) {
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   return (
     <Panel title={t("paidByFamily")}>
       {transactions.length === 0 ? (
@@ -24,9 +26,9 @@ export function ParentPaidCard({ transactions }: { transactions: Transaction[] }
           {transactions.slice(0, 8).map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-4 py-3">
               <div className="min-w-0">
-                <p className="truncate text-sm">{item.merchant ?? item.category}</p>
+                <p className="truncate text-sm">{item.merchant ?? labels.category(item.category)}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  {item.category} · {formatDate(item.occurred_on)} ·{" "}
+                  {labels.category(item.category)} · {formatDate(item.occurred_on)} ·{" "}
                   {item.deducted_from_child ? t("deductedFromYou") : t("coveredByParent")}
                 </p>
               </div>

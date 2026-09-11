@@ -441,9 +441,13 @@ export const INDIVIDUAL_PLAN_HIGHLIGHTS = [
   "Every premium feature for you",
 ];
 
+function dateLocale(): string {
+  return typeof document !== "undefined" && document.documentElement.lang === "en" ? "en-KW" : "ar-KW";
+}
+
 export function formatPlanDate(value: string | null): string {
   if (!value) return "—";
-  return new Date(value).toLocaleDateString(undefined, {
+  return new Date(value).toLocaleDateString(dateLocale(), {
     day: "numeric",
     month: "short",
     year: "numeric",

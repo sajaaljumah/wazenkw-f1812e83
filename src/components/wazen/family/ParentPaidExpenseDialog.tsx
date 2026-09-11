@@ -13,10 +13,11 @@ import { useAddParentPaidExpense } from "@/hooks/use-wazen-finance";
 import type { FamilyMemberSummary } from "@/hooks/use-wazen-finance";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { firstNameOf } from "@/lib/wazen";
+import { useWazenLabels } from "@/lib/i18n-labels";
 
 const inputClass = "wazen-field";
 
-const PAYMENT_METHODS = ["Debit card", "Credit card", "Bank transfer", "Cash", "Apple Pay"] as const;
+
 
 /** Parents record spending they paid for a linked child or teenager. */
 export function ParentPaidExpenseDialog({
@@ -33,12 +34,13 @@ export function ParentPaidExpenseDialog({
   defaultMemberId?: string;
 }) {
   const { t } = useWazenLocale();
+  const { paymentMethods } = useWazenLabels();
   const save = useAddParentPaidExpense();
   const [childId, setChildId] = useState(defaultMemberId ?? members[0]?.profile.id ?? "");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [merchant, setMerchant] = useState("");
-  const [method, setMethod] = useState<string>(PAYMENT_METHODS[0]);
+  const [method, setMethod] = useState<string>("Debit card");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [deduct, setDeduct] = useState(false);
 
@@ -82,7 +84,7 @@ export function ParentPaidExpenseDialog({
       toast.success(t("parentPaidSaved"));
       close();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
+      toast.error(error instanceof Error ? error.message : t("somethingWentWrong"));
     }
   }
 
@@ -122,7 +124,7 @@ export function ParentPaidExpenseDialog({
               className={inputClass}
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="Education"
+              placeholder={t("categoryPlaceholder")}
             />
           </Field>
 
@@ -132,9 +134,9 @@ export function ParentPaidExpenseDialog({
 
           <Field label={t("paymentMethod")}>
             <select className={inputClass} value={method} onChange={(e) => setMethod(e.target.value)}>
-              {PAYMENT_METHODS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
+              {paymentMethods.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>

@@ -9,16 +9,8 @@ import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { useProfile } from "@/hooks/use-wazen-auth";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { PlanBadge } from "@/components/wazen/subscription/PlanBadge";
-import {
-  ACCOUNT_TYPE_LABELS,
-  CURRENCIES,
-  DEFAULT_LANGUAGE,
-  GENDER_LABELS,
-  LANGUAGES,
-  LIFE_STAGE_LABELS,
-  calculateAge,
-  firstNameOf,
-} from "@/lib/wazen";
+import { DEFAULT_LANGUAGE, calculateAge, firstNameOf } from "@/lib/wazen";
+import { useWazenLabels } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -33,6 +25,7 @@ function ProfilePage() {
   const queryClient = useQueryClient();
   const { data: profile, isLoading } = useProfile();
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
@@ -99,7 +92,7 @@ function ProfilePage() {
         <div className="text-center sm:text-start">
           <p className="text-2xl">{firstNameOf(profile.full_name)}</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            {LIFE_STAGE_LABELS[profile.life_stage]} · {ACCOUNT_TYPE_LABELS[profile.account_type]}
+            {labels.lifeStage(profile.life_stage)} · {labels.accountType(profile.account_type)}
           </p>
         </div>
       </section>
@@ -107,8 +100,8 @@ function ProfilePage() {
       <section className="mt-8 grid border-y border-border sm:grid-cols-2">
         <LockedField label={t("dateOfBirth")} value={profile.date_of_birth} />
         <LockedField label={t("ageCalculated")} value={`${calculateAge(profile.date_of_birth)} ${t("years")}`} />
-        <LockedField label={t("gender")} value={GENDER_LABELS[profile.gender]} />
-        <LockedField label={t("accountType")} value={ACCOUNT_TYPE_LABELS[profile.account_type]} />
+        <LockedField label={t("gender")} value={labels.gender(profile.gender)} />
+        <LockedField label={t("accountType")} value={labels.accountType(profile.account_type)} />
       </section>
 
       <section className="mt-10 max-w-3xl border-t border-border pt-7">
@@ -120,7 +113,7 @@ function ProfilePage() {
               className={cn(inputClass, "mt-2")}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Mariam"
+              placeholder={t("firstNamePlaceholder")}
             />
             <span className="mt-1.5 block text-xs text-muted-foreground">{t("firstNameHint")}</span>
           </label>
@@ -141,7 +134,7 @@ function ProfilePage() {
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
               >
-                {LANGUAGES.map((l) => (
+                {labels.languageOptions.map((l) => (
                   <option key={l.value} value={l.value}>
                     {l.label}
                   </option>
@@ -155,7 +148,7 @@ function ProfilePage() {
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
               >
-                {CURRENCIES.map((c) => (
+                {labels.currencyOptions.map((c) => (
                   <option key={c.value} value={c.value}>
                     {c.label}
                   </option>

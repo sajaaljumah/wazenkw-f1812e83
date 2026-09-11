@@ -2,7 +2,6 @@ import { useState } from "react";
 import { ExpensesIcon, GoalsIcon, IncomeIcon, ReceiptIcon, RefundIcon, SavingsIcon, ScheduledIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { EmptyState, Panel, ProgressBar, percentOf } from "./primitives";
 import {
-  TRANSACTION_KIND_LABELS,
   formatDate,
   formatMoney,
   savedForGoal,
@@ -12,13 +11,9 @@ import type { Goal, RecurringItem, Transaction } from "@/lib/finance";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { useWazenLabels } from "@/lib/i18n-labels";
 
-const FILTERS = [
-  { value: "all", label: "All" },
-  { value: "in", label: "Money in" },
-  { value: "out", label: "Spending" },
-  { value: "saving", label: "Saving" },
-] as const;
+const FILTERS = [{ value: "all" }, { value: "in" }, { value: "out" }, { value: "saving" }] as const;
 
 type TransactionFilter = (typeof FILTERS)[number]["value"];
 
@@ -33,7 +28,7 @@ export function RecentTransactionsCard({
   transactions,
   currency,
   limit = 6,
-  title = "Recent transactions",
+  title,
 }: {
   transactions: Transaction[];
   currency: string;
@@ -41,13 +36,14 @@ export function RecentTransactionsCard({
   title?: string;
 }) {
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   const [filter, setFilter] = useState<TransactionFilter>("all");
   const recent = transactions.filter((t) => matchesFilter(t.kind, filter)).slice(0, limit);
   return (
     <Panel
-      title={title}
+      title={title ?? t("recent")}
       action={
-        <div className="flex flex-wrap gap-1" role="group" aria-label="Filter transactions">
+        <div className="flex flex-wrap gap-1" role="group" aria-label={t("filterTransactions")}>
           {FILTERS.map((option) => (
             <Button
               key={option.value}
@@ -71,7 +67,7 @@ export function RecentTransactionsCard({
           description={
             filter === "all"
               ? t("noTransactionsDescription")
-              : "Try another filter, or add a new entry with the quick actions above."
+              : t("tryAnotherFilter")
           }
         />
       ) : (
@@ -97,9 +93,9 @@ export function RecentTransactionsCard({
                   <Icon className="size-4" strokeWidth={ICON_STROKE} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm">{t.merchant || t.category}</p>
+                  <p className="truncate text-sm">{t.merchant || labels.category(t.category)}</p>
                   <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {TRANSACTION_KIND_LABELS[t.kind]} · {t.category} · {formatDate(t.occurred_on)}
+                    {labels.transactionKind(t.kind)} · {labels.category(t.category)} · {formatDate(t.occurred_on)}
                   </p>
                 </div>
                 <span
@@ -123,7 +119,7 @@ export function RecentTransactionsCard({
 export function UpcomingCashFlowCard({
   items,
   currency,
-  title = "Upcoming income & payments",
+  title,
 }: {
   items: RecurringItem[];
   currency: string;
@@ -132,7 +128,7 @@ export function UpcomingCashFlowCard({
   const { t } = useWazenLocale();
   const upcoming = upcomingCashFlow(items).slice(0, 6);
   return (
-    <Panel title={title}>
+    <Panel title={title ?? t("upcoming")}>
       {upcoming.length === 0 ? (
         <EmptyState
           icon={<ScheduledIcon className="size-5" strokeWidth={ICON_STROKE} />}
@@ -180,7 +176,7 @@ export function GoalsCard({
   goals,
   transactions,
   currency,
-  title = "Savings goals",
+  title,
   playful = false,
 }: {
   goals: Goal[];
@@ -192,7 +188,7 @@ export function GoalsCard({
   const { t } = useWazenLocale();
   const list = goals.filter((goal) => goal.kind === "goal");
   return (
-    <Panel title={title}>
+    <Panel title={title ?? t("savingsGoals")}>
       {list.length === 0 ? (
         <EmptyState
           icon={<GoalsIcon className="size-5" strokeWidth={ICON_STROKE} />}
@@ -209,7 +205,7 @@ export function GoalsCard({
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className={cn("text-sm", playful && "text-base")}>{goal.name}</span>
                   <span className="text-xs tabular-nums text-muted-foreground">
-                    {formatMoney(saved, goal.currency || currency)} of{" "}
+                    {formatMoney(saved, goal.currency || currency)} {t("ofWord")}{" "}
                     {formatMoney(Number(goal.target_amount), goal.currency || currency)}
                   </span>
                 </div>
@@ -220,9 +216,9 @@ export function GoalsCard({
                   className={playful ? "mt-3 h-4" : "mt-3"}
                 />
                 <p className="mt-2 text-xs text-muted-foreground">
-                  {percent}% saved
-                  {goal.target_date ? ` · target ${formatDate(goal.target_date)}` : ""}
-                  {playful && percent >= 100 ? " · goal reached!" : ""}
+                  {percent}% {t("savedWord")}
+                  {goal.target_date ? ` · ${t("targetWord")} ${formatDate(goal.target_date)}` : ""}
+                  {playful && percent >= 100 ? ` · ${t("goalReachedTag")}` : ""}
                 </p>
               </li>
             );
@@ -258,7 +254,7 @@ export function EmergencyFundCard({
             {formatMoney(savedForGoal(transactions, fund.id), fund.currency || currency)}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            of {formatMoney(Number(fund.target_amount), fund.currency || currency)} target
+            {t("ofWord")} {formatMoney(Number(fund.target_amount), fund.currency || currency)} · {t("targetWord")}
           </p>
           <ProgressBar
             value={savedForGoal(transactions, fund.id)}
@@ -276,7 +272,7 @@ export function BudgetCard({
   budget,
   spent,
   currency,
-  title = "Monthly budget",
+  title,
 }: {
   budget: number | null;
   spent: number;
@@ -285,7 +281,7 @@ export function BudgetCard({
 }) {
   const { t } = useWazenLocale();
   return (
-    <Panel title={title}>
+    <Panel title={title ?? t("monthlyBudget")}>
       {budget === null ? (
         <EmptyState
           icon={<ReceiptIcon className="size-5" strokeWidth={ICON_STROKE} />}
@@ -297,13 +293,13 @@ export function BudgetCard({
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <p className="text-2xl tabular-nums">{formatMoney(Math.max(budget - spent, 0), currency)}</p>
             <span className="text-xs text-muted-foreground">
-              left of {formatMoney(budget, currency)}
+              {t("leftOf")} {formatMoney(budget, currency)}
             </span>
           </div>
           <ProgressBar value={spent} max={budget} tone={spent > budget ? "charcoal" : "gold"} className="mt-4" />
           <p className="mt-2 text-xs text-muted-foreground">
-            {formatMoney(spent, currency)} spent this month
-            {spent > budget ? " · over budget" : ` · ${percentOf(spent, budget)}% used`}
+            {formatMoney(spent, currency)} {t("spentThisMonth")}
+            {spent > budget ? ` · ${t("overBudget")}` : ` · ${percentOf(spent, budget)}% ${t("usedWord")}`}
           </p>
         </>
       )}

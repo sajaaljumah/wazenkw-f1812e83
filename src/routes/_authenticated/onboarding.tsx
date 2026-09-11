@@ -8,17 +8,15 @@ import { WazenMark } from "@/components/wazen/AppShell";
 import { useProfile } from "@/hooks/use-wazen-auth";
 import {
   ADULT_LIFE_STAGES,
-  CURRENCIES,
   DEFAULT_LANGUAGE,
-  LANGUAGES,
-  LIFE_STAGE_LABELS,
   accountTypeFor,
   calculateAge,
   firstNameOf,
   lifeStageForAge,
-  welcomeMessage,
   type LifeStage,
 } from "@/lib/wazen";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { useWazenLabels } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -29,9 +27,10 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 const inputClass =
   "wazen-field";
 
-const STEPS = ["Basics", "Life stage", "Preferences"];
-
 function Onboarding() {
+  const { t } = useWazenLocale();
+  const labels = useWazenLabels();
+  const STEPS = [t("stepBasics"), t("stepLifeStage"), t("stepPreferences")];
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: profile, isLoading } = useProfile();
@@ -56,10 +55,8 @@ function Onboarding() {
     return (
       <div className="flex min-h-screen items-center justify-center px-6">
         <div className="wazen-panel max-w-md p-8 text-center">
-          <h1 className="text-2xl">We couldn't find your profile</h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Please sign in again to finish setting up your account.
-          </p>
+          <h1 className="text-2xl">{t("profileMissing")}</h1>
+          <p className="mt-3 text-sm text-muted-foreground">{t("profileMissingBody")}</p>
         </div>
       </div>
     );
@@ -71,7 +68,7 @@ function Onboarding() {
 
   async function saveAndFinish() {
     if (!effectiveStage) {
-      toast.error("Select your life stage");
+      toast.error(t("selectLifeStage"));
       return;
     }
     setBusy(true);
@@ -125,13 +122,11 @@ function Onboarding() {
         <section className="border-y border-border py-8 sm:py-10">
           {step === 0 ? (
             <>
-              <h1 className="text-3xl">Basic information</h1>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Date of birth and gender are locked once your account is created.
-              </p>
+              <h1 className="text-3xl">{t("basicInfoTitle")}</h1>
+              <p className="mt-2 text-sm text-muted-foreground">{t("basicInfoBody")}</p>
               <div className="mt-7 space-y-5">
                 <label className="block">
-                  <span className="wazen-label">First name</span>
+                  <span className="wazen-label">{t("firstName")}</span>
                   <input
                     className={cn(inputClass, "mt-2")}
                     value={fullName}
@@ -139,39 +134,38 @@ function Onboarding() {
                   />
                 </label>
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <ReadOnlyRow label="Date of birth" value={profile.date_of_birth} />
-                  <ReadOnlyRow label="Gender" value={profile.gender} capitalize />
+                  <ReadOnlyRow label={t("dateOfBirth")} value={profile.date_of_birth} />
+                  <ReadOnlyRow label={t("gender")} value={labels.gender(profile.gender)} />
                 </div>
-                <ReadOnlyRow label="Age (calculated)" value={`${age} years`} />
+                <ReadOnlyRow label={t("age")} value={`${age} ${t("yearsOld")}`} />
               </div>
               <NextButton
                 onClick={() => {
                   if (fullName.trim().length < 2) {
-                    toast.error("Enter your first name");
+                    toast.error(t("enterFirstNameError"));
                     return;
                   }
                   setStep(1);
                 }}
               >
-                Continue
+                {t("continueLabel")}
               </NextButton>
             </>
           ) : null}
 
           {step === 1 ? (
             <>
-              <h1 className="text-3xl">Your life stage</h1>
+              <h1 className="text-3xl">{t("lifeStageTitle")}</h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                Based on your date of birth, you are {age} years old.
+                {t("lifeStageAgeBody")} {age} {t("yearsOld")}.
               </p>
               <div className="mt-7">
                 {autoStage ? (
                    <div className="rounded-lg border border-input bg-secondary/60 p-5 text-sm">
-                    <strong className="font-normal">{LIFE_STAGE_LABELS[autoStage]}</strong> — chosen
-                    automatically from your age.
+                    <strong className="font-normal">{labels.lifeStage(autoStage)}</strong> —{" "}
+                    {t("autoStageNote")}
                     <span className="mt-2 block text-xs text-muted-foreground">
-                      This account must be linked to a parent or guardian, who will be able to
-                      support and monitor it.
+                      {t("guardianLinkNote")}
                     </span>
                   </div>
                 ) : (
@@ -184,16 +178,16 @@ function Onboarding() {
                          variant={lifeStage === stage ? "default" : "outline"}
                          className="h-auto justify-start p-5 text-start"
                       >
-                        {LIFE_STAGE_LABELS[stage]}
+                        {labels.lifeStage(stage)}
                        </Button>
                     ))}
                   </div>
                 )}
               </div>
               <div className="mt-8 flex gap-3">
-                <BackButton onClick={() => setStep(0)} />
+                <BackButton onClick={() => setStep(0)} label={t("backLabel")} />
                 <NextButton inline onClick={() => setStep(2)}>
-                  Continue
+                  {t("continueLabel")}
                 </NextButton>
               </div>
             </>
@@ -201,19 +195,17 @@ function Onboarding() {
 
           {step === 2 ? (
             <>
-              <h1 className="text-3xl">Preferences</h1>
-              <p className="mt-2 text-sm text-muted-foreground">
-                You can change these at any time in Settings.
-              </p>
+              <h1 className="text-3xl">{t("preferencesTitle")}</h1>
+              <p className="mt-2 text-sm text-muted-foreground">{t("preferencesBody")}</p>
               <div className="mt-7 grid gap-5 sm:grid-cols-2">
                 <label className="block">
-                  <span className="wazen-label">Language</span>
+                  <span className="wazen-label">{t("language")}</span>
                   <select
                     className={cn(inputClass, "mt-2")}
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
                   >
-                    {LANGUAGES.map((l) => (
+                    {labels.languageOptions.map((l) => (
                       <option key={l.value} value={l.value}>
                         {l.label}
                       </option>
@@ -221,13 +213,13 @@ function Onboarding() {
                   </select>
                 </label>
                 <label className="block">
-                  <span className="wazen-label">Base currency</span>
+                  <span className="wazen-label">{t("baseCurrency")}</span>
                   <select
                     className={cn(inputClass, "mt-2")}
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
                   >
-                    {CURRENCIES.map((c) => (
+                    {labels.currencyOptions.map((c) => (
                       <option key={c.value} value={c.value}>
                         {c.label}
                       </option>
@@ -236,9 +228,9 @@ function Onboarding() {
                 </label>
               </div>
               <div className="mt-8 flex gap-3">
-                <BackButton onClick={() => setStep(1)} />
+                <BackButton onClick={() => setStep(1)} label={t("backLabel")} />
                 <NextButton inline busy={busy} onClick={saveAndFinish}>
-                  Finish setup
+                  {t("finishSetup")}
                 </NextButton>
               </div>
             </>
@@ -246,18 +238,18 @@ function Onboarding() {
 
           {step === 3 ? (
             <div className="py-6 text-center">
-              <p className="wazen-label">You're all set</p>
+              <p className="wazen-label">{t("allSet")}</p>
               <h1 className="mt-4 text-2xl min-[375px]:text-3xl sm:text-5xl">
-                Welcome to Wazen, {firstNameOf(fullName)}.
+                {t("welcomeToWazen")}، {firstNameOf(fullName)}
               </h1>
               <p className="mx-auto mt-4 max-w-md text-muted-foreground">
-                {welcomeMessage(effectiveStage)}
+                {labels.welcomeMessage(effectiveStage)}
               </p>
               <Button
                 onClick={() => navigate({ to: "/dashboard" })}
                 className="mt-9"
               >
-                Go to Dashboard
+                {t("goToDashboard")}
                 <ForwardIcon className="size-4" strokeWidth={ICON_STROKE} />
               </Button>
             </div>
@@ -316,14 +308,14 @@ function NextButton({
   );
 }
 
-function BackButton({ onClick }: { onClick: () => void }) {
+function BackButton({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <Button
       type="button"
       onClick={onClick}
       variant="outline"
     >
-      Back
+      {label}
     </Button>
   );
 }

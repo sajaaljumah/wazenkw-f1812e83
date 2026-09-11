@@ -109,7 +109,7 @@ function ZakatPage() {
       });
       toast.success(t("savedToast"));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
+      toast.error(error instanceof Error ? error.message : t("somethingWentWrong"));
     }
   }
 
@@ -132,7 +132,7 @@ function ZakatPage() {
                   await saveCalculation.mutateAsync(result);
                   toast.success(t("zakatCalculationSaved"));
                 } catch (error) {
-                  toast.error(error instanceof Error ? error.message : "Something went wrong");
+                  toast.error(error instanceof Error ? error.message : t("somethingWentWrong"));
                 }
               }}
               disabled={saveCalculation.isPending}

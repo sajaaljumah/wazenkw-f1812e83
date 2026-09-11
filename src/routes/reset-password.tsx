@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { SpinnerIcon } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/reset-password")({
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/reset-password")({
 
 function ResetPassword() {
   const navigate = useNavigate();
+  const { t } = useWazenLocale();
   const [ready, setReady] = useState(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -41,11 +43,11 @@ function ResetPassword() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (password.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error(t("passwordMin"));
       return;
     }
     if (password !== confirm) {
-      toast.error("Passwords do not match");
+      toast.error(t("passwordsMismatch"));
       return;
     }
     setBusy(true);
@@ -55,7 +57,7 @@ function ResetPassword() {
       toast.error(error.message);
       return;
     }
-    toast.success("Password updated");
+    toast.success(t("passwordUpdated"));
     navigate({ to: "/dashboard" });
   }
 
@@ -68,15 +70,13 @@ function ResetPassword() {
       </header>
       <main className="mx-auto max-w-md px-4 pb-20 sm:px-6">
         <section className="border-y border-border py-9">
-          <h1 className="text-3xl">Choose a new password</h1>
+          <h1 className="text-3xl">{t("resetTitle")}</h1>
           {!ready ? (
-            <p className="mt-4 text-sm text-muted-foreground">
-              Open this page from the reset link in your email to continue.
-            </p>
+            <p className="mt-4 text-sm text-muted-foreground">{t("resetOpenFromLink")}</p>
           ) : null}
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">
             <label className="block">
-              <span className="wazen-label">New password</span>
+              <span className="wazen-label">{t("newPassword")}</span>
               <input
                 type="password"
                 autoComplete="new-password"
@@ -86,7 +86,7 @@ function ResetPassword() {
               />
             </label>
             <label className="block">
-              <span className="wazen-label">Confirm password</span>
+              <span className="wazen-label">{t("confirmPasswordLabel")}</span>
               <input
                 type="password"
                 autoComplete="new-password"
@@ -102,7 +102,7 @@ function ResetPassword() {
               className="w-full"
             >
               {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
-              Update password
+              {t("updatePassword")}
             </Button>
           </form>
         </section>

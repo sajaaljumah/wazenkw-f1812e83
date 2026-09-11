@@ -15,6 +15,7 @@ import {
   SpinnerIcon,
 } from "@/components/wazen/icons";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { useWazenLabels } from "@/lib/i18n-labels";
 import { useProfile } from "@/hooks/use-wazen-auth";
 import {
   useAllRecurringItems,
@@ -63,6 +64,7 @@ const STATUS_KEY = {
 
 function RecurringPage() {
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   const { data: profile } = useProfile();
   const items = useAllRecurringItems();
   const toggle = useToggleRecurringItem();
@@ -160,7 +162,7 @@ function RecurringPage() {
                       </div>
                       <p className="mt-1 truncate text-xs text-muted-foreground">
                         {t(frequency === "monthly" ? "monthlyFreq" : frequency)}
-                        {item.merchant ? ` · ${item.merchant}` : ""} · {item.category}
+                        {item.merchant ? ` · ${item.merchant}` : ""} · {labels.category(item.category)}
                         {due ? ` · ${t("nextPayment")}: ${formatDate(due)}` : ""}
                       </p>
                     </div>

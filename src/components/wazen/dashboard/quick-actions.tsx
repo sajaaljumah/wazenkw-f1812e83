@@ -249,7 +249,7 @@ export function ActionDialog({
           throw new Error(tr("enterCategory"));
         }
         const resolvedCategory =
-          kind === "saving" ? "Savings" : kind === "give" ? tr(givingType) : category.trim();
+          kind === "saving" ? t("savingsCategory") : kind === "give" ? tr(givingType) : category.trim();
         const { error } = await supabase.from("transactions").insert({
           user_id: userId,
           // Giving is real spending, so it flows through expense analytics.
@@ -269,7 +269,7 @@ export function ActionDialog({
       toast.success(tr("savedToast"));
       close();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
+      toast.error(error instanceof Error ? error.message : t("somethingWentWrong"));
     } finally {
       setBusy(false);
     }

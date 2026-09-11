@@ -14,7 +14,8 @@ import {
 } from "@/lib/finance";
 import type { Budget, Goal, RecurringItem, Transaction } from "@/lib/finance";
 import type { FamilyMemberSummary } from "@/hooks/use-wazen-finance";
-import { LIFE_STAGE_LABELS, calculateAge, firstNameOf } from "@/lib/wazen";
+import { calculateAge, firstNameOf } from "@/lib/wazen";
+import { useWazenLabels } from "@/lib/i18n-labels";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { PortfolioSummaryCard } from "@/components/wazen/assets/PortfolioSummaryCard";
@@ -189,6 +190,7 @@ export function FamilySummaryCard({
   transactions?: Transaction[];
 }) {
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   const [dialogOpen, setDialogOpen] = useState(false);
   const parentPaid = transactions
     .filter((item) => item.paid_by_parent && item.beneficiary_user_id && item.beneficiary_user_id !== item.user_id)
@@ -243,7 +245,7 @@ export function FamilySummaryCard({
                     <div className="min-w-0">
                       <p className="truncate text-base">{firstNameOf(profile.full_name)}</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        {LIFE_STAGE_LABELS[profile.life_stage]} · {calculateAge(profile.date_of_birth)} years
+                        {labels.lifeStage(profile.life_stage)} · {calculateAge(profile.date_of_birth)} {t("yearsOld")}
                       </p>
                     </div>
                   </div>

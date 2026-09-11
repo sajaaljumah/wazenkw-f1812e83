@@ -13,6 +13,8 @@ import { CategoryChartIcon as CategoryIcon, TrendChartIcon, ICON_STROKE } from "
 import { EmptyState, Panel } from "./primitives";
 import { formatMoney, monthKeyOf, monthlySeries, spendingByCategory } from "@/lib/finance";
 import type { Transaction } from "@/lib/finance";
+import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { useWazenLabels } from "@/lib/i18n-labels";
 
 const BAR_COLORS = [
   "var(--chart-1)",
@@ -38,28 +40,30 @@ const TOOLTIP_STYLE = {
 export function SpendingByCategoryCard({
   transactions,
   currency,
-  title = "Spending by category",
+  title,
 }: {
   transactions: Transaction[];
   currency: string;
   title?: string;
 }) {
+  const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   const slices = spendingByCategory(transactions).slice(0, 6);
   const total = slices.reduce((sum, slice) => sum + slice.amount, 0);
   const max = slices.reduce((peak, slice) => Math.max(peak, slice.amount), 0);
 
   return (
-    <Panel title={title}>
+    <Panel title={title ?? t("spendingCategory")}>
       {slices.length === 0 ? (
         <EmptyState
           icon={<CategoryIcon className="size-5" strokeWidth={ICON_STROKE} />}
-          title="No spending this month yet"
-          description="Once you add expenses, your categories will appear here."
+          title={t("noSpendingYet")}
+          description={t("noSpendingYetBody")}
         />
       ) : (
         <div className="space-y-5">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 border-b border-border/70 pb-4">
-            <span className="wazen-label">Total</span>
+            <span className="wazen-label">{t("total")}</span>
             <span className="wazen-number text-lg">{formatMoney(total, currency)}</span>
           </div>
           <ul className="space-y-4">
@@ -72,7 +76,7 @@ export function SpendingByCategoryCard({
                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 text-sm">
                     <span className="flex min-w-0 items-center gap-2.5">
                       <span className="size-2 rounded-full" style={{ background: color }} />
-                      <span className="truncate">{slice.category}</span>
+                      <span className="truncate">{labels.category(slice.category)}</span>
                     </span>
                     <span className="shrink-0 tabular-nums text-muted-foreground">
                       {share}% · <span className="text-foreground">{formatMoney(slice.amount, currency)}</span>
@@ -115,14 +119,15 @@ export function IncomeVsExpensesCard({
     net: point.income - point.expenses,
   }));
   const hasData = series.some((point) => point.income > 0 || point.expenses > 0);
+  const { t } = useWazenLocale();
 
   return (
-    <Panel title="Income vs expenses">
+    <Panel title={t("incomeExpenses")}>
       {!hasData ? (
         <EmptyState
           icon={<TrendChartIcon className="size-5" strokeWidth={ICON_STROKE} />}
-          title="Not enough data yet"
-          description="Add income and expenses to see how your months compare."
+          title={t("notEnoughData")}
+          description={t("notEnoughDataBody")}
         />
       ) : (
          <div className="h-52 w-full min-w-0 sm:h-56">
@@ -166,13 +171,13 @@ export function IncomeVsExpensesCard({
       )}
       <div className="mt-4 flex flex-wrap items-center gap-5 text-xs text-muted-foreground">
         <span className="flex items-center gap-2">
-          <span className="size-2 rounded-full" style={{ background: "var(--chart-2)" }} /> Income
+          <span className="size-2 rounded-full" style={{ background: "var(--chart-2)" }} /> {t("income")}
         </span>
         <span className="flex items-center gap-2">
-          <span className="size-2 rounded-full" style={{ background: "var(--chart-1)" }} /> Expenses
+          <span className="size-2 rounded-full" style={{ background: "var(--chart-1)" }} /> {t("expensesLabel")}
         </span>
         <span className="flex items-center gap-2">
-          <span className="h-px w-4" style={{ background: "var(--foreground)" }} /> Net
+          <span className="h-px w-4" style={{ background: "var(--foreground)" }} /> {t("netLabel")}
         </span>
       </div>
     </Panel>
@@ -184,13 +189,14 @@ export function SavingsTrendCard({
   transactions,
   currency,
   months = 12,
-  title = "Savings over time",
+  title,
 }: {
   transactions: Transaction[];
   currency: string;
   months?: number;
   title?: string;
 }) {
+  const { t } = useWazenLocale();
   const buckets = new Map<string, number>();
   const now = new Date();
   const keys: string[] = [];
@@ -213,12 +219,12 @@ export function SavingsTrendCard({
   const hasData = series.some((point) => point.total > 0);
 
   return (
-    <Panel title={title}>
+    <Panel title={title ?? t("savingsOverTime")}>
       {!hasData ? (
         <EmptyState
           icon={<TrendChartIcon className="size-5" strokeWidth={ICON_STROKE} />}
-          title="No savings recorded yet"
-          description="Every amount you save will build this line."
+          title={t("noSavingsYet")}
+          description={t("noSavingsYetBody")}
         />
       ) : (
          <div className="h-48 w-full min-w-0">
