@@ -15,6 +15,15 @@ import type { FamilyMemberSummary } from "@/hooks/use-wazen-finance";
 import { LIFE_STAGE_LABELS, calculateAge, firstNameOf } from "@/lib/wazen";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
+import { PortfolioSummaryCard } from "@/components/wazen/assets/PortfolioSummaryCard";
+import { ParentPaidCard } from "@/components/wazen/family/ParentPaidCard";
+import { ParentPaidExpenseDialog } from "@/components/wazen/family/ParentPaidExpenseDialog";
+import { useAssets } from "@/hooks/use-wazen-assets";
+import { useParentPaidForMe } from "@/hooks/use-wazen-finance";
+import { AddIcon, ReceiptIcon } from "@/components/wazen/icons";
+import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/finance";
+import { useState } from "react";
 
 export type DashboardData = {
   userId: string;
@@ -43,6 +52,7 @@ export function AdultDashboard({
   const { monthTransactions, month, all } = useMonthTotals(transactions);
   const savedTotal = all.savings;
   const { t } = useWazenLocale();
+  const assets = useAssets();
 
   return (
     <>
@@ -97,6 +107,8 @@ export function AdultDashboard({
         <UpcomingCashFlowCard items={recurring} currency={currency} />
       </div>
 
+      <PortfolioSummaryCard assets={assets.data ?? []} currency={currency} />
+
       <RecentTransactionsCard transactions={transactions} currency={currency} limit={8} />
 
       {focus === "student" ? (
@@ -119,6 +131,7 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
     .filter((t) => t.kind === "income" && /allowance/i.test(t.category))
     .reduce((sum, t) => sum + Number(t.amount), 0);
   const { t } = useWazenLocale();
+  const parentPaid = useParentPaidForMe();
 
   return (
     <>
@@ -153,6 +166,8 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
 
       <RecentTransactionsCard transactions={transactions} currency={currency} title={t("latestActivity")} />
 
+      <ParentPaidCard transactions={parentPaid.data ?? []} />
+
       <Panel title={t("financialLearning")}>
         <EmptyState
           icon={<StudentIcon className="size-5" strokeWidth={ICON_STROKE} />}
@@ -171,14 +186,40 @@ export { ChildDashboard } from "./child/ChildDashboard";
 export function FamilySummaryCard({
   members,
   isLoading,
+  currency,
+  transactions = [],
 }: {
   members: FamilyMemberSummary[];
   isLoading: boolean;
+  currency: string;
+  /** The parent's own transactions — used to list parent-paid expenses. */
+  transactions?: Transaction[];
 }) {
   const { t } = useWazenLocale();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const parentPaid = transactions
+    .filter((item) => item.paid_by_parent && item.beneficiary_user_id && item.beneficiary_user_id !== item.user_id)
+    .slice(0, 8);
+  const nameOf = (id: string | null | undefined) => {
+    const member = members.find((entry) => entry.profile.id === id);
+    return member ? firstNameOf(member.profile.full_name) : "—";
+  };
+
   return (
-    <Panel title={t("familySummary")}>
+    <>
+    <Panel
+      title={t("familySummary")}
+      action={
+        members.length > 0 ? (
+          <Button size="sm" onClick={() => setDialogOpen(true)}>
+            <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
+            {t("addExpenseForChild")}
+          </Button>
+        ) : null
+      }
+    >
       {isLoading ? (
+
         <p className="text-sm text-muted-foreground">{t("loadingFamily")}</p>
       ) : members.length === 0 ? (
         <EmptyState
@@ -235,9 +276,57 @@ export function FamilySummaryCard({
           })}
         </ul>
       )}
+
+      {members.length > 0 ? (
+        <div className="mt-8 border-t border-border/70 pt-6">
+          <h3 className="text-lg">{t("parentPaidTitle")}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{t("parentPaidIntro")}</p>
+          {parentPaid.length === 0 ? (
+            <div className="mt-4">
+              <EmptyState
+                icon={<ReceiptIcon className="size-5" strokeWidth={ICON_STROKE} />}
+                title={t("noParentPaidRecorded")}
+                description={t("noParentPaidRecordedDescription")}
+              />
+            </div>
+          ) : (
+            <ul className="mt-4 divide-y divide-border/70">
+              {parentPaid.map((item) => (
+                <li key={item.id} className="flex items-center justify-between gap-4 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm">
+                      {item.merchant ?? item.category}
+                      <span className="ms-2 text-xs text-muted-foreground">
+                        {`${t("forFamilyMember")} ${nameOf(item.beneficiary_user_id)}`}
+                      </span>
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {item.category} · {formatDate(item.occurred_on)}
+                      {item.payment_method ? ` · ${item.payment_method}` : ""}
+                      {item.deducted_from_child ? ` · ${t("deductFromChild")}` : ""}
+                    </p>
+                  </div>
+                  <p className="wazen-number shrink-0 text-sm">
+                    {formatMoney(Number(item.amount), item.currency)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : null}
     </Panel>
+
+    <ParentPaidExpenseDialog
+      open={dialogOpen}
+      onClose={() => setDialogOpen(false)}
+      members={members}
+      currency={currency}
+    />
+    </>
   );
 }
+
 
 function Row({ label, value }: { label: string; value: string }) {
   return (

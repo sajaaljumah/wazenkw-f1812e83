@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { DashboardIcon, PremiumIcon, ProfileIcon, SettingsIcon, SignOutIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { DashboardIcon, PortfolioIcon, PremiumIcon, ProfileIcon, SettingsIcon, SignOutIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { useEffect, type ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { WazenLocaleProvider, useWazenLocale } from "@/components/wazen/WazenLocale";
 import { PlanBadge } from "@/components/wazen/subscription/PlanBadge";
 import { firstNameOf } from "@/lib/wazen";
+import { canOwnAssets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/dashboard", label: "overview", icon: DashboardIcon },
+  { to: "/assets", label: "assets", icon: PortfolioIcon, adultsOnly: true },
   { to: "/subscription", label: "plan", icon: PremiumIcon },
   { to: "/profile", label: "profile", icon: ProfileIcon },
   { to: "/settings", label: "settings", icon: SettingsIcon },
@@ -30,6 +32,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const signOut = useSignOut();
   const { data: profile } = useProfile();
   const { t } = useWazenLocale();
+  // Assets belong to independent adult accounts only.
+  const nav = NAV.filter((item) => !("adultsOnly" in item && item.adultsOnly) || canOwnAssets(profile?.life_stage));
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", profile?.theme === "dark");
@@ -48,7 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <WazenMark />
             </Link>
             <nav className="hidden items-center gap-6 sm:flex" aria-label="Primary navigation">
-            {NAV.map(({ to, label, icon: Icon }) => (
+            {nav.map(({ to, label, icon: Icon }) => (
               <Link
                 key={to}
                 to={to}
@@ -101,7 +105,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lifted backdrop-blur-xl sm:hidden" aria-label="Mobile navigation">
         <div className="mx-auto flex max-w-md items-stretch justify-around">
-          {NAV.map(({ to, label, icon: Icon }) => (
+          {nav.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}

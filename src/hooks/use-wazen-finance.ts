@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-wazen-auth";
 import { firstOfMonth } from "@/lib/finance";
@@ -139,3 +139,92 @@ export function useFamilySummary(enabled: boolean) {
     },
   });
 }
+
+/**
+ * Spending a parent recorded for the signed-in child/teenager. These rows live
+ * in the parent's own records, so they never reduce the child's available money
+ * unless the parent explicitly deducted them from the child's funds — in which
+ * case a matching entry also exists in the child's own transactions.
+ */
+export function useParentPaidForMe() {
+  const { user, loading } = useSession();
+  return useQuery({
+    queryKey: ["parent-paid", user?.id],
+    enabled: !loading && !!user,
+    queryFn: async (): Promise<Transaction[]> => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("*")
+        .eq("beneficiary_user_id", user!.id)
+        .eq("paid_by_parent", true)
+        .neq("user_id", user!.id)
+        .order("occurred_on", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as unknown as Transaction[];
+    },
+  });
+}
+
+export type ParentPaidExpenseInput = {
+  childUserId: string;
+  amount: number;
+  category: string;
+  merchant: string | null;
+  occurredOn: string;
+  paymentMethod: string | null;
+  currency: string;
+  /** Only allowed for guardians with funding permission. */
+  deductFromChild: boolean;
+};
+
+/**
+ * Records an expense a parent paid for a linked child or teenager. The expense
+ * always lands in the parent's records because the parent actually paid it. When
+ * the parent chooses to deduct it, a linked entry is also written to the child's
+ * records so the child's own available money reflects it.
+ */
+export function useAddParentPaidExpense() {
+  const { user } = useSession();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: ParentPaidExpenseInput) => {
+      const shared = {
+        kind: "expense" as const,
+        category: input.category,
+        merchant: input.merchant,
+        amount: input.amount,
+        currency: input.currency,
+        occurred_on: input.occurredOn,
+        payment_method: input.paymentMethod,
+        beneficiary_user_id: input.childUserId,
+        paid_by_parent: true,
+      };
+
+      const { data, error } = await supabase
+        .from("transactions")
+        .insert({ ...shared, user_id: user!.id, deducted_from_child: input.deductFromChild })
+        .select("id")
+        .single();
+      if (error) throw error;
+
+      if (input.deductFromChild) {
+        const { error: childError } = await supabase.from("transactions").insert({
+          ...shared,
+          user_id: input.childUserId,
+          deducted_from_child: true,
+          linked_transaction_id: (data as { id: string }).id,
+          note: "Paid by parent from your own money",
+        });
+        if (childError) throw childError;
+      }
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["transactions"] }),
+        queryClient.invalidateQueries({ queryKey: ["family-summary"] }),
+        queryClient.invalidateQueries({ queryKey: ["parent-paid"] }),
+      ]);
+    },
+  });
+}
+

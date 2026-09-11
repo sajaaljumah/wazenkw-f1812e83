@@ -14,7 +14,16 @@ export type Transaction = {
   note: string | null;
   goal_id: string | null;
   created_at: string;
+  /** The family member the money was spent on, when it was not the account owner. */
+  beneficiary_user_id?: string | null;
+  /** True when a parent/guardian paid this on behalf of a child or teenager. */
+  paid_by_parent?: boolean;
+  /** True only when the parent chose to take it out of the child's own money. */
+  deducted_from_child?: boolean;
+  payment_method?: string | null;
+  linked_transaction_id?: string | null;
 };
+
 
 export type Goal = {
   id: string;

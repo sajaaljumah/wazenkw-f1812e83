@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      asset_valuations: {
+        Row: {
+          asset_id: string
+          created_at: string
+          id: string
+          unit_value: number
+          valued_on: string
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          id?: string
+          unit_value: number
+          valued_on: string
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          id?: string
+          unit_value?: number
+          valued_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_valuations_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assets: {
+        Row: {
+          created_at: string
+          currency: string
+          current_unit_value: number
+          id: string
+          kind: Database["public"]["Enums"]["asset_kind"]
+          monthly_rent: number
+          name: string
+          notes: string | null
+          property_type: string | null
+          purchase_date: string
+          purity: string | null
+          quantity: number
+          symbol: string | null
+          unit_cost: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          current_unit_value: number
+          id?: string
+          kind: Database["public"]["Enums"]["asset_kind"]
+          monthly_rent?: number
+          name: string
+          notes?: string | null
+          property_type?: string | null
+          purchase_date: string
+          purity?: string | null
+          quantity?: number
+          symbol?: string | null
+          unit_cost: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          current_unit_value?: number
+          id?: string
+          kind?: Database["public"]["Enums"]["asset_kind"]
+          monthly_rent?: number
+          name?: string
+          notes?: string | null
+          property_type?: string | null
+          purchase_date?: string
+          purity?: string | null
+          quantity?: number
+          symbol?: string | null
+          unit_cost?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       budgets: {
         Row: {
           amount: number
@@ -428,43 +517,58 @@ export type Database = {
       transactions: {
         Row: {
           amount: number
+          beneficiary_user_id: string | null
           category: string
           created_at: string
           currency: string
+          deducted_from_child: boolean
           goal_id: string | null
           id: string
           kind: string
+          linked_transaction_id: string | null
           merchant: string | null
           note: string | null
           occurred_on: string
+          paid_by_parent: boolean
+          payment_method: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           amount: number
+          beneficiary_user_id?: string | null
           category: string
           created_at?: string
           currency?: string
+          deducted_from_child?: boolean
           goal_id?: string | null
           id?: string
           kind: string
+          linked_transaction_id?: string | null
           merchant?: string | null
           note?: string | null
           occurred_on?: string
+          paid_by_parent?: boolean
+          payment_method?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
+          beneficiary_user_id?: string | null
           category?: string
           created_at?: string
           currency?: string
+          deducted_from_child?: boolean
           goal_id?: string | null
           id?: string
           kind?: string
+          linked_transaction_id?: string | null
           merchant?: string | null
           note?: string | null
           occurred_on?: string
+          paid_by_parent?: boolean
+          payment_method?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -476,6 +580,13 @@ export type Database = {
             referencedRelation: "goals"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "transactions_linked_transaction_id_fkey"
+            columns: ["linked_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -484,6 +595,7 @@ export type Database = {
     }
     Functions: {
       calculate_age: { Args: { dob: string }; Returns: number }
+      can_fund_child: { Args: { _child_user_id: string }; Returns: boolean }
       can_monitor_child: { Args: { _child: string }; Returns: boolean }
       has_premium_access: { Args: { _user_id: string }; Returns: boolean }
       is_guardian_of: {
@@ -493,6 +605,7 @@ export type Database = {
     }
     Enums: {
       account_type: "independent" | "dependent" | "parent"
+      asset_kind: "stock" | "gold" | "silver" | "real_estate"
       billing_period: "monthly" | "yearly"
       gender_type: "female" | "male"
       life_stage_type:
@@ -638,6 +751,7 @@ export const Constants = {
   public: {
     Enums: {
       account_type: ["independent", "dependent", "parent"],
+      asset_kind: ["stock", "gold", "silver", "real_estate"],
       billing_period: ["monthly", "yearly"],
       gender_type: ["female", "male"],
       life_stage_type: [
