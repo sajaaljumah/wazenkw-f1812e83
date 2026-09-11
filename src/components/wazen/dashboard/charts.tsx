@@ -149,6 +149,7 @@ export function IncomeVsExpensesCard({
   const { t } = useWazenLocale();
   const latest = series.at(-1);
   const latestNet = latest?.net ?? 0;
+  const { ref, revealed } = useReveal<HTMLDivElement>();
 
   return (
     <Panel title={t("incomeExpenses")}>
