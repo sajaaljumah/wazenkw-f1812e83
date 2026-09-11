@@ -120,6 +120,17 @@ const COPY = {
       "Your profile and family links are protected at the database level, not just in the interface.",
     pillarHabitsTitle: "Habits, not spreadsheets",
     pillarHabitsBody: "Gentle guidance and financial education that grows with you over time.",
+    futureEyebrow: "Planned for the future",
+    futureTitle: "Coming soon with Boubyan",
+    futureBody:
+      "Connect your eligible Boubyan accounts with Wazen to keep your financial information automatically up to date.",
+    futurePlanned: "Planned capabilities",
+    futureItem1: "Automatically import income and expenses from connected accounts.",
+    futureItem2: "Categorize your transactions.",
+    futureItem3: "Automatically update your financial overview and budget.",
+    futureItem4: "Reduce the need for manual transaction entry.",
+    futureDisclaimer:
+      "This is a planned future feature, subject to official bank integration and approval — not available today.",
 
     // auth
     welcomeBack: "Welcome back",
@@ -900,6 +911,16 @@ const COPY = {
     pillarPrivacyBody: "ملفك وروابط عائلتك محمية على مستوى قاعدة البيانات، وليس في الواجهة فقط.",
     pillarHabitsTitle: "عادات، لا جداول",
     pillarHabitsBody: "إرشاد لطيف وتعليم مالي ينمو معك مع الوقت.",
+    futureEyebrow: "مخطط للمستقبل",
+    futureTitle: "قريبًا مع بوبيان",
+    futureBody: "اربط حساباتك البنكية مع Wazen لتحديث معلوماتك المالية تلقائيًا.",
+    futurePlanned: "القدرات المخططة",
+    futureItem1: "استيراد الدخل والمصروفات تلقائيًا من حساباتك.",
+    futureItem2: "تصنيف معاملاتك المالية.",
+    futureItem3: "تحديث ملخصك المالي وميزانيتك تلقائيًا.",
+    futureItem4: "تقليل الحاجة إلى إدخال المعاملات يدويًا.",
+    futureDisclaimer:
+      "هذه ميزة مستقبلية مخططة، رهن بموافقة وتكامل بنكي رسمي — وغير متاحة اليوم.",
 
     // auth
     welcomeBack: "مرحباً بعودتك",
