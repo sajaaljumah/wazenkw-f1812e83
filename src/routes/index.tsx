@@ -50,15 +50,9 @@ function Landing() {
       </header>
 
       <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
-        <section className="relative grid min-h-[62vh] items-end border-b border-border py-14 sm:min-h-[68vh] sm:py-20">
-          <div className="absolute inset-y-0 end-0 hidden w-2/5 border-s border-border lg:block" aria-hidden="true">
-            <div className="grid h-full grid-cols-3">
-              <span className="border-e border-border/70" />
-              <span className="border-e border-border/70" />
-            </div>
-            <div className="absolute inset-x-0 top-1/3 border-t border-border/70" />
-            <div className="absolute inset-x-0 top-2/3 border-t border-border/70" />
-            <div className="absolute bottom-10 end-10 font-display text-8xl text-gold/25">W.</div>
+        <section className="relative grid items-center py-14 sm:py-20">
+          <div className="pointer-events-none absolute inset-y-6 end-0 hidden w-2/5 rounded-[2.5rem] bg-accent/60 lg:block" aria-hidden="true">
+            <div className="absolute bottom-12 end-12 font-display text-8xl font-extrabold text-primary/25">W.</div>
           </div>
           <div className="relative max-w-3xl wazen-enter">
           <p className="wazen-label">{t("landingEyebrow")}</p>
