@@ -1,4 +1,5 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode, type RefObject } from "react";
+import { useReveal } from "@/hooks/use-reveal";
 import {
   Dialog,
   DialogContent,
