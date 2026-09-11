@@ -58,7 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 to={to}
                 className={cn(
                   "relative flex h-[4.5rem] min-w-0 items-center gap-1.5 border-b-2 px-1 text-xs font-semibold transition-colors xl:gap-2 xl:text-sm",
-                  location.pathname === to
+                  isActive(to)
                     ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
@@ -107,14 +107,17 @@ export function AppShell({ children }: { children: ReactNode }) {
       </WazenLocaleProvider>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lifted backdrop-blur-xl sm:hidden" aria-label={t("mobileNav")}>
-        <div className="mx-auto grid max-w-md grid-cols-6 items-stretch">
+        <div
+          className="mx-auto grid max-w-md items-stretch"
+          style={{ gridTemplateColumns: `repeat(${nav.length}, minmax(0, 1fr))` }}
+        >
           {nav.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}
               className={cn(
                 "relative flex min-h-[4.25rem] min-w-0 flex-col items-center justify-center gap-1 px-0.5 py-2 text-center text-[0.625rem] font-semibold leading-tight transition-colors",
-                location.pathname === to
+                isActive(to)
                   ? "text-primary after:absolute after:top-0 after:h-0.5 after:w-8 after:rounded-full after:bg-primary"
                   : "text-muted-foreground",
               )}
