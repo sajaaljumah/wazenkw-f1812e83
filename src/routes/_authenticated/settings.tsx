@@ -11,17 +11,14 @@ import { applyTheme, cacheTheme } from "@/components/wazen/WazenTheme";
 import { PlanBadge } from "@/components/wazen/subscription/PlanBadge";
 import {
   ADULT_LIFE_STAGES,
-  CURRENCIES,
   DEFAULT_LANGUAGE,
-  GENDER_LABELS,
-  LANGUAGES,
-  LIFE_STAGE_LABELS,
   accountTypeFor,
   calculateAge,
   firstNameOf,
   lifeStageForAge,
   type LifeStage,
 } from "@/lib/wazen";
+import { useWazenLabels } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -38,6 +35,7 @@ function SettingsPage() {
   const { user } = useSession();
   const { data: profile, isLoading } = useProfile();
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
 
   const [fullName, setFullName] = useState("");
   const [lifeStage, setLifeStage] = useState<LifeStage | "">("");
@@ -146,13 +144,13 @@ function SettingsPage() {
           <Locked label={t("email")} value={user?.email ?? ""} />
           <div className="grid gap-5 sm:grid-cols-2">
             <Locked label={t("dateOfBirth")} value={profile.date_of_birth} />
-            <Locked label={t("gender")} value={GENDER_LABELS[profile.gender]} />
+            <Locked label={t("gender")} value={labels.gender(profile.gender)} />
           </div>
           <label className="block">
             <span className="wazen-label">{t("lifeStageField")}</span>
             {stageLocked ? (
               <div className="mt-2 rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground">
-                {LIFE_STAGE_LABELS[profile.life_stage]} — {t("stageFromAge")} ({age}).
+                {labels.lifeStage(profile.life_stage)} — {t("stageFromAge")} ({age}).
               </div>
             ) : (
               <select
@@ -162,7 +160,7 @@ function SettingsPage() {
               >
                 {ADULT_LIFE_STAGES.map((stage) => (
                   <option key={stage} value={stage}>
-                    {LIFE_STAGE_LABELS[stage]}
+                    {labels.lifeStage(stage)}
                   </option>
                 ))}
               </select>
@@ -181,7 +179,7 @@ function SettingsPage() {
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
             >
-              {LANGUAGES.map((l) => (
+              {labels.languageOptions.map((l) => (
                 <option key={l.value} value={l.value}>
                   {l.label}
                 </option>
@@ -195,7 +193,7 @@ function SettingsPage() {
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
             >
-              {CURRENCIES.map((c) => (
+              {labels.currencyOptions.map((c) => (
                 <option key={c.value} value={c.value}>
                   {c.label}
                 </option>
