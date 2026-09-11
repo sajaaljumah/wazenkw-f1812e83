@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import { useState } from "react";
+import { useReveal } from "@/hooks/use-reveal";
 import { CategoryChartIcon as CategoryIcon, TrendChartIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { EmptyState, Panel } from "./primitives";
 import { formatMoney, monthKeyOf, monthlySeries, spendingByCategory } from "@/lib/finance";
