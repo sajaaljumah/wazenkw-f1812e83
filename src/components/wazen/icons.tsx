@@ -32,7 +32,7 @@ import {
   Loader2,
   Lock,
   LogOut,
-  PiggyBank,
+  Coins,
   Plus,
   Receipt,
   RotateCcw,
@@ -78,7 +78,7 @@ export const AllowanceIcon = Banknote;
 
 // Planning
 export const BudgetIcon = Wallet;
-export const SavingsIcon = PiggyBank;
+export const SavingsIcon = Coins;
 export const GoalsIcon = Target;
 export const EmergencyFundIcon = ShieldCheck;
 export const ScheduledIcon = CalendarDays;
