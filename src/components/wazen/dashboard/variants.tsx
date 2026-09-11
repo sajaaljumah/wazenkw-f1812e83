@@ -9,8 +9,8 @@ import {
   formatMoney,
   inMonth,
   monthKey,
-  savedForGoal,
-  totalsFor,
+  nextDueDate, savedForGoal,
+  upcomingCashFlow, totalsFor,
 } from "@/lib/finance";
 import type { Budget, Goal, RecurringItem, Transaction } from "@/lib/finance";
 import type { FamilyMemberSummary } from "@/hooks/use-wazen-finance";
@@ -73,7 +73,18 @@ export function AdultDashboard({
 
 
       <InsightStrip icon={<AnalyticsIcon className="size-5" strokeWidth={ICON_STROKE} />} label={t("dashboardInsight")}>
-        {month.income >= month.expenses ? t("dashboardInsightHealthy") : t("dashboardInsightWatch")}
+        {budget && month.expenses > Number(budget.amount) ? (
+          <span className="text-destructive font-semibold">{t("overBudget")}</span>
+        ) : month.income >= month.expenses ? (
+          t("dashboardInsightHealthy")
+        ) : (
+          t("dashboardInsightWatch")
+        )}
+        {upcomingCashFlow(recurring, 7).length > 0 && (
+          <div className="mt-1 text-xs text-muted-foreground">
+            {t("comingUp")}: {upcomingCashFlow(recurring, 7)[0].name} ({formatMoney(upcomingCashFlow(recurring, 7)[0].amount, currency)})
+          </div>
+        )}
       </InsightStrip>
 
       <QuickActions userId={userId} currency={currency} goals={goals} />
@@ -139,7 +150,18 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
 
 
       <InsightStrip icon={<StudentIcon className="size-5" strokeWidth={ICON_STROKE} />} label={t("dashboardInsight")}>
-        {month.income >= month.expenses ? t("dashboardInsightHealthy") : t("dashboardInsightWatch")}
+        {budget && month.expenses > Number(budget.amount) ? (
+          <span className="text-destructive font-semibold">{t("overBudget")}</span>
+        ) : month.income >= month.expenses ? (
+          t("dashboardInsightHealthy")
+        ) : (
+          t("dashboardInsightWatch")
+        )}
+        {upcomingCashFlow(recurring, 7).length > 0 && (
+          <div className="mt-1 text-xs text-muted-foreground">
+            {t("comingUp")}: {upcomingCashFlow(recurring, 7)[0].name} ({formatMoney(upcomingCashFlow(recurring, 7)[0].amount, currency)})
+          </div>
+        )}
       </InsightStrip>
 
       <QuickActions userId={userId} currency={currency} goals={goals} actions={["expense", "saving", "give", "income", "goal"]} />
