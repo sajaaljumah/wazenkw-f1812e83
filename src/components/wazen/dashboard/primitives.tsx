@@ -267,15 +267,18 @@ export function ProgressBar({
   className?: string;
 }) {
   const percent = max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0;
+  const { ref, revealed } = useReveal<HTMLDivElement>();
   const [visiblePercent, setVisiblePercent] = useState(0);
   useEffect(() => {
+    if (!revealed) return;
     const frame = window.requestAnimationFrame(() => setVisiblePercent(percent));
     return () => window.cancelAnimationFrame(frame);
-  }, [percent]);
+  }, [percent, revealed]);
   const fill =
     tone === "sage" ? "bg-chart-2" : tone === "charcoal" ? "bg-primary" : "bg-gold";
   return (
     <div
+      ref={ref}
       className={cn("wazen-progress-track h-2 w-full overflow-hidden rounded-full bg-secondary", className)}
       data-complete={percent >= 100 ? "true" : undefined}
       role="progressbar"
