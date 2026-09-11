@@ -83,7 +83,7 @@ export function SpendingByCategoryCard({
                       className="h-full rounded-full transition-[width] duration-700 ease-out group-hover:opacity-90"
                       style={{
                         width: `${width}%`,
-                        background: `linear-gradient(90deg, ${color}, color-mix(in oklab, ${color} 62%, white))`,
+                        background: `linear-gradient(90deg, ${color}, color-mix(in oklab, ${color} 62%, var(--chart-fade)))`,
                       }}
                     />
                   </div>
