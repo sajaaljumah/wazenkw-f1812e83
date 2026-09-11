@@ -8,6 +8,12 @@
  */
 import {
   ArrowDownToLine,
+  ArrowUpRight,
+  ArrowDownRight,
+  Briefcase,
+  Building2,
+  Pencil,
+  Trash2,
   ArrowLeftRight,
   ArrowRight,
   ArrowUpFromLine,
@@ -90,6 +96,12 @@ export const AnalyticsIcon = ChartLine;
 export const CategoryChartIcon = ChartPie;
 export const TrendChartIcon = ChartColumn;
 export const InvestmentsIcon = ChartCandlestick;
+export const PortfolioIcon = Briefcase;
+export const StocksIcon = ChartCandlestick;
+export const MetalsIcon = Coins;
+export const PropertyIcon = Building2;
+export const GainIcon = ArrowUpRight;
+export const LossIcon = ArrowDownRight;
 
 // Engagement & plans
 export const ChallengesIcon = Flag;
@@ -105,3 +117,5 @@ export const CheckIcon = Check;
 export const AddIcon = Plus;
 export const ForwardIcon = ArrowRight;
 export const SpinnerIcon = Loader2;
+export const EditIcon = Pencil;
+export const DeleteIcon = Trash2;
