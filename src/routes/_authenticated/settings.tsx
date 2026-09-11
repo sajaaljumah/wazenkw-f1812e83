@@ -130,6 +130,23 @@ function SettingsPage() {
         <PlanBadge />
       </div>
 
+      <section className="mt-8 max-w-3xl divide-y divide-border border-y border-border">
+        <SettingsLink
+          to="/profile"
+          icon={ProfileIcon}
+          title={t("personalInformation")}
+          body={t("personalInformationBody")}
+          action={t("openLabel")}
+        />
+        <SettingsLink
+          to="/subscription"
+          icon={PremiumIcon}
+          title={t("subscriptionSection")}
+          body={t("subscriptionSectionBody")}
+          action={t("openLabel")}
+        />
+      </section>
+
       <section className="mt-8 max-w-3xl border-t border-border pt-7">
         <h2 className="text-xl">{t("account")}</h2>
         <div className="mt-6 space-y-5">
