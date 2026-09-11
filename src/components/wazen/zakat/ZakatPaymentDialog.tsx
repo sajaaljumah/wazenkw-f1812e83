@@ -63,7 +63,7 @@ export function ZakatPaymentDialog({
       toast.success(t("zakatPaymentSaved"));
       onClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
+      toast.error(error instanceof Error ? error.message : t("somethingWentWrong"));
     }
   }
 

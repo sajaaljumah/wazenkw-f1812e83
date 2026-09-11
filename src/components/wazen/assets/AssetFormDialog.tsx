@@ -111,7 +111,7 @@ export function AssetFormDialog({
       toast.success(t("assetSaved"));
       onClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
+      toast.error(error instanceof Error ? error.message : t("somethingWentWrong"));
     }
   }
 
