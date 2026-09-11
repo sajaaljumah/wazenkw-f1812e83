@@ -223,8 +223,14 @@ export function DisclosurePanel({
   defaultOpen?: boolean;
   className?: string;
 }) {
+  const { ref, revealed } = useReveal<HTMLDetailsElement>();
   return (
-    <details className={cn("wazen-disclosure group", className)} open={defaultOpen}>
+    <details
+      ref={ref}
+      data-revealed={revealed}
+      className={cn("wazen-disclosure wazen-reveal group", className)}
+      open={defaultOpen}
+    >
       <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-4 focus-visible:outline-hidden">
         <span className="min-w-0">
           <span className="block text-base font-semibold sm:text-lg">{title}</span>
