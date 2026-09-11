@@ -1,5 +1,6 @@
-import { AllowanceIcon, BudgetIcon, ExpensesIcon, FamilyIcon, GiveIcon, IncomeIcon, PremiumIcon, SavingsIcon, StudentIcon, ICON_STROKE } from "@/components/wazen/icons";
-import { BalanceHero, EmptyState, Panel, ProgressBar, StatCard, percentOf } from "./primitives";
+import { FamilyIcon, GiveIcon, PremiumIcon, StudentIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { BalanceHero, EmptyState, Panel, ProgressBar, percentOf } from "./primitives";
+
 import { BudgetCard, EmergencyFundCard, GoalsCard, RecentTransactionsCard, UpcomingCashFlowCard } from "./lists";
 import { IncomeVsExpensesCard, SavingsTrendCard, SpendingByCategoryCard } from "./charts";
 
