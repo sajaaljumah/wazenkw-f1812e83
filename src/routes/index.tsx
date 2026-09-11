@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnalyticsIcon, EmergencyFundIcon, FamilyIcon, ForwardIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { WazenMark } from "@/components/wazen/AppShell";
+import { WazenLogo } from "@/components/wazen/WazenLogo";
 import { LanguageToggle } from "@/components/wazen/LanguageToggle";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { Button } from "@/components/ui/button";
