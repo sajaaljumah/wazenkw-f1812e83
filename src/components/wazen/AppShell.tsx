@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { DashboardIcon, DocumentIcon, PortfolioIcon, ScheduledIcon, SettingsIcon, SignOutIcon, ZakatIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { DashboardIcon, DocumentIcon, LearnIcon, PortfolioIcon, ScheduledIcon, SettingsIcon, SignOutIcon, ZakatIcon, ICON_STROKE } from "@/components/wazen/icons";
 import type { ReactNode } from "react";
 import { useProfile, useSignOut } from "@/hooks/use-wazen-auth";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -15,6 +15,7 @@ import { ZakatNotificationBell } from "@/components/wazen/zakat/ZakatNotificatio
 // Core areas only. Account management (profile, subscription) lives in Settings.
 const NAV = [
   { to: "/dashboard", label: "overview", icon: DashboardIcon },
+  { to: "/learn", label: "learnNav", icon: LearnIcon, childrenOnly: true },
   { to: "/recurring", label: "recurringNav", icon: ScheduledIcon },
   { to: "/documents", label: "documentsNav", icon: DocumentIcon },
   { to: "/assets", label: "assets", icon: PortfolioIcon, adultsOnly: true },
@@ -32,7 +33,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { data: profile } = useProfile();
   const { t } = useWazenLocale();
   // Assets belong to independent adult accounts only.
-  const nav = NAV.filter((item) => !("adultsOnly" in item && item.adultsOnly) || canOwnAssets(profile?.life_stage));
+  const nav = NAV.filter(
+    (item) =>
+      (!("adultsOnly" in item && item.adultsOnly) || canOwnAssets(profile?.life_stage)) &&
+      // Learn is part of the child experience only.
+      (!("childrenOnly" in item && item.childrenOnly) || profile?.life_stage === "child"),
+  );
   // Account pages are reached from Settings, so they keep the Settings tab active.
   const SETTINGS_GROUP = ["/settings", "/profile", "/subscription"];
   const isActive = (to: string) =>
