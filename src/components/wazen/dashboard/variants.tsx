@@ -276,9 +276,57 @@ export function FamilySummaryCard({
           })}
         </ul>
       )}
+
+      {members.length > 0 ? (
+        <div className="mt-8 border-t border-border/70 pt-6">
+          <h3 className="text-lg">{t("parentPaidTitle")}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{t("parentPaidIntro")}</p>
+          {parentPaid.length === 0 ? (
+            <div className="mt-4">
+              <EmptyState
+                icon={<ReceiptIcon className="size-5" strokeWidth={ICON_STROKE} />}
+                title={t("noParentPaidRecorded")}
+                description={t("noParentPaidRecordedDescription")}
+              />
+            </div>
+          ) : (
+            <ul className="mt-4 divide-y divide-border/70">
+              {parentPaid.map((item) => (
+                <li key={item.id} className="flex items-center justify-between gap-4 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm">
+                      {item.merchant ?? item.category}
+                      <span className="ms-2 text-xs text-muted-foreground">
+                        {t("forFamilyMember")} {nameOf(item.beneficiary_user_id)}
+                      </span>
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {item.category} · {formatDate(item.occurred_on)}
+                      {item.payment_method ? ` · ${item.payment_method}` : ""}
+                      {item.deducted_from_child ? ` · ${t("deductFromChild")}` : ""}
+                    </p>
+                  </div>
+                  <p className="wazen-number shrink-0 text-sm">
+                    {formatMoney(Number(item.amount), item.currency)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : null}
     </Panel>
+
+    <ParentPaidExpenseDialog
+      open={dialogOpen}
+      onClose={() => setDialogOpen(false)}
+      members={members}
+      currency={currency}
+    />
+    </>
   );
 }
+
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
