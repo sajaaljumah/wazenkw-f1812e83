@@ -12,6 +12,7 @@ import { SpinnerIcon } from "@/components/wazen/icons";
 import { useSaveAsset } from "@/hooks/use-wazen-assets";
 import type { AssetInput } from "@/hooks/use-wazen-assets";
 import { ASSET_KINDS, unitOf } from "@/lib/assets";
+import { GOLD_PURITIES, HOLDING_PURPOSES } from "@/lib/zakat";
 import type { Asset, AssetKind } from "@/lib/assets";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 
@@ -49,6 +50,7 @@ export function AssetFormDialog({
   const [purity, setPurity] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [monthlyRent, setMonthlyRent] = useState("0");
+  const [holdingPurpose, setHoldingPurpose] = useState("");
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -63,6 +65,7 @@ export function AssetFormDialog({
     setPurity(asset?.purity ?? "");
     setPropertyType(asset?.property_type ?? "");
     setMonthlyRent(asset ? String(Number(asset.monthly_rent)) : "0");
+    setHoldingPurpose(asset?.holding_purpose ?? "");
     setNotes(asset?.notes ?? "");
   }, [open, asset]);
 
@@ -99,6 +102,7 @@ export function AssetFormDialog({
       purity: isMetal ? purity.trim() || null : null,
       property_type: isProperty ? propertyType.trim() || null : null,
       monthly_rent: isProperty ? Math.max(Number(monthlyRent) || 0, 0) : 0,
+      holding_purpose: holdingPurpose || null,
       notes: notes.trim() || null,
     };
 
@@ -167,9 +171,34 @@ export function AssetFormDialog({
 
           {isMetal ? (
             <Field label={t("purity")}>
-              <input className={inputClass} value={purity} onChange={(e) => setPurity(e.target.value)} placeholder="24k" />
+              {kind === "gold" ? (
+                <select className={inputClass} value={purity || "24K"} onChange={(e) => setPurity(e.target.value)}>
+                  {GOLD_PURITIES.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input className={inputClass} value={purity} onChange={(e) => setPurity(e.target.value)} placeholder="999" />
+              )}
             </Field>
           ) : null}
+
+          <Field label={t("holdingPurpose")}>
+            <select
+              className={inputClass}
+              value={holdingPurpose}
+              onChange={(e) => setHoldingPurpose(e.target.value)}
+            >
+              <option value="">—</option>
+              {HOLDING_PURPOSES.map((option) => (
+                <option key={option} value={option}>
+                  {t(`purpose_${option}` as "purpose_trade")}
+                </option>
+              ))}
+            </select>
+          </Field>
 
           <Field label={t("purchaseDate")}>
             <input
