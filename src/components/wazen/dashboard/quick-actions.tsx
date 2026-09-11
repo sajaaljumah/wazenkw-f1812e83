@@ -116,7 +116,7 @@ export function QuickActions({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="wazen-label">{t("moneyActions" as never)}</span>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-4 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {order.map((kind) => {
             const item = meta[kind];
             const Icon = item.icon;
@@ -140,7 +140,7 @@ export function QuickActions({
                 >
                   <Icon className="size-4" strokeWidth={ICON_STROKE} />
                 </span>
-                <span className="min-w-0 truncate text-sm font-medium">{item.label}</span>
+                 <span className="min-w-0 text-sm font-medium leading-tight">{item.label}</span>
               </button>
             );
           })}

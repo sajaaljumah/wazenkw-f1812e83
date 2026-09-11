@@ -105,7 +105,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </WazenLocaleProvider>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lifted backdrop-blur-xl sm:hidden" aria-label="Mobile navigation">
-        <div className="mx-auto grid max-w-md grid-cols-4 items-stretch">
+        <div className="mx-auto grid max-w-md grid-cols-6 items-stretch">
           {nav.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
