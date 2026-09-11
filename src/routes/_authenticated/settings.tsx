@@ -299,6 +299,35 @@ function SettingsPage() {
   );
 }
 
+function SettingsLink({
+  to,
+  icon: Icon,
+  title,
+  body,
+  action,
+}: {
+  to: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  title: string;
+  body: string;
+  action: string;
+}) {
+  return (
+    <Link
+      to={to}
+      className="flex items-center gap-4 px-1 py-5 transition-colors hover:bg-secondary/50"
+    >
+      <Icon className="size-5 shrink-0 text-primary" strokeWidth={ICON_STROKE} />
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-semibold">{title}</span>
+        <span className="mt-1 block text-xs text-muted-foreground">{body}</span>
+      </span>
+      <span className="shrink-0 text-xs font-semibold text-primary">{action}</span>
+    </Link>
+  );
+}
+
+
 function Locked({ label, value }: { label: string; value: string }) {
   return (
     <div>
