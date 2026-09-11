@@ -71,37 +71,6 @@ export function AdultDashboard({
         ]}
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard
-          label={t("incomeMonth")}
-          amount={month.income}
-          currency={currency}
-          tone="positive"
-          icon={<IncomeIcon className="size-4" strokeWidth={ICON_STROKE} />}
-        />
-        <StatCard
-          label={t("expensesMonth")}
-          amount={month.expenses}
-          currency={currency}
-          hint={t("refundsHint")}
-          icon={<ExpensesIcon className="size-4" strokeWidth={ICON_STROKE} />}
-        />
-        <StatCard
-          label={t("totalSavings")}
-          amount={savedTotal}
-          currency={currency}
-          tone="gold"
-          hint={t("goalsHint")}
-          icon={<SavingsIcon className="size-4" strokeWidth={ICON_STROKE} />}
-        />
-        <StatCard
-          label={t("availableMoney")}
-          amount={all.net}
-          currency={currency}
-          tone={all.net >= 0 ? "neutral" : "negative"}
-          icon={<BudgetIcon className="size-4" strokeWidth={ICON_STROKE} />}
-        />
-      </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
         <BudgetCard budget={budget ? Number(budget.amount) : null} spent={month.expenses} currency={currency} />
@@ -168,12 +137,6 @@ export function TeenagerDashboard({ data }: { data: DashboardData }) {
         ]}
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard label={t("moneyAvailable")} amount={all.net} currency={currency} icon={<BudgetIcon className="size-4" strokeWidth={ICON_STROKE} />} />
-        <StatCard label={t("allowanceMonth")} amount={allowance} currency={currency} tone="positive" icon={<AllowanceIcon className="size-4" strokeWidth={ICON_STROKE} />} />
-        <StatCard label={t("spentMonth")} amount={month.expenses} currency={currency} icon={<ExpensesIcon className="size-4" strokeWidth={ICON_STROKE} />} />
-        <StatCard label={t("savedSoFar")} amount={all.savings} currency={currency} tone="gold" icon={<SavingsIcon className="size-4" strokeWidth={ICON_STROKE} />} />
-      </div>
 
       <SavingsTrendCard transactions={transactions} currency={currency} title={t("savedSoFar")} />
 
