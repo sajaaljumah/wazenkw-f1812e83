@@ -83,6 +83,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {profile ? (
               <Link
                 to="/profile"
+                data-tour="profile"
                 title={`${firstNameOf(profile.full_name)} — ${t("viewProfileTitle")}`}
                 className="wazen-interactive rounded-full outline-hidden hover:wazen-interactive-hover focus-visible:ring-2 focus-visible:ring-ring/60"
               >
@@ -102,17 +103,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               title={t("signOut")}
               aria-label={t("signOut")}
             >
-              <SignOutIcon className="size-4" strokeWidth={ICON_STROKE} />
+              <SignOutIcon className="size-4 rtl:-scale-x-100" strokeWidth={ICON_STROKE} />
             </Button>
           </div>
         </div>
       </header>
 
       <WazenLocaleProvider language={profile?.language}>
-        <main className="mx-auto max-w-6xl px-3 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-6 min-[375px]:px-4 sm:px-6 sm:pb-14 sm:pt-9 lg:px-8">{children}</main>
+        <main className="mx-auto max-w-6xl px-3 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-6 min-[375px]:px-4 sm:px-6 sm:pt-9 lg:px-8 lg:pb-14">{children}</main>
       </WazenLocaleProvider>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lifted backdrop-blur-xl sm:hidden" aria-label={t("mobileNav")}>
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lifted backdrop-blur-xl lg:hidden" aria-label={t("mobileNav")}>
         <div
           className="mx-auto grid max-w-md items-stretch"
           style={{ gridTemplateColumns: `repeat(${nav.length}, minmax(0, 1fr))` }}
@@ -124,7 +125,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               className={cn(
                 "relative flex min-h-[4.25rem] min-w-0 flex-col items-center justify-center gap-1 px-0.5 py-2 text-center text-[0.625rem] font-semibold leading-tight transition-colors",
                 isActive(to)
-                  ? "text-primary after:absolute after:top-0 after:h-0.5 after:w-8 after:rounded-full after:bg-primary"
+                  ? "bg-primary/5 text-primary after:absolute after:left-1/2 after:top-0 after:h-0.5 after:w-8 after:-translate-x-1/2 after:rounded-full after:bg-primary"
                   : "text-muted-foreground",
               )}
             >
