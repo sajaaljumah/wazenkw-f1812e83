@@ -182,8 +182,9 @@ export function JourneySection({
   className?: string;
   id?: string;
 }) {
+  const { ref, revealed } = useReveal<HTMLElement>();
   return (
-    <section id={id} className={cn("wazen-journey", className)}>
+    <section ref={ref} id={id} data-revealed={revealed} className={cn("wazen-journey wazen-reveal", className)}>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
         <div className="min-w-0">
           {eyebrow ? <p className="wazen-label wazen-journey-eyebrow">{eyebrow}</p> : null}
