@@ -86,14 +86,28 @@ export function ThemeSync() {
   useEffect(() => {
     if (loading) return;
     if (!userId) {
-      applyTheme("light");
+      // Signed out: honour the choice made on the public screens, else light.
+      applyTheme(readGuestTheme() ?? "light");
       return;
     }
-    applyTheme(readCachedTheme(userId) ?? "light");
+    applyTheme(readCachedTheme(userId) ?? readGuestTheme() ?? "light");
   }, [userId, loading]);
+
+  // A visitor who picked a theme before signing in keeps it inside the app,
+  // and it becomes that account's saved preference.
+  useEffect(() => {
+    if (!userId) return;
+    const guest = readGuestTheme();
+    if (!guest) return;
+    clearGuestTheme();
+    cacheTheme(userId, guest);
+    applyTheme(guest);
+    void supabase.from("profiles").update({ theme: guest }).eq("id", userId);
+  }, [userId]);
 
   useEffect(() => {
     if (!userId || !profileTheme) return;
+    if (readGuestTheme()) return;
     cacheTheme(userId, profileTheme);
     applyTheme(profileTheme);
   }, [userId, profileTheme]);
