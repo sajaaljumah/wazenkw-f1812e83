@@ -79,7 +79,7 @@ export function SpendingByCategoryCard({
             </span>
             <span className="wazen-number text-lg">{formatMoney(total, currency)}</span>
           </div>
-          <ul className="space-y-4">
+          <ul ref={ref} className="space-y-4">
             {slices.map((slice, index) => {
               const share = total > 0 ? Math.round((slice.amount / total) * 100) : 0;
               const width = max > 0 ? Math.max((slice.amount / max) * 100, 3) : 0;
