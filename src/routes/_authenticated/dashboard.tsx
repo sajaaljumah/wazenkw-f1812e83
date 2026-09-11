@@ -26,6 +26,7 @@ import { formatToday } from "@/lib/finance";
 import { firstNameOf } from "@/lib/wazen";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { FirstUseWalkthrough } from "@/components/wazen/FirstUseWalkthrough";
+import { isDemoAccount } from "@/lib/demo-accounts";
 import { JourneySection } from "@/components/wazen/dashboard/primitives";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -118,7 +119,7 @@ function Dashboard() {
     <AppShell>
       <FirstUseWalkthrough
         userId={user.id}
-        eligible={user.user_metadata?.["wazen_walkthrough_eligible"] === true}
+        isDemo={isDemoAccount(user.email)}
         lifeStage={profile.life_stage}
       />
       <div className={`space-y-8 wazen-enter ${profile.life_stage === "teenager" ? "stage-teen" : profile.life_stage === "university_student" ? "stage-university" : ""}`}>
