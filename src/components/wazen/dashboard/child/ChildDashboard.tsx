@@ -27,6 +27,7 @@ import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { useWazenLabels } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { useParentPaidForMe } from "@/hooks/use-wazen-finance";
+import { useReveal } from "@/hooks/use-reveal";
 
 type ActionKind = "income" | "expense" | "saving" | "give" | "goal";
 type Sheet = "spend" | "give" | "goal" | null;
