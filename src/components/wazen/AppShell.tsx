@@ -99,7 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <main className="mx-auto max-w-6xl px-4 pb-28 pt-7 sm:px-6 sm:pb-14 sm:pt-10 lg:px-8">{children}</main>
       </WazenLocaleProvider>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/96 pb-[env(safe-area-inset-bottom)] backdrop-blur-md sm:hidden" aria-label="Mobile navigation">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-lifted backdrop-blur-xl sm:hidden" aria-label="Mobile navigation">
         <div className="mx-auto flex max-w-md items-stretch justify-around">
           {NAV.map(({ to, label, icon: Icon }) => (
             <Link
