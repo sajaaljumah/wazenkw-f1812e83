@@ -476,27 +476,29 @@ html[dir="rtl"] .wazen-chart-row[data-active="true"] {
 /* Scroll reveal: direction-agnostic (translateY only), so RTL and LTR match. */
 @utility wazen-reveal {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 520ms ease-out, transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 640ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
   &[data-revealed="true"] {
     opacity: 1;
-    transform: none;
+    transform: translate3d(0, 0, 0);
     will-change: auto;
   }
 }
 
 /* A restrained cascade for repeated content inside a section. */
-.wazen-reveal[data-revealed="true"] > :where(ul, ol, div) > :nth-child(2) {
-  transition-delay: 45ms;
+.wazen-reveal[data-revealed="true"] > :where(ul, ol, div) > :where(.wazen-card, .wazen-stat, li):nth-child(2) {
+  transition-delay: 70ms;
 }
 
-.wazen-reveal[data-revealed="true"] > :where(ul, ol, div) > :nth-child(3) {
-  transition-delay: 90ms;
+.wazen-reveal[data-revealed="true"] > :where(ul, ol, div) > :where(.wazen-card, .wazen-stat, li):nth-child(3) {
+  transition-delay: 140ms;
 }
 
-.wazen-reveal[data-revealed="true"] > :where(ul, ol, div) > :nth-child(n + 4) {
-  transition-delay: 135ms;
+.wazen-reveal[data-revealed="true"] > :where(ul, ol, div) > :where(.wazen-card, .wazen-stat, li):nth-child(n + 4) {
+  transition-delay: 210ms;
 }
 
 /* Soft editorial wash used behind greeting/hero content. */

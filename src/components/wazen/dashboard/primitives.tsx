@@ -23,10 +23,8 @@ export function DashboardHeader({
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t("goodMorning") : hour < 18 ? t("goodAfternoon") : t("goodEvening");
   return (
-    <section className="wazen-masthead relative overflow-hidden" data-tour="welcome">
-      {/* Quiet editorial wash keeps the greeting from reading as another generic card. */}
-      <div aria-hidden className="wazen-hero-wash" />
-      <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center">
+    <section className="wazen-masthead" data-tour="welcome">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
         {avatar ? <div className="shrink-0">{avatar}</div> : null}
         <div className="min-w-0">
           <p className="wazen-label">{today} · {eyebrow}</p>
@@ -60,8 +58,9 @@ export function BalanceHero({
   items: { label: string; amount: number; tone?: "positive" | "negative" | "gold" | "neutral" }[];
   action?: ReactNode;
 }) {
+  const { ref, revealed } = useReveal<HTMLElement>();
   return (
-    <section className="wazen-balance" data-tour="balance">
+    <section ref={ref} data-revealed={revealed} className="wazen-balance wazen-reveal" data-tour="balance">
       <div aria-hidden className="wazen-balance-grid" />
       <div className="relative grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] xl:items-end">
         <div className="min-w-0">
@@ -199,8 +198,9 @@ export function JourneySection({
 }
 
 export function InsightStrip({ icon, label, children }: { icon?: ReactNode; label: string; children: ReactNode }) {
+  const { ref, revealed } = useReveal<HTMLElement>();
   return (
-    <aside className="wazen-insight" aria-label={label}>
+    <aside ref={ref} data-revealed={revealed} className="wazen-insight wazen-reveal" aria-label={label}>
       {icon ? <span className="shrink-0 text-primary">{icon}</span> : null}
       <div className="min-w-0">
         <p className="wazen-label">{label}</p>
