@@ -128,6 +128,13 @@
   --avatar-adult-accent: oklch(0.28 0.012 30);
   --logo-plate: transparent;
   --chart-fade: oklch(1 0 0);
+  /* Child experience — "Playful Luxury": soft pastel surfaces, champagne accents. */
+  --kid-ivory: oklch(0.992 0.002 85);
+  --kid-tint: oklch(0.965 0.006 85);
+  --kid-soft: oklch(0.925 0.018 82);
+  --kid-mid: oklch(0.78 0.045 78);
+  --kid-deep: oklch(0.32 0.012 30);
+  --kid-champagne: oklch(0.72 0.075 78);
 }
 
 .dark {
