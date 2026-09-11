@@ -370,7 +370,7 @@ export function ChildDashboard({
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm">
-                      {t(ACTIVITY_KEY[item.kind])} — {item.merchant ?? labels.category(item.category)}
+                      {t(ACTIVITY_KEY[item.kind])} — {labels.merchant(item.merchant) || labels.category(item.category)}
                     </span>
                     <span className="block text-xs text-muted-foreground">{formatDate(item.occurred_on)}</span>
                   </span>
@@ -399,7 +399,7 @@ export function ChildDashboard({
                   <GiveIcon className="size-5" strokeWidth={ICON_STROKE} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm">{item.merchant ?? item.category}</span>
+                  <span className="block truncate text-sm">{labels.merchant(item.merchant) || labels.category(item.category)}</span>
                   <span className="block text-xs text-muted-foreground">
                     {formatDate(item.occurred_on)} ·{" "}
                     {item.deducted_from_child ? t("kidFromYourMoney") : t("kidFamilyPaid")}
@@ -499,6 +499,7 @@ function SpendSheet({
   onAddExpense: () => void;
 }) {
   const { t } = useWazenLocale();
+  const labels = useWazenLabels();
   const spending = transactions.filter((item) => item.kind === "expense");
   return (
     <SheetShell open={open} onClose={onClose} title={t("kidSpendSheetTitle")} description={t("kidSpendSheetBody")}>
@@ -510,7 +511,7 @@ function SpendSheet({
             <li key={item.id} className="flex items-center justify-between gap-3 rounded-2xl bg-secondary/50 px-4 py-3 text-sm">
               <span className="flex min-w-0 items-center gap-2">
                 <ExpensesIcon className="size-4 shrink-0 text-muted-foreground" strokeWidth={ICON_STROKE} />
-                <span className="truncate">{item.merchant ?? item.category}</span>
+                <span className="truncate">{labels.merchant(item.merchant) || labels.category(item.category)}</span>
               </span>
               <span className="shrink-0 tabular-nums">{formatMoney(Number(item.amount), currency)}</span>
             </li>

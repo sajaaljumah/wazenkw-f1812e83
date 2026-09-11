@@ -191,6 +191,23 @@ export function useWazenLabels() {
     transfer: "تحويل",
     "savings transfer": "تحويل ادخاري",
     investments: "استثمارات",
+    clothes: "ملابس",
+    housing: "سكن",
+    mobile: "هاتف",
+    coffee: "قهوة",
+    snacks: "وجبات خفيفة",
+    groceriesandsnacks: "بقالة ووجبات خفيفة",
+    freelance: "عمل حر",
+    marketing: "تسويق",
+    software: "برامج",
+    equipment: "أجهزة ومعدات",
+    electronics: "إلكترونيات",
+    stipend: "مكافأة طلابية",
+    bonus: "مكافأة",
+    games: "ألعاب",
+    toys: "ألعاب أطفال",
+    "part-time work": "عمل جزئي",
+    "part time work": "عمل جزئي",
     other: "أخرى",
   };
 
@@ -198,6 +215,55 @@ export function useWazenLabels() {
     if (!name) return "";
     if (language !== "ar") return name;
     return CATEGORY_AR[name.trim().toLowerCase()] ?? name;
+  };
+
+  /**
+   * Generic seeded merchant descriptions ("Employer", "Landlord") read as stray
+   * English inside the Arabic app. Real brand names and anything the user typed
+   * are always left exactly as stored.
+   */
+  const MERCHANT_AR: Record<string, string> = {
+    family: "العائلة",
+    "family gift": "هدية من العائلة",
+    transfer: "تحويل",
+    employer: "جهة العمل",
+    landlord: "المالك",
+    clinic: "عيادة",
+    bookstore: "مكتبة",
+    "university bookstore": "مكتبة الجامعة",
+    school: "المدرسة",
+    "school canteen": "مقصف المدرسة",
+    "school charity box": "صندوق تبرعات المدرسة",
+    "student charity drive": "حملة تبرعات طلابية",
+    university: "الجامعة",
+    "campus job": "عمل في الجامعة",
+    fuel: "وقود",
+    "fuel & school run": "وقود وتوصيل المدرسة",
+    taxi: "تاكسي",
+    gym: "النادي الرياضي",
+    supplier: "المورد",
+    cinema: "السينما",
+    "studio rent": "إيجار الاستوديو",
+    "toy shop": "متجر ألعاب",
+    "app store": "متجر التطبيقات",
+    "instagram ads": "إعلانات إنستغرام",
+    "q8 station": "محطة كي أو 8",
+    "kuwait zakat house": "بيت الزكاة الكويتي",
+    "kuwait food bank": "بنك الطعام الكويتي",
+    "direct aid": "العون المباشر",
+    "swimming lessons": "دروس سباحة",
+    "tutoring — mathematics": "دروس رياضيات",
+    "zain top-up": "تعبئة زين",
+    "client 1": "عميل ١",
+    "client 2": "عميل ٢",
+    "client 3": "عميل ٣",
+    "client 4": "عميل ٤",
+  };
+
+  const merchant = (name: string | null | undefined): string => {
+    if (!name) return "";
+    if (language !== "ar") return name;
+    return MERCHANT_AR[name.trim().toLowerCase()] ?? name;
   };
 
   /** Demo picker notes are stored as codes so both languages read naturally. */
@@ -214,6 +280,7 @@ export function useWazenLabels() {
 
   return {
     category,
+    merchant,
     lifeStage,
     gender,
     accountType,

@@ -93,7 +93,7 @@ export function RecentTransactionsCard({
                   <Icon className="size-4" strokeWidth={ICON_STROKE} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm">{t.merchant || labels.category(t.category)}</p>
+                  <p className="truncate text-sm">{labels.merchant(t.merchant) || labels.category(t.category)}</p>
                   <p className="mt-0.5 truncate text-xs text-muted-foreground">
                     {labels.transactionKind(t.kind)} · {labels.category(t.category)} · {formatDate(t.occurred_on)}
                   </p>
