@@ -22,6 +22,7 @@ import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { PortfolioSummaryCard } from "@/components/wazen/assets/PortfolioSummaryCard";
 import { ParentPaidCard } from "@/components/wazen/family/ParentPaidCard";
 import { ParentPaidExpenseDialog } from "@/components/wazen/family/ParentPaidExpenseDialog";
+import { AddChildDialog } from "@/components/wazen/family/AddChildDialog";
 import { useAssets } from "@/hooks/use-wazen-assets";
 import { useParentPaidForMe } from "@/hooks/use-wazen-finance";
 import { AddIcon, ReceiptIcon } from "@/components/wazen/icons";
@@ -214,9 +215,10 @@ export function FamilySummaryCard({
   /** The parent's own transactions — used to list parent-paid expenses. */
   transactions?: Transaction[];
 }) {
-  const { t } = useWazenLocale();
+  const { t, isArabic } = useWazenLocale();
   const labels = useWazenLabels();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [addChildOpen, setAddChildOpen] = useState(false);
   const parentPaid = transactions
     .filter((item) => item.paid_by_parent && item.beneficiary_user_id && item.beneficiary_user_id !== item.user_id)
     .slice(0, 8);
@@ -230,23 +232,37 @@ export function FamilySummaryCard({
     <Panel
       title={t("familySummary")}
       action={
-        members.length > 0 ? (
-          <Button size="sm" onClick={() => setDialogOpen(true)}>
-            <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
-            {t("addExpenseForChild")}
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => setAddChildOpen(true)}>
+            <FamilyIcon className="size-4 me-1.5" strokeWidth={ICON_STROKE} />
+            {isArabic ? "إضافة طفل" : "Add Child"}
           </Button>
-        ) : null
+          {members.length > 0 ? (
+            <Button size="sm" onClick={() => setDialogOpen(true)}>
+              <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
+              {t("addExpenseForChild")}
+            </Button>
+          ) : null}
+        </div>
       }
     >
       {isLoading ? (
 
         <p className="text-sm text-muted-foreground">{t("loadingFamily")}</p>
       ) : members.length === 0 ? (
-        <EmptyState
-          icon={<FamilyIcon className="size-5" strokeWidth={ICON_STROKE} />}
-          title={t("noFamily")}
-          description={t("noFamilyDescription")}
-        />
+        <div className="space-y-4">
+          <EmptyState
+            icon={<FamilyIcon className="size-5" strokeWidth={ICON_STROKE} />}
+            title={t("noFamily")}
+            description={t("noFamilyDescription")}
+          />
+          <div className="flex justify-center pb-2">
+            <Button size="sm" onClick={() => setAddChildOpen(true)}>
+              <FamilyIcon className="size-4 me-1.5" strokeWidth={ICON_STROKE} />
+              {isArabic ? "إضافة أول طفل إلى العائلة" : "Add First Child to Family"}
+            </Button>
+          </div>
+        </div>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {members.map(({ profile, canFund, canMonitor, transactions, goals }) => {
@@ -342,6 +358,10 @@ export function FamilySummaryCard({
       onClose={() => setDialogOpen(false)}
       members={members}
       currency={currency}
+    />
+    <AddChildDialog
+      open={addChildOpen}
+      onOpenChange={setAddChildOpen}
     />
     </>
   );

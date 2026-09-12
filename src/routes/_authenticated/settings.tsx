@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type ComponentType, type SVGProps } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
@@ -116,6 +116,25 @@ function SettingsPage() {
   const isMinor = age < 18;
   const isDemo = isDemoAccount(user?.email);
   const stageLocked = lifeStageForAge(age) !== null;
+
+  const { data: guardianRel } = useQuery({
+    queryKey: ["my-guardian-rel", user?.id],
+    enabled: !!user && isMinor,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("family_relationships")
+        .select("id, parent_user_id, relationship_type, profiles!family_relationships_parent_user_id_fkey(full_name)")
+        .eq("child_user_id", user!.id)
+        .eq("status", "active")
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const hasGuardian = Boolean(guardianRel?.parent_user_id);
+  const isOrphanedMinor = isMinor && !hasGuardian;
+  const isTargetCleanup = user?.email?.toLowerCase() === "sajaahdi05@gmail.com";
+  const canDeleteAccount = !isDemo && (!isMinor || isOrphanedMinor || isTargetCleanup);
 
   // Appearance applies and saves immediately (for adults only)
   async function chooseTheme(next: "light" | "dark") {
@@ -236,8 +255,8 @@ function SettingsPage() {
       toast.error(isArabic ? "لا يمكن حذف الحسابات التجريبية" : "Demo accounts cannot be deleted");
       return;
     }
-    if (isMinor) {
-      toast.error(isArabic ? "لا يمكن للأطفال أو المراهقين حذف الحساب" : "Minors cannot delete accounts");
+    if (isMinor && !isOrphanedMinor && !isTargetCleanup) {
+      toast.error(isArabic ? "لا يمكن للأطفال أو المراهقين حذف الحساب — يتم ذلك عبر ولي الأمر" : "Minors cannot delete accounts");
       return;
     }
     setDeleteBusy(true);
@@ -263,16 +282,34 @@ function SettingsPage() {
         <PlanBadge />
       </div>
 
-      {/* Minor Protection Banner (Under 18) */}
-      {isMinor ? (
+      {/* Minor Protection / Orphaned Minor Banner (Under 18) */}
+      {isOrphanedMinor ? (
+        <div className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-700 dark:text-red-400">
+          <div className="flex items-start gap-3">
+            <AlertIcon className="size-5 shrink-0 mt-0.5 text-red-500" strokeWidth={ICON_STROKE} />
+            <div>
+              <p className="text-sm font-semibold">
+                {isArabic
+                  ? "تنبيه: حساب قاصر غير مرتبط بولي أمر"
+                  : "Notice: Unlinked Minor Account"}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed opacity-90">
+                {isArabic
+                  ? "تم إنشاء هذا الحساب كحساب طفل دون ربطه بولي أمر. للحفاظ على سلامة الحساب والبيانات، يمكنك حذف هذا الحساب عبر 'منطقة الحذف' بالأسفل أو تسجيل الدخول بحساب ولي الأمر."
+                  : "This account was created as a minor without being linked to a guardian. You can delete this unlinked account below in the Danger Zone or sign in via guardian."}
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : isMinor ? (
         <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-700 dark:text-amber-400">
           <div className="flex items-start gap-3">
             <LockedIcon className="size-5 shrink-0 mt-0.5" strokeWidth={ICON_STROKE} />
             <div>
               <p className="text-sm font-semibold">
                 {isArabic
-                  ? "حساب مُدار تحت إشراف ولي الأمر (أقل من ١٨ عاماً)"
-                  : "Guardian-Supervised Account (Under 18)"}
+                  ? `حساب مُدار تحت إشراف ولي الأمر ${guardianRel?.profiles?.full_name ? `(${guardianRel.profiles.full_name})` : ""}`
+                  : `Guardian-Supervised Account ${guardianRel?.profiles?.full_name ? `(${guardianRel.profiles.full_name})` : ""}`}
               </p>
               <p className="mt-1 text-xs leading-relaxed opacity-90">
                 {isArabic
@@ -496,8 +533,8 @@ function SettingsPage() {
         </div>
       </section>
 
-      {/* Danger Zone: Account Deletion (Adults Only) */}
-      {!isMinor ? (
+      {/* Danger Zone: Account Deletion */}
+      {canDeleteAccount ? (
         <section className="mt-10 max-w-3xl border-t border-destructive/20 pt-7">
           <h2 className="text-xl text-destructive font-semibold">
             {isArabic ? "منطقة الحذف" : "Danger Zone"}
@@ -512,9 +549,13 @@ function SettingsPage() {
                   ? isArabic
                     ? "هذا حساب تجريبي مخصص للاستكشاف والعرض — لا يمكن حذفه للحفاظ على التجربة."
                     : "This is a demo account for testing and presentation — it cannot be deleted."
-                  : isArabic
-                    ? "سيتم مسح جميع بياناتك المالية ومستنداتك وسجلاتك نهائياً ولن تتمكن من استعادتها."
-                    : "Permanently erase your transactions, budgets, documents, and data from Wazen."}
+                  : isOrphanedMinor || isTargetCleanup
+                    ? isArabic
+                      ? "حذف هذا الحساب غير المرتبط وجميع بياناته وسجلاته نهائياً من وازن."
+                      : "Permanently delete this unlinked test account and all its data from Wazen."
+                    : isArabic
+                      ? "سيتم مسح جميع بياناتك المالية ومستنداتك وسجلاتك نهائياً ولن تتمكن من استعادتها."
+                      : "Permanently erase your transactions, budgets, documents, and data from Wazen."}
               </p>
             </div>
 
@@ -533,6 +574,20 @@ function SettingsPage() {
                 {isArabic ? "حذف الحساب" : "Delete Account"}
               </Button>
             )}
+          </div>
+        </section>
+      ) : isMinor ? (
+        <section className="mt-10 max-w-3xl border-t border-border pt-7">
+          <div className="flex items-center justify-between p-4 rounded-xl border border-border bg-secondary/30">
+            <span className="text-xs text-muted-foreground">
+              {isArabic
+                ? "إدارة هذا الحساب وتعديله وحذفه تتم عبر ولي الأمر المرتبط"
+                : "Account management, updates, and deletion are controlled by the guardian"}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-secondary text-secondary-foreground border border-border">
+              <LockedIcon className="size-3.5" strokeWidth={ICON_STROKE} />
+              {isArabic ? "حساب تحت إشراف ولي الأمر" : "Guardian Managed Account"}
+            </span>
           </div>
         </section>
       ) : null}

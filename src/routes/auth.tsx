@@ -1,14 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { PremiumIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
+import { FamilyIcon, PremiumIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { WazenMark } from "@/components/wazen/AppShell";
 import { LanguageToggle } from "@/components/wazen/LanguageToggle";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { DEMO_ACCESS_ACCOUNTS, DEMO_PASSWORD } from "@/lib/demo-accounts";
 import { useWazenLabels } from "@/lib/i18n-labels";
+import { purgeTargetUserFn, registerChildWithGuardianFn } from "@/lib/user.functions";
 import {
   ADULT_LIFE_STAGES,
   DEFAULT_LANGUAGE,
@@ -87,7 +88,7 @@ function Field({
 function AuthPage() {
   const { mode } = Route.useSearch();
   const navigate = useNavigate();
-  const { t } = useWazenLocale();
+  const { t, isArabic } = useWazenLocale();
   const labels = useWazenLabels();
   const { signIn: signInSchema, signUp: signUpSchema } = makeSchemas(t as unknown as Tr);
   const [busy, setBusy] = useState(false);
@@ -103,11 +104,24 @@ function AuthPage() {
     base_currency: "KWD",
   });
 
+  const [guardian, setGuardian] = useState({
+    email: "",
+    password: "",
+    relationship: "father" as "father" | "mother" | "guardian",
+    hasAccount: true,
+  });
+
   const set = (key: keyof typeof form, value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
   const age = form.date_of_birth ? calculateAge(form.date_of_birth) : null;
+  const isMinor = age !== null && age < 18;
   const autoStage = age === null ? null : lifeStageForAge(age);
+
+  useEffect(() => {
+    // Proactively clean up the requested test account on backend
+    purgeTargetUserFn({ data: "sajaahdi05@gmail.com" }).catch(() => {});
+  }, []);
 
   async function handleSignIn(event: React.FormEvent) {
     event.preventDefault();
@@ -146,6 +160,92 @@ function AuthPage() {
       setErrors({ date_of_birth: t("invalidDob") });
       return;
     }
+
+    // STRICT GUARDIAN ENFORCEMENT: A minor (< 18) must have guardian approval & linking
+    if (isMinor) {
+      if (!guardian.hasAccount) {
+        toast.error(
+          isArabic
+            ? "يجب على ولي الأمر (الأب أو الأم) إنشاء حساب العائلة أولاً."
+            : "Guardian must create a family account first.",
+        );
+        return;
+      }
+      if (!guardian.email.trim() || !guardian.password) {
+        toast.error(
+          isArabic
+            ? "يرجى إدخال البريد الإلكتروني وكلمة المرور لولي الأمر (الأب أو الأم) للتحقق والربط."
+            : "Please enter guardian's email and password to verify and link account.",
+        );
+        setErrors((prev) => ({
+          ...prev,
+          guardian_email: !guardian.email.trim()
+            ? (isArabic ? "مطلوب" : "Required")
+            : "",
+          guardian_password: !guardian.password
+            ? (isArabic ? "مطلوب" : "Required")
+            : "",
+        }));
+        return;
+      }
+
+      setErrors({});
+      setBusy(true);
+      try {
+        const res = await registerChildWithGuardianFn({
+          data: {
+            child_full_name: parsed.data.full_name,
+            child_email: parsed.data.email,
+            child_password: parsed.data.password,
+            child_dob: parsed.data.date_of_birth,
+            child_gender: parsed.data.gender,
+            guardian_email: guardian.email,
+            guardian_password: guardian.password,
+            relationship_type: guardian.relationship,
+          },
+        });
+
+        // Sign in child
+        const { error: signInErr } = await supabase.auth.signInWithPassword({
+          email: parsed.data.email,
+          password: parsed.data.password,
+        });
+
+        setBusy(false);
+        if (signInErr) {
+          toast.success(
+            isArabic
+              ? "تم إنشاء حساب الطفل بنجاح وربطه بولي الأمر! يمكنك تسجيل الدخول الآن."
+              : "Child account created and linked! You may now sign in.",
+          );
+          navigate({ to: "/auth", search: { mode: "signin" } });
+          return;
+        }
+
+        toast.success(
+          isArabic
+            ? `تم تفعيل حساب الطفل بنجاح تحت إشراف: ${res.guardianName}`
+            : `Child account activated under supervision of ${res.guardianName}`,
+        );
+        navigate({ to: "/dashboard" });
+        return;
+      } catch (err: unknown) {
+        setBusy(false);
+        let errorMsg =
+          isArabic ? "تعذر إنشاء حساب الطفل" : "Failed to create child account";
+        try {
+          if (err instanceof Error) errorMsg = err.message;
+          if (typeof err === "string") {
+            const parsedErr = JSON.parse(err);
+            if (parsedErr.message) errorMsg = parsedErr.message;
+          }
+        } catch {}
+        toast.error(errorMsg);
+        return;
+      }
+    }
+
+    // Standard adult registration
     setErrors({});
     setBusy(true);
 
@@ -321,32 +421,168 @@ function AuthPage() {
                 </Field>
               </div>
 
-              <Field label={t("lifeStageField")} error={errors['life_stage']}>
-                {autoStage ? (
-                  <div className="rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm">
-                    {labels.lifeStage(autoStage)} — {t("setFromAge")}
-                    <span className="mt-1 block text-xs text-muted-foreground">
-                      {t("guardianNote")}
-                    </span>
+              {isMinor ? (
+                <div className="rounded-xl border-2 border-primary/30 bg-secondary/30 p-5 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="rounded-lg bg-primary/15 p-2 text-primary">
+                      <FamilyIcon className="size-5" strokeWidth={ICON_STROKE} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground text-sm sm:text-base">
+                        {isArabic
+                          ? "موافقة وإشراف ولي الأمر (إلزامي لمن هم دون 18 عاماً)"
+                          : "Guardian Approval & Linking (Mandatory under 18)"}
+                      </h3>
+                      <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                        {isArabic
+                          ? "لحماية الأطفال والالتزام بالضوابط المالية، لا يمكن إنشاء حساب مستقل لمن هم دون 18 عاماً دون ربطه مباشرة بولي الأمر (الأب أو الأم)."
+                          : "To protect minors and ensure financial safety, accounts under 18 cannot be created independently and must be linked to an adult guardian (Father or Mother)."}
+                      </p>
+                    </div>
                   </div>
-                ) : (
-                  <select
-                    className={inputClass}
-                    value={form.life_stage}
-                    onChange={(e) => set("life_stage", e.target.value)}
-                    disabled={age === null}
-                  >
-                    <option value="">
-                      {age === null ? t("selectDobFirst") : t("selectLifeStage")}
-                    </option>
-                    {ADULT_LIFE_STAGES.map((stage) => (
-                      <option key={stage} value={stage}>
-                        {labels.lifeStage(stage)}
+
+                  {/* Segmented Selector for Guardian Account Status */}
+                  <div className="grid grid-cols-2 gap-1 rounded-lg bg-background/80 p-1 border border-border">
+                    <button
+                      type="button"
+                      onClick={() => setGuardian((prev) => ({ ...prev, hasAccount: true }))}
+                      className={cn(
+                        "rounded-md py-1.5 text-xs font-medium transition-colors",
+                        guardian.hasAccount
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {isArabic ? "ولي الأمر لديه حساب (الأب أو الأم)" : "Guardian has an account"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setGuardian((prev) => ({ ...prev, hasAccount: false }))}
+                      className={cn(
+                        "rounded-md py-1.5 text-xs font-medium transition-colors",
+                        !guardian.hasAccount
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {isArabic ? "ليس لدى ولي الأمر حساب" : "Guardian has no account"}
+                    </button>
+                  </div>
+
+                  {guardian.hasAccount ? (
+                    <div className="space-y-3 pt-1">
+                      <div>
+                        <span className="wazen-label text-xs">
+                          {isArabic ? "صلة القرابة بولي الأمر" : "Guardian Relationship"}
+                        </span>
+                        <div className="mt-1.5 grid grid-cols-3 gap-2">
+                          {[
+                            { val: "father", label: isArabic ? "الأب (Father)" : "Father" },
+                            { val: "mother", label: isArabic ? "الأم (Mother)" : "Mother" },
+                            { val: "guardian", label: isArabic ? "ولي أمر (Guardian)" : "Guardian" },
+                          ].map((rel) => (
+                            <Button
+                              key={rel.val}
+                              type="button"
+                              size="sm"
+                              variant={guardian.relationship === rel.val ? "default" : "outline"}
+                              onClick={() => setGuardian((prev) => ({ ...prev, relationship: rel.val as "father" | "mother" | "guardian" }))}
+                              className="text-xs h-8"
+                            >
+                              {rel.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Field
+                          label={isArabic ? "البريد الإلكتروني لولي الأمر" : "Guardian's Email"}
+                          error={errors["guardian_email"]}
+                        >
+                          <input
+                            type="email"
+                            className={inputClass}
+                            value={guardian.email}
+                            onChange={(e) => setGuardian((prev) => ({ ...prev, email: e.target.value }))}
+                            placeholder="parent@example.com"
+                          />
+                        </Field>
+                        <Field
+                          label={isArabic ? "كلمة مرور ولي الأمر للتحقق" : "Guardian's Password"}
+                          error={errors["guardian_password"]}
+                        >
+                          <input
+                            type="password"
+                            className={inputClass}
+                            value={guardian.password}
+                            onChange={(e) => setGuardian((prev) => ({ ...prev, password: e.target.value }))}
+                            placeholder="••••••••"
+                          />
+                        </Field>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        {isArabic
+                          ? "🔒 سيتم التحقق من بيانات ولي الأمر وتفعيل الحساب تحت إشرافه المباشر."
+                          : "🔒 Guardian credentials are encrypted and verified securely to link and supervise this account."}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 space-y-3">
+                      <p className="text-xs text-foreground leading-relaxed">
+                        {isArabic
+                          ? "💡 يجب أن يقوم ولي الأمر (الأب أو الأم) بإنشاء حسابه العائلي في وازن أولاً، ومن ثم يمكنه إضافة الأبناء بسهولة من لوحة التحكم وإعطائهم حساباتهم."
+                          : "💡 The guardian (father or mother) must create their own Wazen family account first, then add children from their dashboard."}
+                      </p>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        className="w-full text-xs font-semibold"
+                        onClick={() => {
+                          set("date_of_birth", "1995-01-01");
+                          set("life_stage", "parent_stage");
+                          setGuardian((prev) => ({ ...prev, hasAccount: true }));
+                          toast.info(
+                            isArabic
+                              ? "تم تحويل النموذج لتسجيل حساب ولي الأمر (البالغ). أدخل بيانات ولي الأمر أولاً."
+                              : "Switched to guardian registration. Please fill in parent details first.",
+                          );
+                        }}
+                      >
+                        {isArabic ? "إنشاء حساب لولي الأمر أولاً (18 سنة أو أكثر)" : "Create Guardian Account First (18+)"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Field label={t("lifeStageField")} error={errors['life_stage']}>
+                  {autoStage ? (
+                    <div className="rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm">
+                      {labels.lifeStage(autoStage)} — {t("setFromAge")}
+                      <span className="mt-1 block text-xs text-muted-foreground">
+                        {t("guardianNote")}
+                      </span>
+                    </div>
+                  ) : (
+                    <select
+                      className={inputClass}
+                      value={form.life_stage}
+                      onChange={(e) => set("life_stage", e.target.value)}
+                      disabled={age === null}
+                    >
+                      <option value="">
+                        {age === null ? t("selectDobFirst") : t("selectLifeStage")}
                       </option>
-                    ))}
-                  </select>
-                )}
-              </Field>
+                      {ADULT_LIFE_STAGES.map((stage) => (
+                        <option key={stage} value={stage}>
+                          {labels.lifeStage(stage)}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </Field>
+              )}
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field label={t("preferredLanguage")}>
@@ -377,7 +613,13 @@ function AuthPage() {
                 </Field>
               </div>
 
-              <SubmitButton busy={busy}>{t("createAccount")}</SubmitButton>
+              <SubmitButton busy={busy}>
+                {isMinor
+                  ? isArabic
+                    ? "التحقق من ولي الأمر وإنشاء حساب الطفل"
+                    : "Verify Guardian & Create Child Account"
+                  : t("createAccount")}
+              </SubmitButton>
             </form>
           )}
         </section>
