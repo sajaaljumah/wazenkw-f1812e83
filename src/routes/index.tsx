@@ -1,6 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { AnalyticsIcon, BankIcon, CheckIcon, EmergencyFundIcon, FamilyIcon, ForwardIcon, ICON_STROKE } from "@/components/wazen/icons";
+import {
+  AnalyticsIcon,
+  CheckIcon,
+  EmergencyFundIcon,
+  FamilyIcon,
+  ForwardIcon,
+  ICON_STROKE,
+} from "@/components/wazen/icons";
 import { WazenMark } from "@/components/wazen/AppShell";
 import { WazenLogo } from "@/components/wazen/WazenLogo";
 import { LanguageToggle } from "@/components/wazen/LanguageToggle";
@@ -8,8 +16,7 @@ import { ThemeToggle } from "@/components/wazen/ThemeToggle";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { Button } from "@/components/ui/button";
 
-/** URL the landing-page QR code encodes — the published Wazen app. */
-const WAZEN_URL = "https://wazenkw.lovable.app";
+const DEFAULT_APP_URL = "https://wazenkw-f1812e83.onrender.com";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,114 +47,164 @@ const PILLARS = [
 ] as const;
 
 function Landing() {
-  const { t } = useWazenLocale();
+  const { t, isArabic } = useWazenLocale();
+  const [appUrl, setAppUrl] = useState(DEFAULT_APP_URL);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.origin) {
+      setAppUrl(window.location.origin);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen overflow-hidden bg-background">
-      <header className="sticky top-0 z-20 border-b border-border/70 bg-card/85 backdrop-blur-xl"><div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 sm:px-8">
-        <WazenMark />
-        <div className="flex items-center gap-1">
-          <ThemeToggle />
-          <LanguageToggle />
-          <Button asChild variant="ghost">
-            <Link to="/auth"
-              search={{ mode: "signin" as const }}
-            >{t("signIn")}</Link>
-          </Button>
+      <header className="sticky top-0 z-20 border-b border-border/70 bg-card/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 sm:px-8">
+          <WazenMark />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <ThemeToggle />
+            <LanguageToggle />
+            <Button asChild variant="ghost" className="text-sm font-medium">
+              <Link to="/auth" search={{ mode: "signin" as const }}>
+                {t("signIn")}
+              </Link>
+            </Button>
+          </div>
         </div>
-      </div></header>
+      </header>
 
       <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
-        {/* Presentation-ready QR code — scan to open Wazen on a phone. */}
-        <section className="flex flex-col items-center px-4 pt-10 pb-2 sm:pt-14" aria-label="Wazen QR code">
-          <p className="font-display text-lg sm:text-2xl text-foreground" dir="rtl" lang="ar">
-            امسح الـ QR Code ودش Wazen معانا 👇
-          </p>
-          <div className="mt-4 rounded-3xl bg-card p-4 sm:p-6 shadow-sm ring-1 ring-border/60">
-            <div className="rounded-2xl bg-white p-3 sm:p-4">
-              <QRCodeSVG
-                value={WAZEN_URL}
-                size={224}
-                level="M"
-                marginSize={2}
-                className="h-44 w-44 sm:h-56 sm:w-56"
-                aria-label={`QR code for ${WAZEN_URL}`}
-              />
+        {/* HERO SECTION WITH EMBEDDED QR SHOWCASE CARD */}
+        <section className="grid items-center gap-10 py-12 lg:grid-cols-12 lg:gap-14 lg:py-20">
+          {/* Main Copy & CTAs */}
+          <div className="relative z-10 flex flex-col justify-center lg:col-span-7 wazen-enter">
+            <div className="inline-flex items-center gap-2 self-start rounded-full bg-accent/60 px-3.5 py-1.5 text-xs font-semibold text-primary border border-primary/10">
+              <span className="size-2 rounded-full bg-primary animate-pulse" />
+              {t("landingEyebrow")}
+            </div>
+
+            <h1 className="mt-5">
+              <WazenLogo size={96} />
+              <span className="sr-only">Wazen</span>
+            </h1>
+
+            <p className="mt-5 font-display text-3xl font-bold leading-tight tracking-tight sm:text-5xl text-foreground">
+              {t("landingTagline")}
+            </p>
+
+            <p className="mt-5 max-w-xl text-base sm:text-lg leading-relaxed text-muted-foreground">
+              {t("landingBody")}
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3.5">
+              <Button asChild size="lg" className="h-12 px-6 text-base font-semibold shadow-md gap-2">
+                <Link to="/auth" search={{ mode: "signup" as const }}>
+                  {t("createAccount")}
+                  <ForwardIcon className="size-4" strokeWidth={ICON_STROKE} />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base font-semibold">
+                <Link to="/auth" search={{ mode: "signin" as const }}>
+                  {t("exploreDemo")}
+                </Link>
+              </Button>
+            </div>
+
+            {/* Feature Badges */}
+            <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-border/60 pt-6 text-xs text-muted-foreground">
+              <span className="flex items-center gap-2">
+                <CheckIcon className="size-4 text-emerald-500" strokeWidth={ICON_STROKE} />
+                {isArabic ? "مجاني وسهل الاستخدام" : "Free & intuitive"}
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckIcon className="size-4 text-emerald-500" strokeWidth={ICON_STROKE} />
+                {isArabic ? "خصوصية تامة وحماية عائلية" : "Private & family safe"}
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckIcon className="size-4 text-emerald-500" strokeWidth={ICON_STROKE} />
+                {isArabic ? "يعمل على الهاتف والحاسوب" : "Responsive on any screen"}
+              </span>
+            </div>
+          </div>
+
+          {/* THE PINK/ACCENT CARD WITH EMBEDDED QR CODE */}
+          <div className="lg:col-span-5 wazen-enter">
+            <div className="relative flex flex-col items-center justify-center rounded-[2.5rem] bg-accent/40 p-6 sm:p-8 border border-primary/15 shadow-soft backdrop-blur-sm overflow-hidden text-center">
+              {/* Subtle decorative watermark logo in corner */}
+              <span className="pointer-events-none absolute -bottom-6 -end-6 opacity-15" aria-hidden="true">
+                <WazenLogo size={140} />
+              </span>
+
+              {/* Title above QR */}
+              <p className="text-base font-bold text-foreground mb-1 relative z-10">
+                {isArabic ? "امسح الـ QR Code ودش وازن 📱" : "Scan QR code to open Wazen 📱"}
+              </p>
+              <p className="text-xs text-muted-foreground mb-5 max-w-xs relative z-10">
+                {isArabic
+                  ? "افتح كاميرا هاتفك وامسح الكود لفتح أحدث نسخة من التطبيق مباشرة"
+                  : "Open your camera to launch the latest version directly"}
+              </p>
+
+              {/* QR Code container */}
+              <div className="rounded-3xl bg-card p-4 sm:p-5 shadow-sm ring-1 ring-border/80 relative z-10 transition-transform hover:scale-[1.02] duration-300">
+                <div className="rounded-2xl bg-white p-3 sm:p-4">
+                  <QRCodeSVG
+                    value={appUrl}
+                    size={210}
+                    level="M"
+                    marginSize={2}
+                    className="h-44 w-44 sm:h-52 sm:w-52"
+                    aria-label={`QR code for ${appUrl}`}
+                  />
+                </div>
+              </div>
+
+              {/* Live Version Indicator */}
+              <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] font-medium text-muted-foreground relative z-10">
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="truncate max-w-[240px] dir-ltr text-left font-mono text-[11px]">
+                  {appUrl.replace(/^https?:\/\//, "")}
+                </span>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="relative grid items-center py-14 sm:py-20">
-          <div className="pointer-events-none absolute inset-y-6 end-0 hidden w-2/5 rounded-[2.5rem] bg-accent/60 lg:block" aria-hidden="true">
-            <span className="absolute bottom-10 end-10 opacity-30">
-              <WazenLogo size={110} />
-            </span>
-          </div>
-          <div className="relative max-w-3xl wazen-enter">
-          <p className="wazen-label">{t("landingEyebrow")}</p>
-          <h1 className="mt-5">
-            <WazenLogo size={92} />
-            <span className="sr-only">Wazen</span>
-          </h1>
-          <p className="mt-6 max-w-2xl font-display text-3xl leading-tight sm:text-5xl">{t("landingTagline")}</p>
-
-          <p className="mt-6 max-w-xl text-lg text-muted-foreground">{t("landingBody")}</p>
-          <div className="mt-9 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link
-              to="/auth"
-              search={{ mode: "signup" as const }}
-            >
-              {t("createAccount")}
-              <ForwardIcon className="size-4" strokeWidth={ICON_STROKE} />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link
-              to="/auth"
-              search={{ mode: "signin" as const }}
-            >
-              {t("exploreDemo")}
-              </Link>
-            </Button>
-          </div>
-          </div>
-        </section>
-
-        <section className="grid gap-4 sm:grid-cols-3">
+        {/* PILLARS SECTION */}
+        <section className="grid gap-5 sm:grid-cols-3 pt-6">
           {PILLARS.map(({ icon: Icon, title, body }) => (
-            <article key={title} className="wazen-card">
+            <article
+              key={title}
+              className="wazen-card transition-all duration-300 hover:shadow-lifted hover:-translate-y-0.5"
+            >
               <span className="flex size-11 items-center justify-center rounded-2xl bg-accent text-primary">
                 <Icon className="size-5" strokeWidth={ICON_STROKE} />
               </span>
-              <h2 className="mt-5 text-xl">{t(title)}</h2>
+              <h2 className="mt-5 text-xl font-semibold">{t(title)}</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(body)}</p>
             </article>
           ))}
         </section>
-
-        <section className="wazen-card wazen-enter" aria-labelledby="future-heading">
-          <div className="flex items-center gap-3">
-            <span className="flex size-11 items-center justify-center rounded-2xl bg-accent text-primary">
-              <BankIcon className="size-5" strokeWidth={ICON_STROKE} />
-            </span>
-            <div className="min-w-0">
-              <p className="wazen-label">{t("futureEyebrow")}</p>
-              <h2 id="future-heading" className="mt-1 text-xl">{t("futureTitle")}</h2>
-            </div>
-          </div>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("futureBody")}</p>
-          <p className="mt-5 wazen-label">{t("futurePlanned")}</p>
-          <ul className="mt-3 grid gap-2.5 sm:grid-cols-2">
-            {[t("futureItem1"), t("futureItem2"), t("futureItem3"), t("futureItem4")].map((item) => (
-              <li key={item} className="flex items-start gap-2.5 text-sm">
-                <CheckIcon className="mt-0.5 size-4 shrink-0 text-primary" strokeWidth={ICON_STROKE} />
-                <span className="text-foreground/90">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-5 border-t border-border/70 pt-4 text-xs text-muted-foreground">{t("futureDisclaimer")}</p>
-        </section>
       </main>
+
+      {/* MINIMAL CLEAN FOOTER */}
+      <footer className="border-t border-border/60 bg-card/40 py-8">
+        <div className="mx-auto flex max-w-6xl flex-col sm:flex-row items-center justify-between gap-4 px-5 sm:px-8 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <WazenMark />
+            <span>—</span>
+            <span>{isArabic ? "جميع الحقوق محفوظة © وازن" : "All rights reserved © Wazen"}</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link to="/auth" search={{ mode: "signin" as const }} className="hover:text-foreground transition-colors">
+              {t("signIn")}
+            </Link>
+            <Link to="/auth" search={{ mode: "signup" as const }} className="hover:text-foreground transition-colors">
+              {t("createAccount")}
+            </Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
