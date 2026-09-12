@@ -5,7 +5,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -124,7 +123,7 @@ export function UpgradeCheckoutDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md w-full overflow-hidden p-6">
         {stage === "review" ? (
           <>
             <DialogHeader>
@@ -138,20 +137,25 @@ export function UpgradeCheckoutDialog({
             </DialogHeader>
 
             {/* Plan Selector Toggle (Individual vs Family) */}
-            <div className="grid grid-cols-2 gap-2 rounded-xl bg-secondary/70 p-1.5 border border-border/50">
+            <div className="grid grid-cols-2 gap-2 rounded-xl bg-secondary/70 p-1.5 border border-border/50 w-full">
               <button
                 type="button"
                 onClick={() => setSelectedKind("individual")}
                 className={cn(
-                  "flex items-center justify-center gap-2 rounded-lg py-2.5 px-3 text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer",
+                  "flex flex-col items-center justify-center gap-1 rounded-lg py-2 px-2 text-center transition-all duration-200 cursor-pointer min-w-0 w-full",
                   selectedKind === "individual"
-                    ? "bg-background text-foreground shadow-sm font-semibold"
-                    : "text-muted-foreground hover:text-foreground",
+                    ? "bg-background text-foreground shadow-sm font-semibold border border-border/60"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/40",
                 )}
               >
-                <PremiumIcon className="size-4 text-gold shrink-0" strokeWidth={ICON_STROKE} />
-                <span>
-                  {isArabic ? "بريميوم فردي" : "Individual"} ({formatMoney(individualAmount, currency)})
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <PremiumIcon className="size-4 text-gold shrink-0" strokeWidth={ICON_STROKE} />
+                  <span className="text-xs sm:text-sm font-semibold truncate">
+                    {isArabic ? "بريميوم فردي" : "Individual"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-muted-foreground font-medium">
+                  {formatMoney(individualAmount, currency)}
                 </span>
               </button>
 
@@ -159,20 +163,25 @@ export function UpgradeCheckoutDialog({
                 type="button"
                 onClick={() => setSelectedKind("family")}
                 className={cn(
-                  "flex items-center justify-center gap-2 rounded-lg py-2.5 px-3 text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer",
+                  "flex flex-col items-center justify-center gap-1 rounded-lg py-2 px-2 text-center transition-all duration-200 cursor-pointer min-w-0 w-full",
                   selectedKind === "family"
-                    ? "bg-background text-foreground shadow-sm font-semibold"
-                    : "text-muted-foreground hover:text-foreground",
+                    ? "bg-background text-foreground shadow-sm font-semibold border border-border/60"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/40",
                 )}
               >
-                <FamilyIcon className="size-4 text-primary shrink-0" strokeWidth={ICON_STROKE} />
-                <span>
-                  {isArabic ? "بريميوم عائلي" : "Family"} ({formatMoney(familyAmount, currency)})
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <FamilyIcon className="size-4 text-primary shrink-0" strokeWidth={ICON_STROKE} />
+                  <span className="text-xs sm:text-sm font-semibold truncate">
+                    {isArabic ? "بريميوم عائلي" : "Family"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-muted-foreground font-medium">
+                  {formatMoney(familyAmount, currency)}
                 </span>
               </button>
             </div>
 
-            <div className="wazen-panel space-y-3 p-4">
+            <div className="wazen-panel space-y-3 p-4 w-full">
               <p className="wazen-label">{t("planSummary")}</p>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between gap-3">
@@ -209,29 +218,43 @@ export function UpgradeCheckoutDialog({
               {t("stripeSecureNote")}
             </p>
 
-            <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
-                {t("cancel")}
-              </Button>
+            <div className="flex flex-col gap-2.5 w-full pt-1">
               <Button
-                type="button"
-                variant="secondary"
-                onClick={handleDirectActivation}
-                disabled={directBusy}
-                className="gap-2 border border-gold/30 text-gold hover:bg-gold/10"
+                onClick={handleContinueToPayment}
+                className="w-full gap-2 h-11 text-sm font-semibold shadow-md"
               >
-                {directBusy ? (
-                  <SpinnerIcon className="size-4 animate-spin text-gold" strokeWidth={ICON_STROKE} />
-                ) : (
-                  <CheckIcon className="size-4 text-gold" strokeWidth={ICON_STROKE} />
-                )}
-                {isArabic ? "تفعيل فوري مباشر" : "Instant Activation"}
-              </Button>
-              <Button onClick={handleContinueToPayment} className="gap-2">
                 <PremiumIcon className="size-4" strokeWidth={ICON_STROKE} />
                 {t("continueToPayment")} ({formatMoney(currentTotal, currency)})
               </Button>
-            </DialogFooter>
+
+              <div className="flex items-center justify-between gap-2 w-full">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onOpenChange(false)}
+                  className="px-4 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  {t("cancel")}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleDirectActivation}
+                  disabled={directBusy}
+                  className="gap-1.5 text-xs text-gold hover:text-gold hover:bg-gold/10 font-medium"
+                >
+                  {directBusy ? (
+                    <SpinnerIcon className="size-3.5 animate-spin text-gold" strokeWidth={ICON_STROKE} />
+                  ) : (
+                    <CheckIcon className="size-3.5 text-gold" strokeWidth={ICON_STROKE} />
+                  )}
+                  {isArabic ? "تفعيل فوري مباشر" : "Instant Activation"}
+                </Button>
+              </div>
+            </div>
           </>
         ) : stage === "redirecting" ? (
           <div className="flex flex-col items-center gap-4 py-8 text-center">
@@ -253,7 +276,7 @@ export function UpgradeCheckoutDialog({
                 ? "يمكنك تفعيل اشتراك وازن بريميوم مباشرة الآن لحسابك والاستفادة من كافة الميزات:"
                 : t("stripeNotConnectedBody")}
             </DialogDescription>
-            <DialogFooter className="w-full flex flex-col gap-2 sm:justify-center mt-2">
+            <div className="w-full flex flex-col gap-2 mt-2">
               <Button
                 onClick={handleDirectActivation}
                 disabled={directBusy}
@@ -271,7 +294,7 @@ export function UpgradeCheckoutDialog({
               <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full">
                 {t("closeLabel")}
               </Button>
-            </DialogFooter>
+            </div>
           </div>
         )}
       </DialogContent>
