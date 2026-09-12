@@ -57,6 +57,25 @@ function Landing() {
       </div></header>
 
       <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
+        {/* Presentation-ready QR code — scan to open Wazen on a phone. */}
+        <section className="flex flex-col items-center px-4 pt-10 pb-2 sm:pt-14" aria-label="Wazen QR code">
+          <p className="font-display text-lg sm:text-2xl text-foreground" dir="rtl" lang="ar">
+            امسح الـ QR Code ودش Wazen معانا 👇
+          </p>
+          <div className="mt-4 rounded-3xl bg-card p-4 sm:p-6 shadow-sm ring-1 ring-border/60">
+            <div className="rounded-2xl bg-white p-3 sm:p-4">
+              <QRCodeSVG
+                value={WAZEN_URL}
+                size={224}
+                level="M"
+                marginSize={2}
+                className="h-44 w-44 sm:h-56 sm:w-56"
+                aria-label={`QR code for ${WAZEN_URL}`}
+              />
+            </div>
+          </div>
+        </section>
+
         <section className="relative grid items-center py-14 sm:py-20">
           <div className="pointer-events-none absolute inset-y-6 end-0 hidden w-2/5 rounded-[2.5rem] bg-accent/60 lg:block" aria-hidden="true">
             <span className="absolute bottom-10 end-10 opacity-30">
