@@ -21,6 +21,14 @@ import {
 import { useWazenLabels } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -44,7 +52,7 @@ function SettingsPage() {
   const signOut = useSignOut();
   const { user } = useSession();
   const { data: profile, isLoading } = useProfile();
-  const { t } = useWazenLocale();
+  const { t, isArabic } = useWazenLocale();
   const labels = useWazenLabels();
 
   const [fullName, setFullName] = useState("");
@@ -53,6 +61,10 @@ function SettingsPage() {
   const [currency, setCurrency] = useState("KWD");
   const [theme, setTheme] = useState("light");
   const [busy, setBusy] = useState(false);
+
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [emailBusy, setEmailBusy] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -155,6 +167,32 @@ function SettingsPage() {
     toast.success(t("passwordUpdated"));
   }
 
+  async function handleUpdateEmail() {
+    const trimmed = newEmail.trim().toLowerCase();
+    if (!trimmed || !trimmed.includes("@")) {
+      toast.error(isArabic ? "الرجاء إدخال بريد إلكتروني صحيح" : "Please enter a valid email address");
+      return;
+    }
+    if (trimmed === user?.email?.toLowerCase()) {
+      toast.error(isArabic ? "هذا هو بريدك الإلكتروني الحالي بالفعل" : "This is already your current email");
+      return;
+    }
+    setEmailBusy(true);
+    const { error } = await supabase.auth.updateUser({ email: trimmed });
+    setEmailBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(
+      isArabic
+        ? "تم إرسال رابط تأكيد إلى بريدك الإلكتروني الجديد. يرجى فتح البريد والضغط على الرابط لإتمام التحديث."
+        : "Confirmation email sent. Please verify the link in your inbox to complete the update.",
+    );
+    setEmailDialogOpen(false);
+    setNewEmail("");
+  }
+
   return (
     <AppShell>
       <p className="wazen-label">{t("accountControls")}</p>
@@ -191,7 +229,28 @@ function SettingsPage() {
               onChange={(e) => setFullName(e.target.value)}
             />
           </label>
-          <Locked label={t("email")} value={user?.email ?? ""} />
+
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="wazen-label flex items-center gap-1.5">
+                <LockedIcon className="size-3 text-muted-foreground" strokeWidth={ICON_STROKE} />
+                {t("email")}
+              </span>
+              <button
+                type="button"
+                onClick={() => setEmailDialogOpen(true)}
+                className="text-xs font-semibold text-primary hover:underline cursor-pointer transition-colors"
+              >
+                {isArabic ? "تغيير البريد الإلكتروني" : "Change email"}
+              </button>
+            </div>
+            <div className="mt-2 flex items-center justify-between rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground">
+              <span className="font-mono text-xs sm:text-sm text-foreground">{user?.email ?? ""}</span>
+              <span className="rounded bg-background/80 px-2 py-0.5 text-[11px] text-muted-foreground border border-border/40">
+                {isArabic ? "معرّف الدخول الأساسي" : "Sign-in ID"}
+              </span>
+            </div>
+          </div>
           <div className="grid gap-5 sm:grid-cols-2">
             <Locked label={t("dateOfBirth")} value={profile.date_of_birth} />
             <Locked label={t("gender")} value={labels.gender(profile.gender)} />
@@ -328,6 +387,53 @@ function SettingsPage() {
         <h2 className="text-xl">{t("privacy")}</h2>
         <p className="mt-3 text-sm text-muted-foreground">{t("privacyBody")}</p>
       </section>
+
+      {/* Change Email Dialog */}
+      <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{isArabic ? "تغيير البريد الإلكتروني" : "Change Email Address"}</DialogTitle>
+            <DialogDescription>
+              {isArabic
+                ? "أدخل عنوان بريدك الإلكتروني الجديد. لأسباب أمنية، سيتم إرسال رابط تأكيد إلى البريد الجديد لتأكيد الملكية."
+                : "Enter your new email address. For account security, a confirmation link will be sent to your new email."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-3">
+            <div>
+              <span className="wazen-label">{isArabic ? "البريد الحالي" : "Current Email"}</span>
+              <div className="mt-1.5 rounded-lg border border-input bg-secondary/60 px-3.5 py-2.5 text-sm font-mono text-muted-foreground">
+                {user?.email ?? ""}
+              </div>
+            </div>
+
+            <div>
+              <label className="block">
+                <span className="wazen-label">{isArabic ? "البريد الإلكتروني الجديد" : "New Email"}</span>
+                <input
+                  type="email"
+                  className={cn(inputClass, "mt-1.5")}
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  autoComplete="email"
+                />
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEmailDialogOpen(false)}>
+              {t("cancel")}
+            </Button>
+            <Button onClick={handleUpdateEmail} disabled={emailBusy}>
+              {emailBusy ? <SpinnerIcon className="size-4 animate-spin me-2" /> : null}
+              {isArabic ? "إرسال رابط التحقق" : "Send Verification Link"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
