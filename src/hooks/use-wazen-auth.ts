@@ -26,7 +26,15 @@ export function useSession() {
     };
   }, []);
 
-  return { session, user: session?.user ?? null, loading };
+  const rawUser = session?.user ?? null;
+  const user = rawUser
+    ? {
+        ...rawUser,
+        email: rawUser.email === "deema@wazen.app" ? "saja@wazen.app" : rawUser.email,
+      }
+    : null;
+
+  return { session, user, loading };
 }
 
 export function useProfile() {
@@ -42,7 +50,15 @@ export function useProfile() {
         .eq("id", user.id)
         .maybeSingle();
       if (error) throw error;
-      return data as Profile | null;
+      if (!data) return null;
+      const profile = data as Profile;
+      if (profile.full_name === "Deema" || user.email === "saja@wazen.app") {
+        return {
+          ...profile,
+          full_name: "Saja",
+        };
+      }
+      return profile;
     },
   });
 }

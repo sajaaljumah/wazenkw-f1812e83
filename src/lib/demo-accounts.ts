@@ -22,7 +22,7 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
   { email: "yaqoub@wazen.app", name: "Yaqoub", gender: "male", life_stage: "university_student", note: "Student" },
   { email: "hessa@wazen.app", name: "Hessa", gender: "female", life_stage: "employee", note: "Employee" },
   { email: "saad@wazen.app", name: "Saad", gender: "male", life_stage: "employee", note: "Employee" },
-  { email: "deema@wazen.app", name: "Deema", gender: "female", life_stage: "self_employed", note: "Self-employed" },
+  { email: "saja@wazen.app", name: "Saja", gender: "female", life_stage: "self_employed", note: "Self-employed" },
   { email: "khaled@wazen.app", name: "Khaled", gender: "male", life_stage: "self_employed", note: "Self-employed" },
 ];
 
@@ -34,7 +34,7 @@ export const DEMO_ACCESS_ACCOUNTS = DEMO_ACCOUNTS.filter((account) =>
     "reem@wazen.app",
     "dana@wazen.app",
     "hessa@wazen.app",
-    "deema@wazen.app",
+    "saja@wazen.app",
   ].includes(account.email),
 );
 
@@ -45,5 +45,9 @@ export const DEMO_ACCESS_ACCOUNTS = DEMO_ACCOUNTS.filter((account) =>
 export function isDemoAccount(email: string | null | undefined) {
   if (!email) return false;
   const value = email.trim().toLowerCase();
-  return DEMO_ACCOUNTS.some((account) => account.email === value);
+  return (
+    DEMO_ACCOUNTS.some((account) => account.email === value) ||
+    value === "deema@wazen.app" ||
+    value === "saja@wazen.app"
+  );
 }

@@ -34,7 +34,7 @@ const inputClass =
 function ProfilePage() {
   const queryClient = useQueryClient();
   const { data: profile, isLoading } = useProfile();
-  const { t } = useWazenLocale();
+  const { t, isArabic } = useWazenLocale();
   const labels = useWazenLabels();
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -58,7 +58,14 @@ function ProfilePage() {
     );
   }
 
+  const age = calculateAge(profile.date_of_birth);
+  const isMinor = age < 18;
+
   async function save() {
+    if (isMinor) {
+      toast.error(isArabic ? "لا يمكن تعديل البيانات لحسابات الأطفال والمراهقين" : "Minors cannot edit details");
+      return;
+    }
     if (!profile) return;
     if (firstNameOf(fullName).length < 2) {
       toast.error(t("enterFirstName"));
@@ -116,64 +123,84 @@ function ProfilePage() {
 
       <section className="mt-10 max-w-3xl border-t border-border pt-7">
         <h2 className="text-xl">{t("editableDetails")}</h2>
-        <div className="mt-6 space-y-5">
-          <label className="block">
-            <span className="wazen-label">{t("firstName")}</span>
-            <input
-              className={cn(inputClass, "mt-2")}
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder={t("firstNamePlaceholder")}
-            />
-            <span className="mt-1.5 block text-xs text-muted-foreground">{t("firstNameHint")}</span>
-          </label>
-          <label className="block">
-            <span className="wazen-label">{t("photoUrl")}</span>
-            <input
-              className={cn(inputClass, "mt-2")}
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="https://…"
-            />
-          </label>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className="block">
-              <span className="wazen-label">{t("language")}</span>
-              <select
-                className={cn(inputClass, "mt-2")}
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-              >
-                {labels.languageOptions.map((l) => (
-                  <option key={l.value} value={l.value}>
-                    {l.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block">
-              <span className="wazen-label">{t("baseCurrency")}</span>
-              <select
-                className={cn(inputClass, "mt-2")}
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-              >
-                {labels.currencyOptions.map((c) => (
-                  <option key={c.value} value={c.value}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+        {isMinor ? (
+          <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-700 dark:text-amber-400">
+            <div className="flex items-start gap-3">
+              <LockedIcon className="size-5 shrink-0 mt-0.5" strokeWidth={ICON_STROKE} />
+              <div>
+                <p className="text-sm font-semibold">
+                  {isArabic
+                    ? "حساب مُدار تحت إشراف ولي الأمر (أقل من ١٨ عاماً)"
+                    : "Guardian-Supervised Account (Under 18)"}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed opacity-90">
+                  {isArabic
+                    ? "بياناتك الشخصية محمية ومقيدة للقراءة فقط حتى بلوغ سن ١٨ عاماً. لتعديل أي بيانات، يرجى مراجعة ولي الأمر."
+                    : "Your profile details are locked in read-only mode until reaching 18 years of age. Please ask your guardian to make any changes."}
+                </p>
+              </div>
+            </div>
           </div>
-          <Button
-            onClick={save}
-            disabled={busy}
-          >
-            {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
-            {t("saveChanges")}
-          </Button>
-        </div>
+        ) : (
+          <div className="mt-6 space-y-5">
+            <label className="block">
+              <span className="wazen-label">{t("firstName")}</span>
+              <input
+                className={cn(inputClass, "mt-2")}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder={t("firstNamePlaceholder")}
+              />
+              <span className="mt-1.5 block text-xs text-muted-foreground">{t("firstNameHint")}</span>
+            </label>
+            <label className="block">
+              <span className="wazen-label">{t("photoUrl")}</span>
+              <input
+                className={cn(inputClass, "mt-2")}
+                value={avatarUrl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+                placeholder="https://…"
+              />
+            </label>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <label className="block">
+                <span className="wazen-label">{t("language")}</span>
+                <select
+                  className={cn(inputClass, "mt-2")}
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                >
+                  {labels.languageOptions.map((l) => (
+                    <option key={l.value} value={l.value}>
+                      {l.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="wazen-label">{t("baseCurrency")}</span>
+                <select
+                  className={cn(inputClass, "mt-2")}
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                >
+                  {labels.currencyOptions.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <Button
+              onClick={save}
+              disabled={busy}
+            >
+              {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
+              {t("saveChanges")}
+            </Button>
+          </div>
+        )}
       </section>
     </AppShell>
   );
