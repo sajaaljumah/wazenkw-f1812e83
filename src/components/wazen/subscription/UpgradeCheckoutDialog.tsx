@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   AlertIcon,
   CheckIcon,
+  FamilyIcon,
   PremiumIcon,
   SpinnerIcon,
   ICON_STROKE,
@@ -18,6 +19,7 @@ import {
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { useWazenLabels } from "@/lib/i18n-labels";
 import { formatMoney, type BillingPeriod, type SubscriptionKind } from "@/lib/subscription";
+import { cn } from "@/lib/utils";
 
 import { useServerFn } from "@tanstack/react-start";
 import { createCheckoutSessionFn } from "@/lib/subscription.functions";
@@ -27,37 +29,56 @@ type Stage = "review" | "redirecting" | "not-connected";
 export function UpgradeCheckoutDialog({
   open,
   onOpenChange,
-  kind,
-  billingPeriod,
-  total,
-  currency,
-  kindLabel,
+  initialKind = "individual",
+  billingPeriod = "monthly",
+  individualAmount = 2.5,
+  familyAmount = 5.0,
+  additionalChildren = 0,
+  currency = "KWD",
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  kind: SubscriptionKind;
-  billingPeriod: BillingPeriod;
-  total: number;
-  currency: string;
-  kindLabel: string;
+  initialKind?: SubscriptionKind;
+  billingPeriod?: BillingPeriod;
+  individualAmount?: number;
+  familyAmount?: number;
+  additionalChildren?: number;
+  currency?: string;
 }) {
-  const { t } = useWazenLocale();
+  const { t, isArabic } = useWazenLocale();
   const labels = useWazenLabels();
   const [stage, setStage] = useState<Stage>("review");
+  const [selectedKind, setSelectedKind] = useState<SubscriptionKind>(initialKind);
   const createCheckout = useServerFn(createCheckoutSessionFn);
 
-  // Reset to the review step every time the dialog is opened.
+  // Sync selectedKind when dialog opens or initialKind changes
   useEffect(() => {
-    if (open) setStage("review");
-  }, [open]);
+    if (open) {
+      setStage("review");
+      setSelectedKind(initialKind);
+    }
+  }, [open, initialKind]);
+
+  const currentTotal =
+    selectedKind === "family"
+      ? familyAmount + Math.max(0, additionalChildren) * 1.0
+      : individualAmount;
 
   async function handleContinueToPayment() {
     setStage("redirecting");
     try {
+      const origin =
+        typeof window !== "undefined" && window.location.origin
+          ? window.location.origin
+          : "https://wazenkw-f1812e83.onrender.com";
+
       const res = await createCheckout({
         data: {
-          kind,
+          kind: selectedKind,
           billingPeriod,
+          additionalChildren: selectedKind === "family" ? additionalChildren : 0,
+          successUrl: `${origin}/subscription?session_id={CHECKOUT_SESSION_ID}&success=true`,
+          cancelUrl: `${origin}/subscription?canceled=true`,
         },
       });
       if (res?.url) {
@@ -85,23 +106,70 @@ export function UpgradeCheckoutDialog({
               </DialogDescription>
             </DialogHeader>
 
+            {/* Plan Selector Toggle (Individual vs Family) */}
+            <div className="grid grid-cols-2 gap-2 rounded-xl bg-secondary/70 p-1.5 border border-border/50">
+              <button
+                type="button"
+                onClick={() => setSelectedKind("individual")}
+                className={cn(
+                  "flex items-center justify-center gap-2 rounded-lg py-2.5 px-3 text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer",
+                  selectedKind === "individual"
+                    ? "bg-background text-foreground shadow-sm font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <PremiumIcon className="size-4 text-gold shrink-0" strokeWidth={ICON_STROKE} />
+                <span>
+                  {isArabic ? "بريميوم فردي" : "Individual"} ({formatMoney(individualAmount, currency)})
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedKind("family")}
+                className={cn(
+                  "flex items-center justify-center gap-2 rounded-lg py-2.5 px-3 text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer",
+                  selectedKind === "family"
+                    ? "bg-background text-foreground shadow-sm font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <FamilyIcon className="size-4 text-primary shrink-0" strokeWidth={ICON_STROKE} />
+                <span>
+                  {isArabic ? "بريميوم عائلي" : "Family"} ({formatMoney(familyAmount, currency)})
+                </span>
+              </button>
+            </div>
+
             <div className="wazen-panel space-y-3 p-4">
               <p className="wazen-label">{t("planSummary")}</p>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted-foreground">{t("premium")}</dt>
-                  <dd className="font-medium">{kindLabel}</dd>
+                  <dd className="font-semibold text-foreground">
+                    {labels.subscriptionKind(selectedKind)}
+                  </dd>
                 </div>
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted-foreground">{labels.billingPeriod(billingPeriod)}</dt>
-                  <dd className="font-medium">
-                    {formatMoney(total, currency)} / {labels.billingPeriod(billingPeriod)}
+                  <dd className="font-semibold text-foreground">
+                    {formatMoney(currentTotal, currency)} / {labels.billingPeriod(billingPeriod)}
                   </dd>
                 </div>
+                {selectedKind === "family" && additionalChildren > 0 ? (
+                  <div className="flex justify-between gap-3 text-xs text-muted-foreground pt-1 border-t border-border/50">
+                    <dt>{additionalChildren} {t("extraChildrenWord")}</dt>
+                    <dd>+{formatMoney(additionalChildren * 1.0, currency)}</dd>
+                  </div>
+                ) : null}
               </dl>
               <p className="flex items-center gap-2 border-t border-border pt-3 text-sm text-muted-foreground">
                 <CheckIcon className="size-4 shrink-0 text-chart-2" strokeWidth={ICON_STROKE} />
-                {t("premiumFeaturesIncluded")}
+                {selectedKind === "family"
+                  ? isArabic
+                    ? "يشمل حسابين للوالدين وحتى 4 أطفال مع كافة الميزات"
+                    : "Covers 2 parents and up to 4 children with all features"
+                  : t("premiumFeaturesIncluded")}
               </p>
             </div>
 
@@ -114,7 +182,10 @@ export function UpgradeCheckoutDialog({
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 {t("cancel")}
               </Button>
-              <Button onClick={handleContinueToPayment}>{t("continueToPayment")}</Button>
+              <Button onClick={handleContinueToPayment} className="gap-2">
+                <PremiumIcon className="size-4" strokeWidth={ICON_STROKE} />
+                {t("continueToPayment")} ({formatMoney(currentTotal, currency)})
+              </Button>
             </DialogFooter>
           </>
         ) : stage === "redirecting" ? (

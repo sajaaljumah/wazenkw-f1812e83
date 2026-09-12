@@ -295,7 +295,7 @@ export async function activatePremium(
   const current = await requireBillingOwner(supabase, userId);
 
   const familyId = current.family?.familyId ?? null;
-  const kind = input.kind === "family" && familyId ? "family" : "individual";
+  const kind = input.kind;
   const price = findPrice(current.prices, kind, input.billingPeriod);
   const now = new Date();
   const periodEnd = addPeriod(now, input.billingPeriod);

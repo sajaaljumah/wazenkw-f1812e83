@@ -148,38 +148,80 @@ export async function createCheckoutSession(
   const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
   if (options.kind === "individual") {
-    if (!premiumPriceId) {
-      throw new Error("STRIPE_PREMIUM_PRICE_ID is not configured in server environment.");
+    if (premiumPriceId && premiumPriceId.trim().length > 0) {
+      lineItems.push({
+        price: premiumPriceId.trim(),
+        quantity: 1,
+      });
+    } else {
+      lineItems.push({
+        price_data: {
+          currency: "kwd",
+          product_data: {
+            name: "وازن بريميوم - اشتراك فردي (Wazen Premium Individual)",
+            description: "وصول كامل لكافة الميزات والتحليلات المالية المتقدمة لحسابك الشخصي.",
+          },
+          unit_amount: 2500, // 2.500 KWD (KWD is 3 decimals)
+          recurring: {
+            interval: options.billingPeriod === "yearly" ? "year" : "month",
+          },
+        },
+        quantity: 1,
+      });
     }
-    lineItems.push({
-      price: premiumPriceId,
-      quantity: 1,
-    });
   } else {
     // Family plan
-    if (!familyPriceId) {
-      throw new Error("STRIPE_FAMILY_PRICE_ID is not configured in server environment.");
+    if (familyPriceId && familyPriceId.trim().length > 0) {
+      lineItems.push({
+        price: familyPriceId.trim(),
+        quantity: 1,
+      });
+    } else {
+      lineItems.push({
+        price_data: {
+          currency: "kwd",
+          product_data: {
+            name: "وازن بريميوم - اشتراك عائلي (Wazen Premium Family)",
+            description: "باقة عائلية متكاملة تشمل حسابين للوالدين وحتى 4 أطفال مع لوحة تحكم عائلية.",
+          },
+          unit_amount: 5000, // 5.000 KWD (KWD is 3 decimals)
+          recurring: {
+            interval: options.billingPeriod === "yearly" ? "year" : "month",
+          },
+        },
+        quantity: 1,
+      });
     }
-    lineItems.push({
-      price: familyPriceId,
-      quantity: 1,
-    });
 
     const extraChildren = options.additionalChildren ?? 0;
     if (extraChildren > 0) {
-      if (!additionalChildPriceId) {
-        throw new Error(
-          "STRIPE_FAMILY_ADDITIONAL_CHILD_PRICE_ID is not configured in server environment.",
-        );
+      if (additionalChildPriceId && additionalChildPriceId.trim().length > 0) {
+        lineItems.push({
+          price: additionalChildPriceId.trim(),
+          quantity: extraChildren,
+        });
+      } else {
+        lineItems.push({
+          price_data: {
+            currency: "kwd",
+            product_data: {
+              name: "وازن - مقعد طفل إضافي (Wazen Extra Child Seat)",
+            },
+            unit_amount: 1000, // 1.000 KWD
+            recurring: {
+              interval: options.billingPeriod === "yearly" ? "year" : "month",
+            },
+          },
+          quantity: extraChildren,
+        });
       }
-      lineItems.push({
-        price: additionalChildPriceId,
-        quantity: extraChildren,
-      });
     }
   }
 
-  const baseUrl = process.env.APP_URL || "https://wazen.app";
+  let baseUrl = process.env.APP_URL || "https://wazenkw-f1812e83.onrender.com";
+  if (baseUrl.includes("wazen.onrender.com") && !baseUrl.includes("wazenkw-f1812e83")) {
+    baseUrl = "https://wazenkw-f1812e83.onrender.com";
+  }
   const successUrl =
     options.successUrl || `${baseUrl}/subscription?session_id={CHECKOUT_SESSION_ID}&success=true`;
   const cancelUrl = options.cancelUrl || `${baseUrl}/subscription?canceled=true`;

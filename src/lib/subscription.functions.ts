@@ -214,3 +214,93 @@ export const openBillingPortal = createServerFn({ method: "POST" })
       };
     },
   );
+
+/**
+ * Verifies a completed Stripe Checkout Session upon client redirect.
+ * Immediately activates Premium entitlements for the authenticated user and syncs MongoDB Atlas & Supabase.
+ */
+export const verifyCheckoutSessionFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        sessionId: z.string().min(1),
+      })
+      .parse(data ?? {}),
+  )
+  .handler(async ({ context, data }): Promise<{
+    success: boolean;
+    plan?: "individual" | "family";
+    entitlements?: Entitlements;
+  }> => {
+    const { retrieveCheckoutSession, syncSubscriptionState, getStripeClient } = await import(
+      "@/lib/stripe.server"
+    );
+    const { loadEntitlements } = await import("@/lib/subscription.server");
+
+    const session = await retrieveCheckoutSession(data.sessionId);
+
+    // Verify ownership
+    const sessionUserId = session.client_reference_id || session.metadata?.userId;
+    if (sessionUserId && sessionUserId !== context.userId) {
+      throw new Error("Unauthorized session verification.");
+    }
+
+    const isPaid = session.payment_status === "paid" || session.status === "complete";
+    if (!isPaid) {
+      return { success: false };
+    }
+
+    const kind = session.metadata?.kind === "family" ? "family" : "individual";
+    const familyId = session.metadata?.familyId || null;
+    const additionalChildren = parseInt(session.metadata?.additionalChildren || "0", 10) || 0;
+    const customerId =
+      typeof session.customer === "string" ? session.customer : session.customer?.id || null;
+    const subscriptionId =
+      typeof session.subscription === "string"
+        ? session.subscription
+        : session.subscription?.id || null;
+
+    let periodStart = new Date().toISOString();
+    let periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    let priceId: string | null = null;
+
+    if (subscriptionId) {
+      try {
+        const stripe = getStripeClient();
+        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        if (sub.current_period_start) {
+          periodStart = new Date(sub.current_period_start * 1000).toISOString();
+        }
+        if (sub.current_period_end) {
+          periodEnd = new Date(sub.current_period_end * 1000).toISOString();
+        }
+        priceId = sub.items?.data?.[0]?.price?.id || null;
+      } catch (err) {
+        console.warn("Could not retrieve subscription details from Stripe:", err);
+      }
+    }
+
+    await syncSubscriptionState({
+      userId: context.userId,
+      plan: kind,
+      status: "active",
+      stripeCustomerId: customerId,
+      stripeSubscriptionId: subscriptionId,
+      stripeCheckoutSessionId: session.id,
+      stripePriceId: priceId,
+      familyId,
+      additionalChildCount: additionalChildren,
+      periodStart,
+      periodEnd,
+      cancelAtPeriodEnd: false,
+    });
+
+    const entitlements = await loadEntitlements(context.supabase, context.userId);
+    return {
+      success: true,
+      plan: kind,
+      entitlements,
+    };
+  });
+
