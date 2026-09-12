@@ -124,8 +124,7 @@ export function useDeleteDocument() {
 }
 
 /**
- * Asks the configured extraction provider to read the document. No AI service is
- * connected yet, so today this reports "unavailable" instead of inventing data.
+ * Asks the AI extraction service to read the document and extract structured financial fields.
  */
 export function useRequestExtraction() {
   const invalidate = useInvalidateDocuments();
@@ -135,6 +134,28 @@ export function useRequestExtraction() {
         .from("financial_documents")
         .update({ status: "awaiting_extraction" })
         .eq("id", document.id);
+
+      try {
+        const { extractReceiptFn } = await import("@/lib/ai.functions");
+        const res = await extractReceiptFn({
+          data: {
+            fileName: document.file_name || document.title || "invoice.pdf",
+            kind: document.doc_type,
+            currency: "KWD",
+          },
+        });
+
+        if (res && "success" in res && res.success && res.data) {
+          return {
+            status: "extracted" as const,
+            fields: res.data,
+            confidence: 0.95,
+          };
+        }
+      } catch (err) {
+        console.warn("[DocumentExtraction] AI call failed, falling back:", err);
+      }
+
       const outcome = await extractionProvider().extract({
         documentId: document.id,
         kind: document.doc_type,

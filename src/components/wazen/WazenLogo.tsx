@@ -1,5 +1,3 @@
-import darkLogo from "@/assets/wazen-logo-dark.png.asset.json";
-import lightLogo from "@/assets/wazen-logo-light.png.asset.json";
 import { cn } from "@/lib/utils";
 
 /** Intrinsic size of both source artworks (they share the same canvas). */
@@ -27,22 +25,24 @@ export function WazenLogo({
       role="img"
       aria-label="Wazen"
     >
-      {([
-        [lightLogo.url, "dark:hidden"],
-        [darkLogo.url, "hidden dark:block"],
-      ] as const).map(([url, visibility]) => (
-        <img
-          key={url}
-          src={url}
-          alt=""
-          aria-hidden
-          width={SRC_W}
-          height={SRC_H}
-          className={cn("absolute inset-0 size-full object-contain", visibility)}
-          loading="eager"
-          decoding="async"
-        />
-      ))}
+      <img
+        src="/wazen-logo-dark.png"
+        alt="Wazen Logo"
+        width={SRC_W}
+        height={SRC_H}
+        className="absolute inset-0 size-full object-contain dark:hidden"
+        loading="eager"
+        decoding="async"
+      />
+      <img
+        src="/wazen-logo-light.png"
+        alt="Wazen Logo"
+        width={SRC_W}
+        height={SRC_H}
+        className="absolute inset-0 size-full object-contain hidden dark:block"
+        loading="eager"
+        decoding="async"
+      />
     </span>
   );
 }

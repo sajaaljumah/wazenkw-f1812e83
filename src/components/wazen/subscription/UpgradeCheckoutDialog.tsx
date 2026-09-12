@@ -19,19 +19,11 @@ import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { useWazenLabels } from "@/lib/i18n-labels";
 import { formatMoney, type BillingPeriod, type SubscriptionKind } from "@/lib/subscription";
 
+import { useServerFn } from "@tanstack/react-start";
+import { createCheckoutSessionFn } from "@/lib/subscription.functions";
+
 type Stage = "review" | "redirecting" | "not-connected";
 
-/**
- * Frontend-only preparation for the future Stripe Checkout integration.
- *
- * Today this dialog never processes a payment or activates Premium — it only
- * walks the user from "Upgrade" → plan confirmation → "Continue to Payment"
- * → a "redirecting to Stripe Checkout" state, then honestly reports that the
- * live Stripe connection is not wired yet. When Anti-Gravity connects Stripe
- * Test Mode, the "redirecting" stage will be replaced by a real redirect to
- * the Checkout URL returned by the server, and Premium activation will happen
- * through the webhook instead.
- */
 export function UpgradeCheckoutDialog({
   open,
   onOpenChange,
@@ -52,17 +44,30 @@ export function UpgradeCheckoutDialog({
   const { t } = useWazenLocale();
   const labels = useWazenLabels();
   const [stage, setStage] = useState<Stage>("review");
+  const createCheckout = useServerFn(createCheckoutSessionFn);
 
   // Reset to the review step every time the dialog is opened.
   useEffect(() => {
     if (open) setStage("review");
   }, [open]);
 
-  function handleContinueToPayment() {
+  async function handleContinueToPayment() {
     setStage("redirecting");
-    // Stripe Checkout is not connected yet. In the future this is where the
-    // server will return a Stripe Checkout URL and we will redirect to it.
-    window.setTimeout(() => setStage("not-connected"), 2200);
+    try {
+      const res = await createCheckout({
+        data: {
+          kind,
+          billingPeriod,
+        },
+      });
+      if (res?.url) {
+        window.location.href = res.url;
+        return;
+      }
+      setStage("not-connected");
+    } catch {
+      setStage("not-connected");
+    }
   }
 
   return (
@@ -75,7 +80,9 @@ export function UpgradeCheckoutDialog({
                 <PremiumIcon className="size-5" strokeWidth={ICON_STROKE} />
               </span>
               <DialogTitle className="text-center">{t("upgradeConfirmTitle")}</DialogTitle>
-              <DialogDescription className="text-center">{t("upgradeConfirmBody")}</DialogDescription>
+              <DialogDescription className="text-center">
+                {t("upgradeConfirmBody")}
+              </DialogDescription>
             </DialogHeader>
 
             <div className="wazen-panel space-y-3 p-4">
@@ -125,7 +132,9 @@ export function UpgradeCheckoutDialog({
               <AlertIcon className="size-5" strokeWidth={ICON_STROKE} />
             </span>
             <DialogTitle className="text-xl">{t("stripeNotConnectedTitle")}</DialogTitle>
-            <DialogDescription className="max-w-sm">{t("stripeNotConnectedBody")}</DialogDescription>
+            <DialogDescription className="max-w-sm">
+              {t("stripeNotConnectedBody")}
+            </DialogDescription>
             <DialogFooter className="w-full sm:justify-center">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 {t("closeLabel")}

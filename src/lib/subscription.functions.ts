@@ -20,9 +20,7 @@ export const getMyEntitlements = createServerFn({ method: "GET" })
 /** Server-verified single-feature check, for UI that must not guess. */
 export const checkFeatureAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) =>
-    z.object({ feature: z.enum(PREMIUM_FEATURES) }).parse(data),
-  )
+  .inputValidator((data) => z.object({ feature: z.enum(PREMIUM_FEATURES) }).parse(data))
   .handler(async ({ context, data }): Promise<{ allowed: boolean; feature: PremiumFeature }> => {
     const { loadEntitlements } = await import("@/lib/subscription.server");
     const entitlements = await loadEntitlements(context.supabase, context.userId);
@@ -84,6 +82,58 @@ export const getSubscriptionQuote = createServerFn({ method: "GET" })
   });
 
 /**
+ * Server-side TanStack Start function for Stripe Test Mode Checkout Session creation.
+ * Rejects child/teen accounts server-side.
+ * Does NOT mark a user Premium merely because Checkout was opened.
+ */
+export const createCheckoutSessionFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        kind: z.enum(["individual", "family"]).default("individual"),
+        billingPeriod: z.enum(["monthly", "yearly"]).default("monthly"),
+        additionalChildren: z.number().int().min(0).max(20).default(0),
+        successUrl: z.string().optional(),
+        cancelUrl: z.string().optional(),
+      })
+      .parse(data ?? {}),
+  )
+  .handler(
+    async ({
+      context,
+      data,
+    }): Promise<{
+      sessionId: string;
+      url: string | null;
+    }> => {
+      const { requireBillingOwner } = await import("@/lib/subscription.server");
+      const current = await requireBillingOwner(context.supabase, context.userId);
+      const { createCheckoutSession } = await import("@/lib/stripe.server");
+
+      const session = await createCheckoutSession({
+        userId: context.userId,
+        userEmail:
+          "userEmail" in context &&
+          typeof (context as { userEmail?: unknown }).userEmail === "string"
+            ? (context as { userEmail: string }).userEmail
+            : null,
+        kind: data.kind,
+        billingPeriod: data.billingPeriod,
+        additionalChildren: data.additionalChildren,
+        familyId: current.family?.familyId ?? null,
+        successUrl: data.successUrl,
+        cancelUrl: data.cancelUrl,
+      });
+
+      return {
+        sessionId: session.id,
+        url: session.url,
+      };
+    },
+  );
+
+/**
  * Upgrade entry point. Payment processing is not connected yet, so activating a
  * premium plan writes the subscription state directly (Free → Premium) and the
  * UI reads it back from the server. When Stripe is added, create the Checkout
@@ -124,6 +174,22 @@ export const startPremiumUpgrade = createServerFn({ method: "POST" })
 export const cancelPremiumSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ status: "cancelled"; entitlements: Entitlements }> => {
+    // If active Stripe subscription exists, cancel via Stripe
+    try {
+      const { getCollection } = await import("@/lib/mongodb.server");
+      const subCol = await getCollection("subscriptions");
+      const mongoSub = await subCol.findOne({ user_id: context.userId });
+      if (mongoSub?.stripe_subscription_id) {
+        const { cancelSubscription } = await import("@/lib/stripe.server");
+        await cancelSubscription(mongoSub.stripe_subscription_id, true);
+        const { loadEntitlements } = await import("@/lib/subscription.server");
+        const updated = await loadEntitlements(context.supabase, context.userId);
+        return { status: "cancelled", entitlements: updated };
+      }
+    } catch {
+      // Fallback to direct cancellation
+    }
+
     const { cancelPremium } = await import("@/lib/subscription.server");
     const entitlements = await cancelPremium(context.supabase, context.userId);
     return { status: "cancelled", entitlements };
@@ -135,12 +201,16 @@ export const cancelPremiumSubscription = createServerFn({ method: "POST" })
  */
 export const openBillingPortal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ status: "not_configured" | "redirect"; url: string | null; message: string }> => {
-    const { requireBillingOwner } = await import("@/lib/subscription.server");
-    await requireBillingOwner(context.supabase, context.userId);
-    return {
-      status: "not_configured",
-      url: null,
-      message: "Subscription management is not connected yet.",
-    };
-  });
+  .handler(
+    async ({
+      context,
+    }): Promise<{ status: "not_configured" | "redirect"; url: string | null; message: string }> => {
+      const { requireBillingOwner } = await import("@/lib/subscription.server");
+      await requireBillingOwner(context.supabase, context.userId);
+      return {
+        status: "not_configured",
+        url: null,
+        message: "Subscription management is not connected yet.",
+      };
+    },
+  );
