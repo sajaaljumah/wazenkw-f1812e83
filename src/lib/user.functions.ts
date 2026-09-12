@@ -180,7 +180,14 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
       console.warn("Supabase record deletion error:", err);
     }
 
-    // 3. Delete from Supabase Auth if admin key is present
+    // 3. Attempt to delete from Supabase Auth via RPC if available
+    try {
+      await context.supabase.rpc("delete_current_user");
+    } catch (rpcErr) {
+      console.warn("RPC delete_current_user error:", rpcErr);
+    }
+
+    // 4. Delete from Supabase Auth if admin key is present
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

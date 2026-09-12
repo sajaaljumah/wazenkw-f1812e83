@@ -278,11 +278,16 @@ function SettingsPage() {
     }
     setDeleteBusy(true);
     try {
+      try {
+        await supabase.rpc("delete_current_user");
+      } catch {}
+
       const res = await deleteAccount({ data: undefined });
       if (res?.success) {
         toast.success(isArabic ? "تم حذف حسابك بنجاح" : "Your account has been deleted successfully");
         setDeleteDialogOpen(false);
         await signOut();
+        window.location.href = "/";
       }
     } catch (err: unknown) {
       setDeleteBusy(false);
