@@ -95,6 +95,47 @@ function SettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [pwBusy, setPwBusy] = useState(false);
 
+  const age = profile?.date_of_birth ? calculateAge(profile.date_of_birth) : 0;
+  const isMinor = Boolean(profile?.date_of_birth && age < 18);
+  const isDemo = isDemoAccount(user?.email);
+  const stageLocked = Boolean(profile?.date_of_birth && lifeStageForAge(age) !== null);
+
+  const { data: guardianRel } = useQuery({
+    queryKey: ["my-guardian-rel", user?.id],
+    enabled: !!user && isMinor,
+    queryFn: async () => {
+      try {
+        const { data: rel, error } = await supabase
+          .from("family_relationships")
+          .select("id, parent_user_id, relationship_type")
+          .eq("child_user_id", user!.id)
+          .eq("status", "active")
+          .maybeSingle();
+        if (error || !rel?.parent_user_id) return null;
+
+        const { data: parentProf } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", rel.parent_user_id)
+          .maybeSingle();
+
+        return {
+          id: rel.id,
+          parent_user_id: rel.parent_user_id,
+          relationship_type: rel.relationship_type,
+          parent_name: parentProf?.full_name || null,
+        };
+      } catch {
+        return null;
+      }
+    },
+  });
+
+  const hasGuardian = Boolean(guardianRel?.parent_user_id);
+  const isOrphanedMinor = isMinor && !hasGuardian;
+  const isTargetCleanup = user?.email?.toLowerCase() === "sajaahdi05@gmail.com";
+  const canDeleteAccount = !isDemo && (!isMinor || isOrphanedMinor || isTargetCleanup);
+
   useEffect(() => {
     if (!profile) return;
     setFullName(profile.full_name);
@@ -111,30 +152,6 @@ function SettingsPage() {
       </AppShell>
     );
   }
-
-  const age = calculateAge(profile.date_of_birth);
-  const isMinor = age < 18;
-  const isDemo = isDemoAccount(user?.email);
-  const stageLocked = lifeStageForAge(age) !== null;
-
-  const { data: guardianRel } = useQuery({
-    queryKey: ["my-guardian-rel", user?.id],
-    enabled: !!user && isMinor,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("family_relationships")
-        .select("id, parent_user_id, relationship_type, profiles!family_relationships_parent_user_id_fkey(full_name)")
-        .eq("child_user_id", user!.id)
-        .eq("status", "active")
-        .maybeSingle();
-      return data;
-    },
-  });
-
-  const hasGuardian = Boolean(guardianRel?.parent_user_id);
-  const isOrphanedMinor = isMinor && !hasGuardian;
-  const isTargetCleanup = user?.email?.toLowerCase() === "sajaahdi05@gmail.com";
-  const canDeleteAccount = !isDemo && (!isMinor || isOrphanedMinor || isTargetCleanup);
 
   // Appearance applies and saves immediately (for adults only)
   async function chooseTheme(next: "light" | "dark") {
@@ -308,8 +325,8 @@ function SettingsPage() {
             <div>
               <p className="text-sm font-semibold">
                 {isArabic
-                  ? `حساب مُدار تحت إشراف ولي الأمر ${guardianRel?.profiles?.full_name ? `(${guardianRel.profiles.full_name})` : ""}`
-                  : `Guardian-Supervised Account ${guardianRel?.profiles?.full_name ? `(${guardianRel.profiles.full_name})` : ""}`}
+                  ? `حساب مُدار تحت إشراف ولي الأمر ${guardianRel?.parent_name ? `(${guardianRel.parent_name})` : ""}`
+                  : `Guardian-Supervised Account ${guardianRel?.parent_name ? `(${guardianRel.parent_name})` : ""}`}
               </p>
               <p className="mt-1 text-xs leading-relaxed opacity-90">
                 {isArabic
