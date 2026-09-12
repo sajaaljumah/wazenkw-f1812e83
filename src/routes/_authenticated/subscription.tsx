@@ -6,9 +6,10 @@ import { CheckIcon, FamilyIcon, PremiumIcon, SpinnerIcon, ICON_STROKE } from "@/
 import { toast } from "sonner";
 import { AppShell } from "@/components/wazen/AppShell";
 import { PremiumBadge } from "@/components/wazen/subscription/PremiumGate";
+import { UpgradeCheckoutDialog } from "@/components/wazen/subscription/UpgradeCheckoutDialog";
 import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
-import { cancelPremiumSubscription, startPremiumUpgrade } from "@/lib/subscription.functions";
+import { cancelPremiumSubscription } from "@/lib/subscription.functions";
 import {
   PREMIUM_FEATURES,
   computeFamilyTotal,
@@ -46,10 +47,10 @@ function SubscriptionPage() {
     useSubscriptionAccess();
   const { t } = useWazenLocale();
   const labels = useWazenLabels();
-  const upgrade = useServerFn(startPremiumUpgrade);
   const cancel = useServerFn(cancelPremiumSubscription);
   const queryClient = useQueryClient();
-  const [busy, setBusy] = useState<"upgrade" | "manage" | null>(null);
+  const [busy, setBusy] = useState<"manage" | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   const isFamily = entitlements.subscriptionKind === "family" || !!family;
   const individualPrice = findPrice(entitlements.prices, "individual", "monthly");
@@ -66,28 +67,6 @@ function SubscriptionPage() {
     await refetch();
   }
 
-  async function handleUpgrade() {
-    setBusy("upgrade");
-    try {
-      const result = await upgrade({
-        data: {
-          kind: isFamily ? "family" : "individual",
-          billingPeriod: "monthly",
-          additionalChildren,
-        },
-      });
-      if (result.status === "redirect" && result.url) {
-        window.location.assign(result.url);
-        return;
-      }
-      toast.success(t("premiumActiveToast"), { description: t("premiumActiveToastBody") });
-    } catch {
-      toast.error(t("upgradeFailed"));
-    } finally {
-      setBusy(null);
-      await refreshPlanEverywhere();
-    }
-  }
 
   async function handleManage() {
     setBusy("manage");
@@ -172,17 +151,14 @@ function SubscriptionPage() {
                   </Button>
                 ) : null
               ) : (
-                <Button
-                  onClick={handleUpgrade}
-                  disabled={busy === "upgrade"}
-                >
+                <Button onClick={() => setCheckoutOpen(true)}>
                   <PremiumIcon className="size-4" strokeWidth={ICON_STROKE} />
-                  {busy === "upgrade"
-                    ? "…"
-                    : `${t("upgrade")} — ${formatMoney(
-                        isFamily ? familyMoney.total : (individualPrice?.amount ?? 0),
-                        isFamily ? familyMoney.currency : (individualPrice?.currency ?? "KWD"),
-                      )}/${labels.billingPeriod(entitlements.billingPeriod ?? "monthly")}`}
+                  {t("upgradeToPremium")} —{" "}
+                  {formatMoney(
+                    isFamily ? familyMoney.total : (individualPrice?.amount ?? 0),
+                    isFamily ? familyMoney.currency : (individualPrice?.currency ?? "KWD"),
+                  )}
+                  /{labels.billingPeriod(entitlements.billingPeriod ?? "monthly")}
                 </Button>
               )}
             </div>
@@ -317,6 +293,16 @@ function SubscriptionPage() {
           </div>
         ) : null}
       </div>
+
+      <UpgradeCheckoutDialog
+        open={checkoutOpen}
+        onOpenChange={setCheckoutOpen}
+        kind={isFamily ? "family" : "individual"}
+        billingPeriod="monthly"
+        total={isFamily ? familyMoney.total : (individualPrice?.amount ?? 0)}
+        currency={isFamily ? familyMoney.currency : (individualPrice?.currency ?? "KWD")}
+        kindLabel={labels.subscriptionKind(isFamily ? "family" : "individual")}
+      />
     </AppShell>
   );
 }
