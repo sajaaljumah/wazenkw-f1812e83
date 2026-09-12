@@ -278,16 +278,40 @@ function SettingsPage() {
     }
     setDeleteBusy(true);
     try {
+      // 1. Permanently scramble credentials in Supabase Auth so original email/password NEVER work again
+      const deadEmail = `deleted-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@deleted.wazen.kw`;
+      const deadPassword = crypto.randomUUID() + "-" + crypto.randomUUID() + "-wazen-" + Date.now();
+      try {
+        await supabase.auth.updateUser({
+          email: deadEmail,
+          password: deadPassword,
+          data: {
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+            original_email: user?.email,
+          },
+        });
+      } catch (authErr) {
+        console.warn("Credential scrambling notice:", authErr);
+      }
+
       try {
         await supabase.rpc("delete_current_user");
       } catch {}
 
+      // 2. Wipe all application records from MongoDB & Supabase
       const res = await deleteAccount({ data: undefined });
       if (res?.success) {
-        toast.success(isArabic ? "تم حذف حسابك بنجاح" : "Your account has been deleted successfully");
+        toast.success(isArabic ? "تم حذف حسابك نهائياً" : "Your account has been deleted permanently");
         setDeleteDialogOpen(false);
-        await signOut();
-        window.location.href = "/";
+        try {
+          localStorage.clear();
+          sessionStorage.clear();
+        } catch {}
+        try {
+          await signOut();
+        } catch {}
+        window.location.href = "/auth";
       }
     } catch (err: unknown) {
       setDeleteBusy(false);

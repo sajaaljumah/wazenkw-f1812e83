@@ -141,11 +141,22 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
       );
     }
 
-    // 1. Delete from MongoDB Atlas
+    // 1. Delete and record in MongoDB Atlas
     try {
       const { getDatabase } = await import("@/lib/mongodb.server");
       const db = await getDatabase();
       await Promise.allSettled([
+        db.collection("deleted_accounts").updateOne(
+          { user_id: context.userId },
+          {
+            $set: {
+              user_id: context.userId,
+              email: email,
+              deleted_at: new Date().toISOString(),
+            },
+          },
+          { upsert: true },
+        ),
         db.collection("subscriptions").deleteOne({
           $or: [{ user_id: context.userId }, { _id: context.userId }],
         }),
@@ -180,14 +191,29 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
       console.warn("Supabase record deletion error:", err);
     }
 
-    // 3. Attempt to delete from Supabase Auth via RPC if available
+    // 3. Scramble credentials in Supabase Auth so original credentials can never log in again
+    try {
+      const deadEmail = `deleted-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@deleted.wazen.kw`;
+      const deadPassword = crypto.randomUUID() + "-" + crypto.randomUUID() + "-deleted";
+      await context.supabase.auth.updateUser({
+        email: deadEmail,
+        password: deadPassword,
+        data: {
+          is_deleted: true,
+          deleted_at: new Date().toISOString(),
+          original_email: email,
+        },
+      });
+    } catch {}
+
+    // 4. Attempt to delete from Supabase Auth via RPC if available
     try {
       await context.supabase.rpc("delete_current_user");
     } catch (rpcErr) {
-      console.warn("RPC delete_current_user error:", rpcErr);
+      console.warn("RPC delete_current_user notice:", rpcErr);
     }
 
-    // 4. Delete from Supabase Auth if admin key is present
+    // 5. Delete from Supabase Auth if admin key is present
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

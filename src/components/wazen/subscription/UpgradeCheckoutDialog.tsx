@@ -22,7 +22,9 @@ import { formatMoney, type BillingPeriod, type SubscriptionKind } from "@/lib/su
 import { cn } from "@/lib/utils";
 
 import { useServerFn } from "@tanstack/react-start";
-import { createCheckoutSessionFn } from "@/lib/subscription.functions";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { createCheckoutSessionFn, startPremiumUpgrade } from "@/lib/subscription.functions";
 
 type Stage = "review" | "redirecting" | "not-connected";
 
@@ -49,7 +51,10 @@ export function UpgradeCheckoutDialog({
   const labels = useWazenLabels();
   const [stage, setStage] = useState<Stage>("review");
   const [selectedKind, setSelectedKind] = useState<SubscriptionKind>(initialKind);
+  const [directBusy, setDirectBusy] = useState(false);
   const createCheckout = useServerFn(createCheckoutSessionFn);
+  const directUpgrade = useServerFn(startPremiumUpgrade);
+  const queryClient = useQueryClient();
 
   // Sync selectedKind when dialog opens or initialKind changes
   useEffect(() => {
@@ -63,6 +68,32 @@ export function UpgradeCheckoutDialog({
     selectedKind === "family"
       ? familyAmount + Math.max(0, additionalChildren) * 1.0
       : individualAmount;
+
+  async function handleDirectActivation() {
+    setDirectBusy(true);
+    try {
+      const res = await directUpgrade({
+        data: {
+          kind: selectedKind,
+          billingPeriod,
+          additionalChildren: selectedKind === "family" ? additionalChildren : 0,
+        },
+      });
+      if (res?.entitlements) {
+        await queryClient.invalidateQueries({ queryKey: ["entitlements"] });
+        toast.success(
+          isArabic
+            ? `تم تفعيل وازن بريميوم (${selectedKind === "family" ? "عائلي" : "فردي"}) وحفظه بنجاح!`
+            : `Wazen Premium (${selectedKind}) activated and saved successfully!`,
+        );
+        onOpenChange(false);
+      }
+    } catch {
+      toast.error(isArabic ? "تعذر تفعيل الاشتراك" : "Failed to activate subscription");
+    } finally {
+      setDirectBusy(false);
+    }
+  }
 
   async function handleContinueToPayment() {
     setStage("redirecting");
@@ -178,9 +209,23 @@ export function UpgradeCheckoutDialog({
               {t("stripeSecureNote")}
             </p>
 
-            <DialogFooter>
+            <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 {t("cancel")}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleDirectActivation}
+                disabled={directBusy}
+                className="gap-2 border border-gold/30 text-gold hover:bg-gold/10"
+              >
+                {directBusy ? (
+                  <SpinnerIcon className="size-4 animate-spin text-gold" strokeWidth={ICON_STROKE} />
+                ) : (
+                  <CheckIcon className="size-4 text-gold" strokeWidth={ICON_STROKE} />
+                )}
+                {isArabic ? "تفعيل فوري مباشر" : "Instant Activation"}
               </Button>
               <Button onClick={handleContinueToPayment} className="gap-2">
                 <PremiumIcon className="size-4" strokeWidth={ICON_STROKE} />
@@ -204,10 +249,26 @@ export function UpgradeCheckoutDialog({
             </span>
             <DialogTitle className="text-xl">{t("stripeNotConnectedTitle")}</DialogTitle>
             <DialogDescription className="max-w-sm">
-              {t("stripeNotConnectedBody")}
+              {isArabic
+                ? "يمكنك تفعيل اشتراك وازن بريميوم مباشرة الآن لحسابك والاستفادة من كافة الميزات:"
+                : t("stripeNotConnectedBody")}
             </DialogDescription>
-            <DialogFooter className="w-full sm:justify-center">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <DialogFooter className="w-full flex flex-col gap-2 sm:justify-center mt-2">
+              <Button
+                onClick={handleDirectActivation}
+                disabled={directBusy}
+                className="w-full gap-2 bg-gold hover:bg-gold/90 text-primary-foreground font-semibold"
+              >
+                {directBusy ? (
+                  <SpinnerIcon className="size-4 animate-spin" strokeWidth={ICON_STROKE} />
+                ) : (
+                  <PremiumIcon className="size-4" strokeWidth={ICON_STROKE} />
+                )}
+                {isArabic
+                  ? `تفعيل بريميوم (${selectedKind === "family" ? "عائلي" : "فردي"}) مباشرة الآن`
+                  : `Activate Premium (${selectedKind}) Directly Now`}
+              </Button>
+              <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full">
                 {t("closeLabel")}
               </Button>
             </DialogFooter>

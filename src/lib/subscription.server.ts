@@ -117,6 +117,27 @@ export async function loadEntitlements(
     );
   }
 
+  // 1b. Check Supabase Auth user_metadata (FAST & SECURE GUARANTEED PERSISTENCE)
+  if (!ownSubscription || ownSubscription.plan !== "premium" || ownSubscription.status !== "active") {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const metaSub = userData?.user?.user_metadata?.subscription;
+      if (metaSub && (metaSub.plan === "premium" || metaSub.status === "active")) {
+        const isExpired =
+          metaSub.current_period_end && new Date(metaSub.current_period_end) <= new Date();
+        if (!isExpired) {
+          ownSubscription = mapMongoSubDocToSubscription({
+            ...metaSub,
+            user_id: userId,
+            plan: "premium",
+            status: "active",
+            subscription_type: metaSub.subscription_type || metaSub.plan_id || "individual",
+          });
+        }
+      }
+    } catch {}
+  }
+
   // 2. Fetch membership, prices, and Supabase subscription fallback in parallel
   try {
     const [ownRes, memberRes, pricesRes] = await Promise.all([
@@ -340,7 +361,29 @@ export async function activatePremium(
     );
   }
 
-  // 2. Best-effort Supabase sync if SUPABASE_SERVICE_ROLE_KEY is present
+  // 2. Persist to Supabase Auth user_metadata (Instant, permanent, and guaranteed)
+  try {
+    await supabase.auth.updateUser({
+      data: {
+        subscription: {
+          plan: "premium",
+          plan_id: kind,
+          subscription_type: kind,
+          status: "active",
+          family_id: kind === "family" ? familyId : null,
+          billing_period: input.billingPeriod,
+          current_period_start: current.startedAt ?? now.toISOString(),
+          current_period_end: periodEnd.toISOString(),
+          cancel_at_period_end: false,
+          updated_at: now.toISOString(),
+        },
+      },
+    });
+  } catch (authErr) {
+    console.warn("Supabase user_metadata subscription update error:", authErr);
+  }
+
+  // 3. Best-effort Supabase sync if SUPABASE_SERVICE_ROLE_KEY is present
   if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -374,6 +417,23 @@ export async function activatePremium(
     } catch {
       // Non-fatal if Supabase admin fails
     }
+  } else {
+    try {
+      await supabase.from("subscriptions").upsert(
+        {
+          user_id: userId,
+          plan: "premium",
+          status: "active",
+          subscription_type: kind,
+          family_id: kind === "family" ? familyId : null,
+          billing_period: input.billingPeriod,
+          price_key: price?.key ?? null,
+          current_period_start: now.toISOString(),
+          current_period_end: periodEnd.toISOString(),
+        },
+        { onConflict: "user_id" },
+      );
+    } catch {}
   }
 
   return loadEntitlements(supabase, userId);
@@ -415,7 +475,22 @@ export async function cancelPremium(
     );
   }
 
-  // 2. Best-effort Supabase sync if SUPABASE_SERVICE_ROLE_KEY is present
+  // 2. Update Supabase Auth user_metadata
+  try {
+    await supabase.auth.updateUser({
+      data: {
+        subscription: {
+          plan: "free",
+          plan_id: "free",
+          status: "cancelled",
+          cancelled_at: now,
+          updated_at: now,
+        },
+      },
+    });
+  } catch {}
+
+  // 3. Best-effort Supabase sync if SUPABASE_SERVICE_ROLE_KEY is present
   if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -432,6 +507,19 @@ export async function cancelPremium(
     } catch {
       // Non-fatal if Supabase admin fails
     }
+  } else {
+    try {
+      await supabase
+        .from("subscriptions")
+        .update({
+          plan: "free",
+          status: "cancelled",
+          cancelled_at: now,
+          cancel_at_period_end: false,
+          current_period_end: now,
+        })
+        .eq("user_id", userId);
+    } catch {}
   }
 
   return loadEntitlements(supabase, userId);

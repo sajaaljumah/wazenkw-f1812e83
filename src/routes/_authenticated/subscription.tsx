@@ -74,7 +74,11 @@ function SubscriptionPage() {
   const familyMoney = computeFamilyTotal(familyPrice, additionalChildren);
 
   /** Refreshes every place the plan status is shown (header, profile, settings). */
-  async function refreshPlanEverywhere() {
+  async function refreshPlanEverywhere(newEntitlements?: typeof entitlements) {
+    if (newEntitlements) {
+      queryClient.setQueryData(["entitlements"], newEntitlements);
+      queryClient.setQueryData(["entitlements", entitlements.userId], newEntitlements);
+    }
     await queryClient.invalidateQueries({ queryKey: ["entitlements"] });
     await refetch();
   }
@@ -109,7 +113,7 @@ function SubscriptionPage() {
                     : "Individual subscription is now active.",
             },
           );
-          await refreshPlanEverywhere();
+          await refreshPlanEverywhere(res.entitlements);
           navigate({ search: {}, replace: true });
         } else if (active) {
           toast.dismiss(toastId);

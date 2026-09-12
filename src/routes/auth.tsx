@@ -125,6 +125,20 @@ function AuthPage() {
 
   async function handleSignIn(event: React.FormEvent) {
     event.preventDefault();
+    const cleanEmail = form.email.trim().toLowerCase();
+    if (
+      cleanEmail === "sajaahdi05@gmail.com" ||
+      cleanEmail.includes("deleted.wazen") ||
+      cleanEmail.includes("deleted-")
+    ) {
+      toast.error(
+        isArabic
+          ? "تم حذف هذا الحساب نهائياً ولا يمكن الدخول إليه."
+          : "This account has been permanently deleted.",
+      );
+      return;
+    }
+
     const parsed = signInSchema.safeParse({ email: form.email, password: form.password });
     if (!parsed.success) {
       setErrors(fieldErrors(parsed.error));
@@ -132,12 +146,13 @@ function AuthPage() {
     }
     setErrors({});
     setBusy(true);
-    let { error } = await supabase.auth.signInWithPassword(parsed.data);
+    let { data: authData, error } = await supabase.auth.signInWithPassword(parsed.data);
     if (error && parsed.data.email.trim().toLowerCase() === "saja@wazen.app") {
       const fallback = await supabase.auth.signInWithPassword({
         email: "deema@wazen.app",
         password: parsed.data.password,
       });
+      authData = fallback.data;
       error = fallback.error;
     }
     setBusy(false);
@@ -145,11 +160,43 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
+
+    // Failsafe check: If account is marked deleted, sign out immediately and block entry
+    const user = authData?.user;
+    if (
+      user &&
+      (user.user_metadata?.is_deleted === true ||
+        user.email?.toLowerCase() === "sajaahdi05@gmail.com" ||
+        user.email?.toLowerCase().includes("deleted.wazen"))
+    ) {
+      await supabase.auth.signOut();
+      toast.error(
+        isArabic
+          ? "تم حذف هذا الحساب نهائياً ولا يمكن الدخول إليه."
+          : "This account has been permanently deleted.",
+      );
+      return;
+    }
+
     navigate({ to: "/dashboard" });
   }
 
   async function handleSignUp(event: React.FormEvent) {
     event.preventDefault();
+    const cleanEmail = form.email.trim().toLowerCase();
+    if (
+      cleanEmail === "sajaahdi05@gmail.com" ||
+      cleanEmail.includes("deleted.wazen") ||
+      cleanEmail.includes("deleted-")
+    ) {
+      toast.error(
+        isArabic
+          ? "هذا البريد الإلكتروني محظور ومحذوف نهائياً."
+          : "This email address is permanently blocked.",
+      );
+      return;
+    }
+
     const lifeStage = autoStage ?? form.life_stage;
     const parsed = signUpSchema.safeParse({ ...form, life_stage: lifeStage });
     if (!parsed.success) {

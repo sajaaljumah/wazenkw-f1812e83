@@ -296,6 +296,28 @@ export const verifyCheckoutSessionFn = createServerFn({ method: "POST" })
       cancelAtPeriodEnd: false,
     });
 
+    // Update Supabase Auth user_metadata directly for guaranteed permanence
+    try {
+      await context.supabase.auth.updateUser({
+        data: {
+          subscription: {
+            plan: "premium",
+            plan_id: kind,
+            subscription_type: kind,
+            status: "active",
+            family_id: familyId,
+            billing_period: "monthly",
+            current_period_start: periodStart,
+            current_period_end: periodEnd,
+            cancel_at_period_end: false,
+            updated_at: new Date().toISOString(),
+          },
+        },
+      });
+    } catch (metaErr) {
+      console.warn("Supabase user_metadata sync notice:", metaErr);
+    }
+
     const entitlements = await loadEntitlements(context.supabase, context.userId);
     return {
       success: true,
