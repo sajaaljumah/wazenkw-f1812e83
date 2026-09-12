@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { QRCodeSVG } from "qrcode.react";
 import { AnalyticsIcon, BankIcon, CheckIcon, EmergencyFundIcon, FamilyIcon, ForwardIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { WazenMark } from "@/components/wazen/AppShell";
 import { WazenLogo } from "@/components/wazen/WazenLogo";
@@ -6,6 +7,9 @@ import { LanguageToggle } from "@/components/wazen/LanguageToggle";
 import { ThemeToggle } from "@/components/wazen/ThemeToggle";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { Button } from "@/components/ui/button";
+
+/** URL the landing-page QR code encodes — the published Wazen app. */
+const WAZEN_URL = "https://wazenkw.lovable.app";
 
 export const Route = createFileRoute("/")({
   head: () => ({
