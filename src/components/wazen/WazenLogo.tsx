@@ -26,7 +26,7 @@ export function WazenLogo({
       aria-label="Wazen"
     >
       <img
-        src="/wazen-logo-dark.png"
+        src="/wazen-logo-light.png"
         alt="Wazen Logo"
         width={SRC_W}
         height={SRC_H}
@@ -35,7 +35,7 @@ export function WazenLogo({
         decoding="async"
       />
       <img
-        src="/wazen-logo-light.png"
+        src="/wazen-logo-dark.png"
         alt="Wazen Logo"
         width={SRC_W}
         height={SRC_H}
