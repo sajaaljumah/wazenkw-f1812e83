@@ -89,9 +89,9 @@ function Landing() {
         <section className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
           {/* Main Copy & CTAs */}
           <div className="relative z-10 flex flex-col justify-center lg:col-span-7 wazen-enter">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
+            <div className="inline-flex items-center gap-2 self-start rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
               <span className="size-2 rounded-full bg-primary" />
-              {isArabic ? "النسخة المباشرة المحدثة" : "Latest Live Version"}
+              {t("landingEyebrow")}
             </div>
 
             <h1 className="mt-5">
