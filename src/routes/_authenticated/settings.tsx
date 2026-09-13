@@ -164,8 +164,7 @@ function SettingsPage() {
 
   const hasGuardian = Boolean(guardianRel?.parent_user_id);
   const isOrphanedMinor = isMinor && !hasGuardian;
-  const isTargetCleanup = user?.email?.toLowerCase() === "sajaahdi05@gmail.com";
-  const canDeleteAccount = !isDemo && (!isMinor || isOrphanedMinor || isTargetCleanup);
+  const canDeleteAccount = !isDemo && (!isMinor || isOrphanedMinor);
 
   useEffect(() => {
     if (!profile) return;
@@ -301,7 +300,7 @@ function SettingsPage() {
       toast.error(isArabic ? "لا يمكن حذف الحسابات التجريبية" : "Demo accounts cannot be deleted");
       return;
     }
-    if (isMinor && !isOrphanedMinor && !isTargetCleanup) {
+    if (isMinor && !isOrphanedMinor) {
       toast.error(isArabic ? "لا يمكن للأطفال أو المراهقين حذف الحساب — يتم ذلك عبر ولي الأمر" : "Minors cannot delete accounts");
       return;
     }
@@ -322,12 +321,13 @@ function SettingsPage() {
         console.warn("Credential metadata update notice:", authErr);
       }
 
+      // 2. Wipe all application records from MongoDB & Supabase server-side
+      const res = await deleteAccount({ data: undefined });
+
+      // 3. Purge user from auth.users via RPC
       try {
         await supabase.rpc("delete_current_user");
       } catch {}
-
-      // 2. Wipe all application records from MongoDB & Supabase server-side
-      const res = await deleteAccount({ data: undefined });
       if (res?.success) {
         toast.success(isArabic ? "تم حذف حسابك نهائياً" : "Your account has been deleted permanently");
         setDeleteDialogOpen(false);

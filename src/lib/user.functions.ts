@@ -13,7 +13,18 @@ export async function purgeUserByEmail(targetEmail: string) {
   }
   const cleanEmail = targetEmail.trim().toLowerCase();
 
-  // 1. If Supabase admin client is available
+  // 1. Attempt RPC purge_deleted_user_by_email
+  try {
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
+    const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
+    const authClient = createClient(supabaseUrl, supabaseKey);
+    await authClient.rpc("purge_deleted_user_by_email", { target_email: cleanEmail });
+  } catch (rpcErr) {
+    console.warn("[Auto-Purge] RPC purge notice:", rpcErr);
+  }
+
+  // 2. If Supabase admin client is available
   if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -47,7 +58,7 @@ export async function purgeUserByEmail(targetEmail: string) {
     }
   }
 
-  // 2. Also wipe from MongoDB
+  // 3. Also wipe from MongoDB
   try {
     const { getDatabase, isMongoConfigured } = await import("@/lib/mongodb.server");
     if (isMongoConfigured()) {
@@ -63,26 +74,26 @@ export async function purgeUserByEmail(targetEmail: string) {
           db.collection("family_relationships").deleteMany({ $or: [{ child_user_id: userId }, { parent_user_id: userId }] }),
         ]);
       }
+      await db.collection("deleted_accounts").deleteMany({ email: cleanEmail });
     }
   } catch (mongoErr) {
     console.warn("[Auto-Purge] MongoDB error:", mongoErr);
   }
 
+  DELETED_EMAILS_SET.delete(cleanEmail);
   return { success: true };
 }
 
 // Known deleted accounts cache (persists across server function calls in memory)
-const DELETED_EMAILS_SET = new Set<string>([
-  "sajaahdi05@gmail.com",
-  "saja.aljumah@gmail.com",
-]);
+const DELETED_EMAILS_SET = new Set<string>();
 
 const DELETED_USER_IDS_SET = new Set<string>([
   "d03b6caf-3271-4cee-9b11-56e2d9337b6c",
 ]);
 
 /**
- * Checks whether an account has been permanently deleted in MongoDB, Supabase, or blacklist.
+ * Checks whether an account session has been permanently deleted in MongoDB or registry.
+ * Primarily validates by userId to avoid banning future new accounts created with the same email.
  */
 export async function isAccountDeleted(
   email?: string | null,
@@ -91,10 +102,9 @@ export async function isAccountDeleted(
   const cleanEmail = email?.trim().toLowerCase();
   const cleanId = userId?.trim();
 
-  // 1. Check in-memory sets & blocked patterns
+  // 1. Check in-memory sets & blocked system dummy patterns
   if (cleanEmail) {
     if (
-      DELETED_EMAILS_SET.has(cleanEmail) ||
       cleanEmail.includes("deleted.wazen") ||
       cleanEmail.startsWith("deleted-")
     ) {
@@ -106,22 +116,17 @@ export async function isAccountDeleted(
     return { isDeleted: true, reason: "User ID marked deleted in registry" };
   }
 
-  // 2. Check MongoDB deleted_accounts collection
+  // 2. Check MongoDB deleted_accounts collection by userId
   try {
     const { getDatabase, isMongoConfigured } = await import("@/lib/mongodb.server");
     if (isMongoConfigured()) {
       const db = await getDatabase();
-      const conditions: any[] = [];
-      if (cleanEmail) conditions.push({ email: cleanEmail });
       if (cleanId) {
-        conditions.push({ user_id: cleanId });
-        conditions.push({ _id: cleanId });
-      }
-      if (conditions.length > 0) {
-        const found = await db.collection("deleted_accounts").findOne({ $or: conditions });
+        const found = await db.collection("deleted_accounts").findOne({
+          $or: [{ user_id: cleanId }, { _id: cleanId }],
+        });
         if (found) {
-          if (cleanEmail) DELETED_EMAILS_SET.add(cleanEmail);
-          if (cleanId) DELETED_USER_IDS_SET.add(cleanId);
+          DELETED_USER_IDS_SET.add(cleanId);
           return { isDeleted: true, reason: "Account found in MongoDB deleted_accounts" };
         }
       }
@@ -133,9 +138,53 @@ export async function isAccountDeleted(
   return { isDeleted: false };
 }
 
-// Run auto-cleanup for test accounts
-purgeUserByEmail("sajaahdi05@gmail.com").catch(() => {});
-purgeUserByEmail("saja.aljumah@gmail.com").catch(() => {});
+/**
+ * Prepares an email for a fresh sign-up by clearing any stale deleted account markers
+ * or purged auth records, allowing the user to create a brand new account cleanly.
+ */
+export const prepareEmailForSignUpFn = createServerFn({ method: "POST" })
+  .validator((input: { email: string }) => input)
+  .handler(async ({ data }) => {
+    const cleanEmail = data.email?.trim().toLowerCase();
+    if (!cleanEmail || isDemoAccount(cleanEmail)) {
+      return { success: false };
+    }
+
+    // 1. Remove from in-memory deleted set
+    DELETED_EMAILS_SET.delete(cleanEmail);
+
+    // 2. Clear from MongoDB deleted_accounts
+    try {
+      const { getDatabase, isMongoConfigured } = await import("@/lib/mongodb.server");
+      if (isMongoConfigured()) {
+        const db = await getDatabase();
+        await db.collection("deleted_accounts").deleteMany({ email: cleanEmail });
+      }
+    } catch {}
+
+    // 3. Purge marked-deleted account in Supabase Auth if any
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
+      const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
+      const client = createClient(supabaseUrl, supabaseKey);
+      await client.rpc("purge_deleted_user_by_email", { target_email: cleanEmail });
+    } catch {}
+
+    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: usersData } = await supabaseAdmin.auth.admin.listUsers();
+        const existing = usersData?.users.find((u) => u.email?.toLowerCase() === cleanEmail);
+        if (existing && (existing.user_metadata?.is_deleted || existing.user_metadata?.account_status === "deleted")) {
+          await supabaseAdmin.from("profiles").delete().eq("id", existing.id);
+          await supabaseAdmin.auth.admin.deleteUser(existing.id);
+        }
+      } catch {}
+    }
+
+    return { success: true };
+  });
 
 /**
  * Server function to check if an account is permanently deleted.
@@ -181,8 +230,6 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
       );
     }
 
-    const isTargetCleanupEmail = email === "sajaahdi05@gmail.com" || email === "saja.aljumah@gmail.com";
-
     // Check age/life stage to protect minors
     const { data: profile } = await context.supabase
       .from("profiles")
@@ -202,8 +249,8 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
     const hasGuardian = Boolean(relationships && relationships.length > 0);
 
     // If it's a minor who HAS an active guardian, guardian control is required.
-    // Unlinked/orphaned accounts or target cleanup email are allowed to delete.
-    if (isMinor && hasGuardian && !isTargetCleanupEmail) {
+    // Unlinked/orphaned accounts are allowed to delete.
+    if (isMinor && hasGuardian) {
       throw new Response(
         JSON.stringify({
           error: "minor_account_protected",
@@ -213,8 +260,7 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
       );
     }
 
-    // Add to in-memory blacklist immediately
-    if (email) DELETED_EMAILS_SET.add(email);
+    // Add deleted user ID to in-memory blacklist immediately
     if (context.userId) DELETED_USER_IDS_SET.add(context.userId);
 
     // 1. Delete and record in MongoDB Atlas
@@ -419,7 +465,8 @@ export const registerChildWithGuardianFn = createServerFn({ method: "POST" })
       guardianFullName = guardianProfile.full_name;
     }
 
-    // 2. Create the child account
+    // 2. Create the child account (clear any stale deleted record first)
+    await prepareEmailForSignUpFn({ data: { email: cleanChildEmail } }).catch(() => {});
     let childUserId = "";
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -628,7 +675,8 @@ export const parentAddChildFn = createServerFn({ method: "POST" })
 
     const guardianId = context.userId;
 
-    // 2. Create child in Supabase
+    // 2. Create child in Supabase (clear any stale deleted record first)
+    await prepareEmailForSignUpFn({ data: { email: cleanChildEmail } }).catch(() => {});
     let childUserId = "";
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

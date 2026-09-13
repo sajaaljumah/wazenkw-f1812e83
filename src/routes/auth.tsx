@@ -11,7 +11,7 @@ import { DEMO_ACCESS_ACCOUNTS, DEMO_PASSWORD } from "@/lib/demo-accounts";
 import { useWazenLabels } from "@/lib/i18n-labels";
 import {
   checkAccountDeletedFn,
-  purgeTargetUserFn,
+  prepareEmailForSignUpFn,
   registerChildWithGuardianFn,
 } from "@/lib/user.functions";
 import {
@@ -122,31 +122,11 @@ function AuthPage() {
   const isMinor = age !== null && age < 18;
   const autoStage = age === null ? null : lifeStageForAge(age);
 
-  useEffect(() => {
-    // Proactively clean up the requested test account on backend
-    purgeTargetUserFn({ data: "sajaahdi05@gmail.com" }).catch(() => {});
-  }, []);
-
   async function handleSignIn(event: React.FormEvent) {
     event.preventDefault();
     const cleanEmail = form.email.trim().toLowerCase();
 
-    // 1. Pre-check against deleted accounts registry
-    try {
-      const preCheck = await checkAccountDeletedFn({ data: { email: cleanEmail } });
-      if (preCheck?.isDeleted) {
-        toast.error(
-          isArabic
-            ? "تم حذف هذا الحساب نهائياً ولا يمكن الدخول إليه."
-            : "This account has been permanently deleted.",
-        );
-        return;
-      }
-    } catch {}
-
     if (
-      cleanEmail === "sajaahdi05@gmail.com" ||
-      cleanEmail === "saja.aljumah@gmail.com" ||
       cleanEmail.includes("deleted.wazen") ||
       cleanEmail.startsWith("deleted-")
     ) {
@@ -197,8 +177,6 @@ function AuthPage() {
       (user.user_metadata?.is_deleted === true ||
         user.user_metadata?.account_status === "deleted" ||
         isServerDeleted ||
-        user.email?.toLowerCase() === "sajaahdi05@gmail.com" ||
-        user.email?.toLowerCase() === "saja.aljumah@gmail.com" ||
         user.email?.toLowerCase().includes("deleted.wazen") ||
         user.email?.toLowerCase().startsWith("deleted-"))
     ) {
@@ -222,29 +200,14 @@ function AuthPage() {
     event.preventDefault();
     const cleanEmail = form.email.trim().toLowerCase();
 
-    // Check if email belongs to a deleted account
-    try {
-      const checkRes = await checkAccountDeletedFn({ data: { email: cleanEmail } });
-      if (checkRes?.isDeleted) {
-        toast.error(
-          isArabic
-            ? "تم حذف هذا الحساب نهائياً مسبقاً ولا يمكن استخدامه مرة أخرى."
-            : "This account has been permanently deleted and cannot be registered.",
-        );
-        return;
-      }
-    } catch {}
-
     if (
-      cleanEmail === "sajaahdi05@gmail.com" ||
-      cleanEmail === "saja.aljumah@gmail.com" ||
       cleanEmail.includes("deleted.wazen") ||
       cleanEmail.startsWith("deleted-")
     ) {
       toast.error(
         isArabic
-          ? "هذا البريد الإلكتروني محظور ومحذوف نهائياً ولا يمكن استخدامه."
-          : "This email address is permanently blocked and deleted.",
+          ? "لا يمكن استخدام هذا البريد الإلكتروني."
+          : "This email address cannot be used.",
       );
       return;
     }
@@ -259,6 +222,11 @@ function AuthPage() {
       setErrors({ date_of_birth: t("invalidDob") });
       return;
     }
+
+    // Prepare email by safely purging any stale marked-deleted records before creating new account
+    try {
+      await prepareEmailForSignUpFn({ data: { email: cleanEmail } });
+    } catch {}
 
     // STRICT GUARDIAN ENFORCEMENT: A minor (< 18) must have guardian approval & linking
     if (isMinor) {

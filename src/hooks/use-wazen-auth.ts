@@ -17,8 +17,6 @@ export function useSession() {
       return (
         u.user_metadata?.is_deleted === true ||
         u.user_metadata?.account_status === "deleted" ||
-        email === "sajaahdi05@gmail.com" ||
-        email === "saja.aljumah@gmail.com" ||
         email?.includes("deleted.wazen") ||
         email?.startsWith("deleted-")
       );
