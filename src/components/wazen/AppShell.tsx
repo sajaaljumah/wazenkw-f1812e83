@@ -11,6 +11,8 @@ import { canOwnAssets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 import { WazenLogo } from "@/components/wazen/WazenLogo";
 import { ZakatNotificationBell } from "@/components/wazen/zakat/ZakatNotificationBell";
+import { ThemeToggle } from "@/components/wazen/ThemeToggle";
+import { LanguageToggle } from "@/components/wazen/LanguageToggle";
 
 // Core areas only. Account management (profile, subscription) lives in Settings.
 const NAV = [
@@ -75,7 +77,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
             </nav>
           </div>
-          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <ThemeToggle />
+            <LanguageToggle />
             <PlanBadge className="hidden lg:inline-flex" size="sm" />
             {profile ? (
               <ZakatNotificationBell lifeStage={profile.life_stage} currency={profile.base_currency} />

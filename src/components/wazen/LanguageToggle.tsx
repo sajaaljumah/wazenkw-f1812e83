@@ -4,23 +4,37 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * Language switch for the public screens. Signed-in users change their saved
- * preference in Settings, which always wins over this device-level choice.
+ * Language switch for all users across public screens and the app header.
+ * Instantly toggles between Arabic and English and updates user preferences.
  */
-export function LanguageToggle({ className }: { className?: string }) {
+export function LanguageToggle({
+  className,
+  showLabel = true,
+}: {
+  className?: string;
+  showLabel?: boolean;
+}) {
   const { language, setLanguage, t } = useWazenLocale();
+  const nextLang = language === "ar" ? "en" : "ar";
+  const label = language === "ar" ? "English" : "العربية";
 
   return (
     <Button
       type="button"
       variant="ghost"
       size="sm"
-      className={cn("gap-2", className)}
-      onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
-      aria-label={t("language")}
+      className={cn("gap-1.5 px-2 text-xs sm:gap-2 sm:text-sm font-medium transition-colors", className)}
+      onClick={() => setLanguage(nextLang)}
+      aria-label={language === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+      title={language === "ar" ? "Switch to English" : "التبديل إلى العربية"}
     >
-      <LanguageIcon className="size-4" strokeWidth={ICON_STROKE} />
-      {language === "ar" ? t("english") : t("arabic")}
+      <LanguageIcon className="size-4 text-muted-foreground transition-transform duration-200 hover:scale-110" strokeWidth={ICON_STROKE} />
+      {showLabel ? (
+        <>
+          <span className="hidden sm:inline">{label}</span>
+          <span className="sm:hidden font-semibold">{language === "ar" ? "EN" : "عربي"}</span>
+        </>
+      ) : null}
     </Button>
   );
 }

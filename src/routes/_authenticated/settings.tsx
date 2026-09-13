@@ -108,29 +108,53 @@ function SettingsPage() {
   const family = useFamilySummary(!isMinor);
 
   const { data: guardianRel } = useQuery({
-    queryKey: ["my-guardian-rel", user?.id],
+    queryKey: ["my-guardian-rel", user?.id, isArabic],
     enabled: !!user && isMinor,
     queryFn: async () => {
       try {
-        const { data: rel, error } = await supabase
+        const { data: rels, error } = await supabase
           .from("family_relationships")
           .select("id, parent_user_id, relationship_type")
           .eq("child_user_id", user!.id)
-          .eq("status", "active")
-          .maybeSingle();
-        if (error || !rel?.parent_user_id) return null;
+          .eq("status", "active");
+        if (error || !rels || rels.length === 0) return null;
 
-        const { data: parentProf } = await supabase
+        const parentIds = rels.map((r) => r.parent_user_id);
+        const { data: parentProfiles } = await supabase
           .from("profiles")
-          .select("full_name")
-          .eq("id", rel.parent_user_id)
-          .maybeSingle();
+          .select("id, full_name")
+          .in("id", parentIds);
+
+        const profMap = new Map((parentProfiles ?? []).map((p) => [p.id, p.full_name]));
+
+        const DEMO_PARENT_NAMES: Record<string, { ar: string; en: string }> = {
+          "b6c5b289-b6ef-443b-9984-dda0a4b8b6e0": { ar: "مريم", en: "Mariam" },
+          "24ef9684-9969-49d5-a367-265e93e7f1d8": { ar: "يوسف", en: "Yousef" },
+        };
+
+        const formatted = rels
+          .map((r) => {
+            const known = DEMO_PARENT_NAMES[r.parent_user_id];
+            let name = profMap.get(r.parent_user_id) || (isArabic ? known?.ar : known?.en) || "";
+            if (isArabic) {
+              if (name.toLowerCase() === "mariam") name = "مريم";
+              else if (name.toLowerCase() === "yousef") name = "يوسف";
+            }
+            const relLabel =
+              r.relationship_type === "mother"
+                ? (isArabic ? "الأم" : "Mother")
+                : r.relationship_type === "father"
+                ? (isArabic ? "الأب" : "Father")
+                : (isArabic ? "ولي الأمر" : "Guardian");
+            return name ? `${name} (${relLabel})` : relLabel;
+          })
+          .join(" / ");
 
         return {
-          id: rel.id,
-          parent_user_id: rel.parent_user_id,
-          relationship_type: rel.relationship_type,
-          parent_name: parentProf?.full_name || null,
+          id: rels[0].id,
+          parent_user_id: rels[0].parent_user_id,
+          relationship_type: rels[0].relationship_type,
+          parent_name: formatted || null,
         };
       } catch {
         return null;
@@ -160,9 +184,8 @@ function SettingsPage() {
     );
   }
 
-  // Appearance applies and saves immediately (for adults only)
+  // Appearance applies and saves immediately (for all users including minors)
   async function chooseTheme(next: "light" | "dark") {
-    if (isMinor) return;
     setTheme(next);
     applyTheme(next);
     if (user?.id) cacheTheme(user.id, next);
@@ -178,9 +201,8 @@ function SettingsPage() {
     await queryClient.invalidateQueries({ queryKey: ["profile"] });
   }
 
-  // Language applies and saves immediately (for adults only)
+  // Language applies and saves immediately (for all users including minors)
   async function chooseLanguage(next: string) {
-    if (isMinor) return;
     setLanguage(next);
     if (!profile) return;
     const { error } = await supabase.from("profiles").update({ language: next }).eq("id", profile.id);
@@ -558,8 +580,7 @@ function SettingsPage() {
           <label className="block">
             <span className="wazen-label">{t("language")}</span>
             <select
-              disabled={isMinor}
-              className={cn(inputClass, "mt-2", isMinor && "opacity-75 cursor-not-allowed")}
+              className={cn(inputClass, "mt-2")}
               value={language}
               onChange={(e) => void chooseLanguage(e.target.value)}
             >
@@ -594,10 +615,9 @@ function SettingsPage() {
                 <Button
                   key={value}
                   type="button"
-                  disabled={isMinor}
                   onClick={() => void chooseTheme(value)}
                   variant={theme === value ? "default" : "outline"}
-                  className={cn("flex-1", isMinor && "opacity-75 cursor-not-allowed")}
+                  className="flex-1"
                 >
                   {value === "light" ? t("lightMode") : t("darkMode")}
                 </Button>

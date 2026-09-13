@@ -6,8 +6,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { setActiveDateLocale } from "@/lib/finance";
-import { useProfile } from "@/hooks/use-wazen-auth";
+import { useProfile, useSession } from "@/hooks/use-wazen-auth";
 
 export type WazenLanguage = "en" | "ar";
 
@@ -1645,16 +1647,21 @@ function readStoredLanguage(): WazenLanguage | null {
  * visitors fall back to their last choice on this device, then to Arabic.
  */
 export function AppLocaleProvider({ children }: { children: ReactNode }) {
+  const { user } = useSession();
   const { data: profile } = useProfile();
+  const queryClient = useQueryClient();
   const [local, setLocal] = useState<WazenLanguage>(DEFAULT_LANGUAGE);
+  const [manualLang, setManualLang] = useState<WazenLanguage | null>(null);
 
   useEffect(() => {
     const stored = readStoredLanguage();
     if (stored) setLocal(stored);
   }, []);
 
+  // Use explicitly toggled language if set; otherwise use profile language if available, else local storage/default
   const language: WazenLanguage =
-    profile?.language === "en" ? "en" : profile?.language === "ar" ? "ar" : local;
+    manualLang ??
+    (profile?.language === "en" ? "en" : profile?.language === "ar" ? "ar" : local);
 
   // Dates formatted outside React (helpers) follow the chosen language too.
   setActiveDateLocale(language === "ar" ? "ar-KW" : "en-KW");
@@ -1669,7 +1676,29 @@ export function AppLocaleProvider({ children }: { children: ReactNode }) {
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
   }, [language]);
 
-  const setLanguage = useCallback((next: WazenLanguage) => setLocal(next), []);
+  const setLanguage = useCallback(
+    (next: WazenLanguage) => {
+      setManualLang(next);
+      setLocal(next);
+      try {
+        localStorage.setItem(STORAGE_KEY, next);
+      } catch {}
+      document.documentElement.lang = next;
+      document.documentElement.dir = next === "ar" ? "rtl" : "ltr";
+      setActiveDateLocale(next === "ar" ? "ar-KW" : "en-KW");
+
+      if (user?.id) {
+        void supabase
+          .from("profiles")
+          .update({ language: next })
+          .eq("id", user.id)
+          .then(() => {
+            void queryClient.invalidateQueries({ queryKey: ["profile"] });
+          });
+      }
+    },
+    [user?.id, queryClient],
+  );
 
   return (
     <LocaleContext.Provider value={{ language, setLanguage }}>{children}</LocaleContext.Provider>
@@ -1685,7 +1714,9 @@ export function WazenLocaleProvider({
   children: ReactNode;
 }) {
   const parent = useContext(LocaleContext);
-  const resolved: WazenLanguage = language === "ar" ? "ar" : language === "en" ? "en" : parent.language;
+  // Synchronize with parent locale context so the entire app responds immediately to toggles
+  const resolved: WazenLanguage =
+    parent.language || (language === "ar" ? "ar" : language === "en" ? "en" : DEFAULT_LANGUAGE);
   setActiveDateLocale(resolved === "ar" ? "ar-KW" : "en-KW");
   return (
     <LocaleContext.Provider value={{ language: resolved, setLanguage: parent.setLanguage }}>

@@ -191,15 +191,15 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
       .maybeSingle();
 
     // Check if the minor user is linked to an active guardian
-    const { data: relationship } = await context.supabase
+    const { data: relationships } = await context.supabase
       .from("family_relationships")
       .select("id, parent_user_id")
       .eq("child_user_id", context.userId)
       .eq("status", "active")
-      .maybeSingle();
+      .limit(1);
 
     const isMinor = Boolean(profile?.date_of_birth && calculateAge(profile.date_of_birth) < 18);
-    const hasGuardian = Boolean(relationship?.parent_user_id);
+    const hasGuardian = Boolean(relationships && relationships.length > 0);
 
     // If it's a minor who HAS an active guardian, guardian control is required.
     // Unlinked/orphaned accounts or target cleanup email are allowed to delete.
