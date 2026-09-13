@@ -723,6 +723,16 @@ export const parentAddChildFn = createServerFn({ method: "POST" })
       }
     } else {
       await context.supabase.from("profiles").upsert(childProfileData);
+      await context.supabase.from("family_relationships").upsert(
+        {
+          parent_user_id: guardianId,
+          child_user_id: childUserId,
+          relationship_type: data.relationship_type || "guardian",
+          permissions: { can_monitor: true, can_fund: true },
+          status: "active",
+        },
+        { onConflict: "parent_user_id,child_user_id" },
+      );
     }
 
     // 6. MongoDB Atlas sync (if configured)

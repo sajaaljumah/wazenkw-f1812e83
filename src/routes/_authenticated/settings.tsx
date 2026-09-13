@@ -4,8 +4,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
+  AddIcon,
   AlertIcon,
   DeleteIcon,
+  FamilyIcon,
   LockedIcon,
   PremiumIcon,
   ProfileIcon,
@@ -16,6 +18,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/wazen/AppShell";
 import { useProfile, useSession, useSignOut } from "@/hooks/use-wazen-auth";
+import { useFamilySummary } from "@/hooks/use-wazen-finance";
+import { AddChildDialog } from "@/components/wazen/family/AddChildDialog";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { applyTheme, cacheTheme } from "@/components/wazen/WazenTheme";
 import { PlanBadge } from "@/components/wazen/subscription/PlanBadge";
@@ -99,6 +103,9 @@ function SettingsPage() {
   const isMinor = Boolean(profile?.date_of_birth && age < 18);
   const isDemo = isDemoAccount(user?.email);
   const stageLocked = Boolean(profile?.date_of_birth && lifeStageForAge(age) !== null);
+
+  const [addChildOpen, setAddChildOpen] = useState(false);
+  const family = useFamilySummary(!isMinor);
 
   const { data: guardianRel } = useQuery({
     queryKey: ["my-guardian-rel", user?.id],
@@ -450,6 +457,99 @@ function SettingsPage() {
           </label>
         </div>
       </section>
+
+      {/* Family & Children Section for Adults */}
+      {!isMinor ? (
+        <section className="mt-10 max-w-3xl border-t border-border pt-7">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <FamilyIcon className="size-5 text-primary" strokeWidth={ICON_STROKE} />
+                <h2 className="text-xl font-semibold">{isArabic ? "العائلة والأبناء" : "Family & Children"}</h2>
+              </div>
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+                {isArabic
+                  ? "إدارة حسابات أطفالك وربطهم بحسابك لمتابعة مصروفاتهم وأهدافهم المالية."
+                  : "Manage your children's accounts and link them to guide their financial journey."}
+              </p>
+            </div>
+            <Button
+              type="button"
+              onClick={() => setAddChildOpen(true)}
+              className="shrink-0 gap-2 font-medium"
+            >
+              <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
+              {isArabic ? "إضافة طفل / تابع" : "Add Child"}
+            </Button>
+          </div>
+
+          <div className="mt-6">
+            {family.isLoading ? (
+              <div className="flex items-center justify-center p-8 rounded-xl border border-border bg-secondary/30">
+                <SpinnerIcon className="size-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : family.data && family.data.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {family.data.map((member) => {
+                  const childAge = member.profile.date_of_birth
+                    ? calculateAge(member.profile.date_of_birth)
+                    : null;
+                  return (
+                    <div
+                      key={member.profile.id}
+                      className="flex items-center justify-between rounded-xl border border-border bg-secondary/40 p-4 transition-all hover:bg-secondary/60"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">
+                          {member.profile.full_name?.charAt(0) || "طفل"}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm text-foreground">
+                            {member.profile.full_name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {labels.lifeStage(member.profile.life_stage)}
+                            {childAge !== null ? ` · ${childAge} ${isArabic ? "سنة" : "yrs"}` : ""}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        {isArabic ? "مرتبط كولي أمر" : "Linked"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-border bg-secondary/20 p-6 text-center">
+                <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
+                  <FamilyIcon className="size-6" strokeWidth={ICON_STROKE} />
+                </div>
+                <p className="text-sm font-semibold text-foreground">
+                  {isArabic ? "لم تقم بإضافة أطفال بعد" : "No children added yet"}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
+                  {isArabic
+                    ? "بإمكانك في أي وقت إضافة حساب لطفلك لفتح تجربة وازن المخصصة للأطفال، ومتابعة مصروفاته وتوجيهه مالياً وربطه بحسابك كولي أمر."
+                    : "You can add a child account at any time to unlock the playful financial experience, monitor their spending, and link them as guardian."}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAddChildOpen(true)}
+                  className="mt-4 gap-1.5"
+                >
+                  <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
+                  {isArabic ? "إضافة طفل جديد الآن" : "Add a child now"}
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <AddChildDialog open={addChildOpen} onOpenChange={setAddChildOpen} />
+        </section>
+      ) : null}
 
       {/* Preferences Section */}
       <section className="mt-10 max-w-3xl border-t border-border pt-7">

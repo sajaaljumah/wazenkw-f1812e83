@@ -23,7 +23,7 @@ import {
 import type { DashboardData } from "@/components/wazen/dashboard/variants";
 import { DashboardHeader } from "@/components/wazen/dashboard/primitives";
 import { formatToday } from "@/lib/finance";
-import { firstNameOf } from "@/lib/wazen";
+import { calculateAge, firstNameOf } from "@/lib/wazen";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { FirstUseWalkthrough } from "@/components/wazen/FirstUseWalkthrough";
 import { isDemoAccount } from "@/lib/demo-accounts";
@@ -70,8 +70,10 @@ function Dashboard() {
   const goals = useGoals();
   const budget = useMonthlyBudget();
   const recurring = useRecurringItems();
+  const isAdult = !profile?.date_of_birth || calculateAge(profile.date_of_birth) >= 18;
   const isParent = profile?.life_stage === "parent";
-  const family = useFamilySummary(!!isParent);
+  const family = useFamilySummary(isAdult);
+  const showFamilySection = isParent || Boolean(family.data && family.data.length > 0);
   const zakat = useZakat();
 
   useEffect(() => {
@@ -168,7 +170,7 @@ function Dashboard() {
           />
         )}
 
-        {isParent ? (
+        {showFamilySection ? (
           <JourneySection title={t("familyFinances")} description={t("noFamilyDescription")}>
             <FamilySummaryCard
               members={family.data ?? []}
