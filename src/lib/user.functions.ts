@@ -19,7 +19,7 @@ export async function purgeUserByEmail(targetEmail: string) {
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
     const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
     const authClient = createClient(supabaseUrl, supabaseKey);
-    await authClient.rpc("purge_deleted_user_by_email", { target_email: cleanEmail });
+    await (authClient.rpc as any)("purge_deleted_user_by_email", { target_email: cleanEmail });
   } catch (rpcErr) {
     console.warn("[Auto-Purge] RPC purge notice:", rpcErr);
   }
@@ -168,7 +168,7 @@ export const prepareEmailForSignUpFn = createServerFn({ method: "POST" })
       const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
       const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
       const client = createClient(supabaseUrl, supabaseKey);
-      await client.rpc("purge_deleted_user_by_email", { target_email: cleanEmail });
+      await (client.rpc as any)("purge_deleted_user_by_email", { target_email: cleanEmail });
     } catch {}
 
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {

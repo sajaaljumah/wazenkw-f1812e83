@@ -150,10 +150,13 @@ function SettingsPage() {
           })
           .join(" / ");
 
+        const primary = rels[0];
+        if (!primary) return null;
+
         return {
-          id: rels[0].id,
-          parent_user_id: rels[0].parent_user_id,
-          relationship_type: rels[0].relationship_type,
+          id: primary.id,
+          parent_user_id: primary.parent_user_id,
+          relationship_type: primary.relationship_type,
           parent_name: formatted || null,
         };
       } catch {
@@ -326,7 +329,7 @@ function SettingsPage() {
 
       // 3. Purge user from auth.users via RPC
       try {
-        await supabase.rpc("delete_current_user");
+        await (supabase.rpc as any)("delete_current_user");
       } catch {}
       if (res?.success) {
         toast.success(isArabic ? "تم حذف حسابك نهائياً" : "Your account has been deleted permanently");
@@ -713,7 +716,7 @@ function SettingsPage() {
                   ? isArabic
                     ? "هذا حساب تجريبي مخصص للاستكشاف والعرض — لا يمكن حذفه للحفاظ على التجربة."
                     : "This is a demo account for testing and presentation — it cannot be deleted."
-                  : isOrphanedMinor || isTargetCleanup
+                  : isOrphanedMinor
                     ? isArabic
                       ? "حذف هذا الحساب غير المرتبط وجميع بياناته وسجلاته نهائياً من وازن."
                       : "Permanently delete this unlinked test account and all its data from Wazen."
