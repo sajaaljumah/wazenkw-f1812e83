@@ -54,32 +54,32 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className={cn("wazen-app-canvas min-h-screen", profile?.life_stage === "teenager" && "stage-teen", profile?.life_stage === "university_student" && "stage-university")}>
       <header className="sticky top-0 z-30 border-b border-border/70 bg-card/85 shadow-soft backdrop-blur-xl">
-        <div className="mx-auto grid h-[4.5rem] max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center gap-3 lg:gap-8">
+        <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between gap-4 px-3 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3 lg:gap-6 xl:gap-8">
             <Link to="/dashboard" className="shrink-0" aria-label={t("overviewAria")}>
               <WazenMark />
             </Link>
-            <nav className="hidden min-w-0 items-center gap-2 lg:flex xl:gap-6" aria-label={t("primaryNav")}>
+            <nav className="hidden items-center gap-1 lg:flex xl:gap-3" aria-label={t("primaryNav")}>
             {nav.map(({ to, label, icon: Icon }) => (
               <Link
                 key={to}
                 to={to}
                 className={cn(
-                  "relative flex h-[4.5rem] min-w-0 items-center gap-1.5 border-b-2 px-1 text-xs font-semibold transition-colors xl:gap-2 xl:text-sm",
+                  "relative flex h-[4.5rem] shrink-0 items-center gap-1.5 border-b-2 px-2 text-xs font-semibold whitespace-nowrap transition-colors xl:gap-2 xl:px-3 xl:text-sm",
                   isActive(to)
                     ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
-                <Icon className="size-4" strokeWidth={ICON_STROKE} />
-                <span className="truncate">{t(label)}</span>
+                <Icon className="size-4 shrink-0" strokeWidth={ICON_STROKE} />
+                <span className="whitespace-nowrap">{t(label)}</span>
               </Link>
             ))}
             </nav>
           </div>
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <ThemeToggle />
-            <LanguageToggle />
+          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
+            <ThemeToggle showLabel={false} />
+            <LanguageToggle compact={true} />
             <PlanBadge className="hidden lg:inline-flex" size="sm" />
             {profile ? (
               <ZakatNotificationBell lifeStage={profile.life_stage} currency={profile.base_currency} />

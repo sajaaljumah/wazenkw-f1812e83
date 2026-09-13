@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
  * Universal theme switch for public pages and inside the app (adults & children).
  * Toggles immediately and syncs with the active profile when signed in.
  */
-export function ThemeToggle({ className, showLabel = true }: { className?: string; showLabel?: boolean }) {
+export function ThemeToggle({ className, showLabel = false }: { className?: string; showLabel?: boolean }) {
   const { t } = useWazenLocale();
   const { user } = useSession();
   const { data: profile } = useProfile();
@@ -57,16 +57,20 @@ export function ThemeToggle({ className, showLabel = true }: { className?: strin
     <Button
       type="button"
       variant="ghost"
-      size="sm"
-      className={cn("gap-1.5 px-2 text-xs sm:gap-2 sm:text-sm font-medium transition-colors", className)}
+      size={showLabel ? "sm" : "icon"}
+      className={cn(
+        "transition-colors rounded-lg",
+        showLabel ? "gap-1.5 px-2 text-xs sm:gap-2 sm:text-sm font-medium" : "size-9",
+        className
+      )}
       onClick={toggle}
       aria-label={theme === "dark" ? t("lightMode") : t("darkMode")}
       title={theme === "dark" ? t("lightMode") : t("darkMode")}
     >
       {theme === "dark" ? (
-        <Sun className="size-4 text-amber-400 transition-transform duration-300 hover:rotate-90" strokeWidth={ICON_STROKE} />
+        <Sun className="size-4 text-amber-400 transition-transform duration-300 hover:rotate-90 shrink-0" strokeWidth={ICON_STROKE} />
       ) : (
-        <Moon className="size-4 text-indigo-600 dark:text-indigo-400 transition-transform duration-300 hover:-rotate-12" strokeWidth={ICON_STROKE} />
+        <Moon className="size-4 text-indigo-600 dark:text-indigo-400 transition-transform duration-300 hover:-rotate-12 shrink-0" strokeWidth={ICON_STROKE} />
       )}
       {showLabel ? (
         <span className="hidden md:inline">
