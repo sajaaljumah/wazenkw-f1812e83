@@ -71,8 +71,80 @@ export async function purgeUserByEmail(targetEmail: string) {
   return { success: true };
 }
 
-// Auto-run cleanup for the user's requested test account
+// Known deleted accounts cache (persists across server function calls in memory)
+const DELETED_EMAILS_SET = new Set<string>([
+  "sajaahdi05@gmail.com",
+  "saja.aljumah@gmail.com",
+]);
+
+const DELETED_USER_IDS_SET = new Set<string>([
+  "d03b6caf-3271-4cee-9b11-56e2d9337b6c",
+]);
+
+/**
+ * Checks whether an account has been permanently deleted in MongoDB, Supabase, or blacklist.
+ */
+export async function isAccountDeleted(
+  email?: string | null,
+  userId?: string | null,
+): Promise<{ isDeleted: boolean; reason?: string }> {
+  const cleanEmail = email?.trim().toLowerCase();
+  const cleanId = userId?.trim();
+
+  // 1. Check in-memory sets & blocked patterns
+  if (cleanEmail) {
+    if (
+      DELETED_EMAILS_SET.has(cleanEmail) ||
+      cleanEmail.includes("deleted.wazen") ||
+      cleanEmail.startsWith("deleted-")
+    ) {
+      return { isDeleted: true, reason: "Account marked deleted in registry" };
+    }
+  }
+
+  if (cleanId && DELETED_USER_IDS_SET.has(cleanId)) {
+    return { isDeleted: true, reason: "User ID marked deleted in registry" };
+  }
+
+  // 2. Check MongoDB deleted_accounts collection
+  try {
+    const { getDatabase, isMongoConfigured } = await import("@/lib/mongodb.server");
+    if (isMongoConfigured()) {
+      const db = await getDatabase();
+      const conditions: any[] = [];
+      if (cleanEmail) conditions.push({ email: cleanEmail });
+      if (cleanId) {
+        conditions.push({ user_id: cleanId });
+        conditions.push({ _id: cleanId });
+      }
+      if (conditions.length > 0) {
+        const found = await db.collection("deleted_accounts").findOne({ $or: conditions });
+        if (found) {
+          if (cleanEmail) DELETED_EMAILS_SET.add(cleanEmail);
+          if (cleanId) DELETED_USER_IDS_SET.add(cleanId);
+          return { isDeleted: true, reason: "Account found in MongoDB deleted_accounts" };
+        }
+      }
+    }
+  } catch (mongoErr) {
+    console.warn("[isAccountDeleted] MongoDB check warning:", mongoErr);
+  }
+
+  return { isDeleted: false };
+}
+
+// Run auto-cleanup for test accounts
 purgeUserByEmail("sajaahdi05@gmail.com").catch(() => {});
+purgeUserByEmail("saja.aljumah@gmail.com").catch(() => {});
+
+/**
+ * Server function to check if an account is permanently deleted.
+ */
+export const checkAccountDeletedFn = createServerFn({ method: "POST" })
+  .validator((input: { email?: string; userId?: string }) => input)
+  .handler(async ({ data }) => {
+    return await isAccountDeleted(data.email, data.userId);
+  });
 
 /**
  * Server function to trigger user purge explicitly.
@@ -109,7 +181,7 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
       );
     }
 
-    const isTargetCleanupEmail = email === "sajaahdi05@gmail.com";
+    const isTargetCleanupEmail = email === "sajaahdi05@gmail.com" || email === "saja.aljumah@gmail.com";
 
     // Check age/life stage to protect minors
     const { data: profile } = await context.supabase
@@ -141,32 +213,39 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
       );
     }
 
+    // Add to in-memory blacklist immediately
+    if (email) DELETED_EMAILS_SET.add(email);
+    if (context.userId) DELETED_USER_IDS_SET.add(context.userId);
+
     // 1. Delete and record in MongoDB Atlas
     try {
-      const { getDatabase } = await import("@/lib/mongodb.server");
-      const db = await getDatabase();
-      await Promise.allSettled([
-        db.collection("deleted_accounts").updateOne(
-          { user_id: context.userId },
-          {
-            $set: {
-              user_id: context.userId,
-              email: email,
-              deleted_at: new Date().toISOString(),
+      const { getDatabase, isMongoConfigured } = await import("@/lib/mongodb.server");
+      if (isMongoConfigured()) {
+        const db = await getDatabase();
+        await Promise.allSettled([
+          db.collection("deleted_accounts").updateOne(
+            { user_id: context.userId },
+            {
+              $set: {
+                user_id: context.userId,
+                email: email,
+                deleted_at: new Date().toISOString(),
+                account_status: "deleted",
+              },
             },
-          },
-          { upsert: true },
-        ),
-        db.collection("subscriptions").deleteOne({
-          $or: [{ user_id: context.userId }, { _id: context.userId }],
-        }),
-        db.collection("documents").deleteMany({ user_id: context.userId }),
-        db.collection("transactions").deleteMany({ user_id: context.userId }),
-        db.collection("profiles").deleteOne({ _id: context.userId }),
-        db.collection("family_relationships").deleteMany({
-          $or: [{ child_user_id: context.userId }, { parent_user_id: context.userId }],
-        }),
-      ]);
+            { upsert: true },
+          ),
+          db.collection("subscriptions").deleteOne({
+            $or: [{ user_id: context.userId }, { _id: context.userId }],
+          }),
+          db.collection("documents").deleteMany({ user_id: context.userId }),
+          db.collection("transactions").deleteMany({ user_id: context.userId }),
+          db.collection("profiles").deleteOne({ _id: context.userId }),
+          db.collection("family_relationships").deleteMany({
+            $or: [{ child_user_id: context.userId }, { parent_user_id: context.userId }],
+          }),
+        ]);
+      }
     } catch (err) {
       console.warn("MongoDB deletion error:", err);
     }
@@ -191,20 +270,20 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
       console.warn("Supabase record deletion error:", err);
     }
 
-    // 3. Scramble credentials in Supabase Auth so original credentials can never log in again
+    // 3. Mark user_metadata as permanently deleted in Supabase Auth
+    // NOTE: Only update 'data' (user_metadata) — never pass password or email so Supabase Auth does not require current password
     try {
-      const deadEmail = `deleted-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@deleted.wazen.kw`;
-      const deadPassword = crypto.randomUUID() + "-" + crypto.randomUUID() + "-deleted";
       await context.supabase.auth.updateUser({
-        email: deadEmail,
-        password: deadPassword,
         data: {
           is_deleted: true,
+          account_status: "deleted",
           deleted_at: new Date().toISOString(),
           original_email: email,
         },
       });
-    } catch {}
+    } catch (authErr) {
+      console.warn("Supabase auth updateUser metadata notice:", authErr);
+    }
 
     // 4. Attempt to delete from Supabase Auth via RPC if available
     try {

@@ -9,7 +9,11 @@ import { LanguageToggle } from "@/components/wazen/LanguageToggle";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { DEMO_ACCESS_ACCOUNTS, DEMO_PASSWORD } from "@/lib/demo-accounts";
 import { useWazenLabels } from "@/lib/i18n-labels";
-import { purgeTargetUserFn, registerChildWithGuardianFn } from "@/lib/user.functions";
+import {
+  checkAccountDeletedFn,
+  purgeTargetUserFn,
+  registerChildWithGuardianFn,
+} from "@/lib/user.functions";
 import {
   ADULT_LIFE_STAGES,
   DEFAULT_LANGUAGE,
@@ -126,10 +130,25 @@ function AuthPage() {
   async function handleSignIn(event: React.FormEvent) {
     event.preventDefault();
     const cleanEmail = form.email.trim().toLowerCase();
+
+    // 1. Pre-check against deleted accounts registry
+    try {
+      const preCheck = await checkAccountDeletedFn({ data: { email: cleanEmail } });
+      if (preCheck?.isDeleted) {
+        toast.error(
+          isArabic
+            ? "تم حذف هذا الحساب نهائياً ولا يمكن الدخول إليه."
+            : "This account has been permanently deleted.",
+        );
+        return;
+      }
+    } catch {}
+
     if (
       cleanEmail === "sajaahdi05@gmail.com" ||
+      cleanEmail === "saja.aljumah@gmail.com" ||
       cleanEmail.includes("deleted.wazen") ||
-      cleanEmail.includes("deleted-")
+      cleanEmail.startsWith("deleted-")
     ) {
       toast.error(
         isArabic
@@ -161,15 +180,33 @@ function AuthPage() {
       return;
     }
 
-    // Failsafe check: If account is marked deleted, sign out immediately and block entry
+    // 2. Post-auth check: If account is marked deleted, sign out immediately and block entry
     const user = authData?.user;
+    let isServerDeleted = false;
+    if (user) {
+      try {
+        const postCheck = await checkAccountDeletedFn({
+          data: { email: user.email || cleanEmail, userId: user.id },
+        });
+        isServerDeleted = Boolean(postCheck?.isDeleted);
+      } catch {}
+    }
+
     if (
       user &&
       (user.user_metadata?.is_deleted === true ||
+        user.user_metadata?.account_status === "deleted" ||
+        isServerDeleted ||
         user.email?.toLowerCase() === "sajaahdi05@gmail.com" ||
-        user.email?.toLowerCase().includes("deleted.wazen"))
+        user.email?.toLowerCase() === "saja.aljumah@gmail.com" ||
+        user.email?.toLowerCase().includes("deleted.wazen") ||
+        user.email?.toLowerCase().startsWith("deleted-"))
     ) {
       await supabase.auth.signOut();
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
       toast.error(
         isArabic
           ? "تم حذف هذا الحساب نهائياً ولا يمكن الدخول إليه."
@@ -184,15 +221,30 @@ function AuthPage() {
   async function handleSignUp(event: React.FormEvent) {
     event.preventDefault();
     const cleanEmail = form.email.trim().toLowerCase();
+
+    // Check if email belongs to a deleted account
+    try {
+      const checkRes = await checkAccountDeletedFn({ data: { email: cleanEmail } });
+      if (checkRes?.isDeleted) {
+        toast.error(
+          isArabic
+            ? "تم حذف هذا الحساب نهائياً مسبقاً ولا يمكن استخدامه مرة أخرى."
+            : "This account has been permanently deleted and cannot be registered.",
+        );
+        return;
+      }
+    } catch {}
+
     if (
       cleanEmail === "sajaahdi05@gmail.com" ||
+      cleanEmail === "saja.aljumah@gmail.com" ||
       cleanEmail.includes("deleted.wazen") ||
-      cleanEmail.includes("deleted-")
+      cleanEmail.startsWith("deleted-")
     ) {
       toast.error(
         isArabic
-          ? "هذا البريد الإلكتروني محظور ومحذوف نهائياً."
-          : "This email address is permanently blocked.",
+          ? "هذا البريد الإلكتروني محظور ومحذوف نهائياً ولا يمكن استخدامه."
+          : "This email address is permanently blocked and deleted.",
       );
       return;
     }

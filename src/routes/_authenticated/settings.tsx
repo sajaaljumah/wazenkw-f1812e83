@@ -278,28 +278,26 @@ function SettingsPage() {
     }
     setDeleteBusy(true);
     try {
-      // 1. Permanently scramble credentials in Supabase Auth so original email/password NEVER work again
-      const deadEmail = `deleted-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@deleted.wazen.kw`;
-      const deadPassword = crypto.randomUUID() + "-" + crypto.randomUUID() + "-wazen-" + Date.now();
+      // 1. Permanently mark account as deleted in Supabase Auth user_metadata
+      // NOTE: We update data (raw_user_meta_data) only — no email/password passed so Supabase does not fail with current_password required.
       try {
         await supabase.auth.updateUser({
-          email: deadEmail,
-          password: deadPassword,
           data: {
             is_deleted: true,
+            account_status: "deleted",
             deleted_at: new Date().toISOString(),
-            original_email: user?.email,
+            original_email: user?.email?.toLowerCase(),
           },
         });
       } catch (authErr) {
-        console.warn("Credential scrambling notice:", authErr);
+        console.warn("Credential metadata update notice:", authErr);
       }
 
       try {
         await supabase.rpc("delete_current_user");
       } catch {}
 
-      // 2. Wipe all application records from MongoDB & Supabase
+      // 2. Wipe all application records from MongoDB & Supabase server-side
       const res = await deleteAccount({ data: undefined });
       if (res?.success) {
         toast.success(isArabic ? "تم حذف حسابك نهائياً" : "Your account has been deleted permanently");

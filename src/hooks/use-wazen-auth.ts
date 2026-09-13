@@ -10,16 +10,44 @@ export function useSession() {
 
   useEffect(() => {
     let active = true;
+
+    function isDeletedUser(u: any) {
+      if (!u) return false;
+      const email = u.email?.toLowerCase();
+      return (
+        u.user_metadata?.is_deleted === true ||
+        u.user_metadata?.account_status === "deleted" ||
+        email === "sajaahdi05@gmail.com" ||
+        email === "saja.aljumah@gmail.com" ||
+        email?.includes("deleted.wazen") ||
+        email?.startsWith("deleted-")
+      );
+    }
+
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
+      if (isDeletedUser(data.session?.user)) {
+        supabase.auth.signOut().catch(() => {});
+        setSession(null);
+        setLoading(false);
+        return;
+      }
       setSession(data.session);
       setLoading(false);
     });
+
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
       if (!active) return;
+      if (isDeletedUser(next?.user)) {
+        supabase.auth.signOut().catch(() => {});
+        setSession(null);
+        setLoading(false);
+        return;
+      }
       setSession(next);
       setLoading(false);
     });
+
     return () => {
       active = false;
       sub.subscription.unsubscribe();

@@ -52,7 +52,13 @@ function Landing() {
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.origin) {
-      setAppUrl(window.location.origin);
+      // If running on local dev (localhost/127.0.0.1), keep DEFAULT_APP_URL so mobile phone scans work
+      const isLocal =
+        window.location.hostname.includes("localhost") ||
+        window.location.hostname.includes("127.0.0.1");
+      if (!isLocal) {
+        setAppUrl(window.location.origin);
+      }
     }
   }, []);
 
@@ -69,18 +75,23 @@ function Landing() {
                 {t("signIn")}
               </Link>
             </Button>
+            <Button asChild size="sm" className="hidden sm:inline-flex font-medium">
+              <Link to="/auth" search={{ mode: "signup" as const }}>
+                {t("createAccount")}
+              </Link>
+            </Button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
+      <main className="mx-auto max-w-6xl space-y-16 px-5 sm:px-8 py-10 sm:py-16">
         {/* HERO SECTION WITH EMBEDDED QR SHOWCASE CARD */}
-        <section className="grid items-center gap-10 py-12 lg:grid-cols-12 lg:gap-14 lg:py-20">
+        <section className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
           {/* Main Copy & CTAs */}
           <div className="relative z-10 flex flex-col justify-center lg:col-span-7 wazen-enter">
-            <div className="inline-flex items-center gap-2 self-start rounded-full bg-accent/60 px-3.5 py-1.5 text-xs font-semibold text-primary border border-primary/10">
-              <span className="size-2 rounded-full bg-primary animate-pulse" />
-              {t("landingEyebrow")}
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
+              <span className="size-2 rounded-full bg-primary" />
+              {isArabic ? "النسخة المباشرة المحدثة" : "Latest Live Version"}
             </div>
 
             <h1 className="mt-5">
@@ -145,8 +156,14 @@ function Landing() {
                   : "Open your camera to launch the latest version directly"}
               </p>
 
-              {/* QR Code container */}
-              <div className="rounded-3xl bg-card p-4 sm:p-5 shadow-sm ring-1 ring-border/80 relative z-10 transition-transform hover:scale-[1.02] duration-300">
+              {/* QR Code clickable link container */}
+              <a
+                href={appUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block rounded-3xl bg-card p-4 sm:p-5 shadow-sm ring-1 ring-border/80 relative z-10 transition-all duration-300 hover:scale-[1.02] hover:ring-primary/40 hover:shadow-lifted cursor-pointer"
+                title={isArabic ? "اضغط لفتح التطبيق مباشرة" : "Click to open app directly"}
+              >
                 <div className="rounded-2xl bg-white p-3 sm:p-4">
                   <QRCodeSVG
                     value={appUrl}
@@ -157,15 +174,24 @@ function Landing() {
                     aria-label={`QR code for ${appUrl}`}
                   />
                 </div>
-              </div>
+                <span className="mt-2 block text-[11px] font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                  {isArabic ? "امسح بالكاميرا أو اضغط للدخول ↗" : "Scan with camera or click to enter ↗"}
+                </span>
+              </a>
 
-              {/* Live Version Indicator */}
-              <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] font-medium text-muted-foreground relative z-10">
+              {/* Live Version Indicator Clickable Pill */}
+              <a
+                href={appUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-full border border-border/70 bg-card/80 px-3.5 py-1 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors relative z-10"
+              >
                 <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="truncate max-w-[240px] dir-ltr text-left font-mono text-[11px]">
                   {appUrl.replace(/^https?:\/\//, "")}
                 </span>
-              </div>
+                <ForwardIcon className="size-3 text-muted-foreground ms-1" strokeWidth={ICON_STROKE} />
+              </a>
             </div>
           </div>
         </section>
