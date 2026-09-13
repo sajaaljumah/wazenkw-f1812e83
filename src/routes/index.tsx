@@ -89,12 +89,7 @@ function Landing() {
         <section className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
           {/* Main Copy & CTAs */}
           <div className="relative z-10 flex flex-col justify-center lg:col-span-7 wazen-enter">
-            <div className="inline-flex items-center gap-2 self-start rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
-              <span className="size-2 rounded-full bg-primary" />
-              {t("landingEyebrow")}
-            </div>
-
-            <h1 className="mt-5">
+            <h1>
               <WazenLogo size={96} />
               <span className="sr-only">Wazen</span>
             </h1>
@@ -152,8 +147,8 @@ function Landing() {
               </p>
               <p className="text-xs text-muted-foreground mb-5 max-w-xs relative z-10">
                 {isArabic
-                  ? "افتح كاميرا هاتفك وامسح الكود لفتح أحدث نسخة من التطبيق مباشرة"
-                  : "Open your camera to launch the latest version directly"}
+                  ? "افتح كاميرا هاتفك وامسح الكود للدخول إلى التطبيق مباشرة"
+                  : "Open your camera to launch the app directly"}
               </p>
 
               {/* QR Code clickable link container */}
