@@ -62,6 +62,7 @@ import {
   Flame,
   ChevronDown,
   MoreHorizontal,
+  Bot,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -131,6 +132,7 @@ export const FreePlanIcon = Circle;
 export const FamilyIcon = Users;
 export const StudentIcon = GraduationCap;
 export const LockedIcon = Lock;
+export const AiIcon = Bot;
 
 // Utility
 export const CheckIcon = Check;

@@ -22,11 +22,17 @@ import { useWazenLabels } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
+type SubscriptionSearch = {
+  session_id?: string | undefined;
+  success?: boolean | undefined;
+  canceled?: boolean | undefined;
+};
+
 export const Route = createFileRoute("/_authenticated/subscription")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    session_id: typeof search.session_id === "string" ? search.session_id : undefined,
-    success: search.success === "true" || search.success === true,
-    canceled: search.canceled === "true" || search.canceled === true,
+  validateSearch: (search: Record<string, unknown>): SubscriptionSearch => ({
+    session_id: typeof search["session_id"] === "string" ? search["session_id"] : undefined,
+    success: search["success"] === "true" || search["success"] === true ? true : undefined,
+    canceled: search["canceled"] === "true" || search["canceled"] === true ? true : undefined,
   }),
   component: SubscriptionPage,
   head: () => ({
@@ -77,7 +83,8 @@ function SubscriptionPage() {
   async function refreshPlanEverywhere(newEntitlements?: typeof entitlements) {
     if (newEntitlements) {
       queryClient.setQueryData(["entitlements"], newEntitlements);
-      queryClient.setQueryData(["entitlements", entitlements.userId], newEntitlements);
+      const uid = (entitlements as unknown as { userId?: string })?.userId;
+      if (uid) queryClient.setQueryData(["entitlements", uid], newEntitlements);
     }
     await queryClient.invalidateQueries({ queryKey: ["entitlements"] });
     await refetch();
@@ -114,7 +121,7 @@ function SubscriptionPage() {
             },
           );
           await refreshPlanEverywhere(res.entitlements);
-          navigate({ search: {}, replace: true });
+          navigate({ search: { session_id: undefined, success: false, canceled: false }, replace: true });
         } else if (active) {
           toast.dismiss(toastId);
           toast.error(
@@ -122,7 +129,7 @@ function SubscriptionPage() {
               ? "لم تكتمل عملية الدفع عبر Stripe بعد."
               : "Payment has not been completed through Stripe yet.",
           );
-          navigate({ search: {}, replace: true });
+          navigate({ search: { session_id: undefined, success: false, canceled: false }, replace: true });
         }
       } catch (err) {
         console.error("Failed to verify Stripe session:", err);
@@ -133,7 +140,7 @@ function SubscriptionPage() {
               ? "حدث خطأ أثناء التحقق من الاشتراك."
               : "Error verifying Stripe subscription.",
           );
-          navigate({ search: {}, replace: true });
+          navigate({ search: { session_id: undefined, success: false, canceled: false }, replace: true });
         }
       }
     }
@@ -148,7 +155,7 @@ function SubscriptionPage() {
   useEffect(() => {
     if (search.canceled) {
       toast.info(isArabic ? "تم إلغاء عملية الدفع." : "Payment was cancelled.");
-      navigate({ search: {}, replace: true });
+      navigate({ search: { session_id: undefined, success: false, canceled: false }, replace: true });
     }
   }, [search.canceled]);
 

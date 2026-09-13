@@ -247,7 +247,10 @@ export function AiFinancialAdvisor({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => handleRequestAdvice(quickPrompts[0].prompt)}
+                    onClick={() => {
+                      const prompt = quickPrompts[0]?.prompt;
+                      if (prompt) handleRequestAdvice(prompt);
+                    }}
                     className="mt-3 h-7 text-xs"
                   >
                     <RetryIcon className="size-3 me-1.5" strokeWidth={ICON_STROKE} />

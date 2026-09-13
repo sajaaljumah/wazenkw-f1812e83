@@ -98,7 +98,7 @@ export type ChatCompletionResult = {
  * Never logs or returns the key value in public responses.
  */
 function getApiKey(): string | null {
-  const key = process.env.OPENROUTER_API_KEY;
+  const key = process.env["OPENROUTER_API_KEY"];
   if (!key || key.trim() === "") {
     return null;
   }

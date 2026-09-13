@@ -11,8 +11,8 @@ export const Route = createFileRoute("/_authenticated")({
     const u = data.user;
     const email = u.email?.toLowerCase();
     if (
-      u.user_metadata?.is_deleted === true ||
-      u.user_metadata?.account_status === "deleted" ||
+      u.user_metadata?.["is_deleted"] === true ||
+      u.user_metadata?.["account_status"] === "deleted" ||
       email?.includes("deleted.wazen") ||
       email?.startsWith("deleted-")
     ) {

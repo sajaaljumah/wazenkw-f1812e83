@@ -7,7 +7,6 @@
  * Never exposes the connection string, credentials, or internal exceptions.
  */
 import { MongoClient, Db, Collection, IndexSpecification, Document } from "mongodb";
-import type { FxSnapshot } from "@/lib/currency";
 
 export type MongoDbError = {
   success: false;
@@ -301,7 +300,7 @@ function sanitizeErrorMessage(error: unknown): string {
  * Checks whether MongoDB URI is configured in server environment.
  */
 export function isMongoConfigured(): boolean {
-  const uri = process.env.MONGODB_URI;
+  const uri = process.env["MONGODB_URI"];
   return Boolean(uri && uri.trim().length > 0);
 }
 
@@ -309,7 +308,7 @@ export function isMongoConfigured(): boolean {
  * Returns the active MongoClient, reusing the cached pool instance.
  */
 export async function getMongoClient(): Promise<MongoClient> {
-  const uri = process.env.MONGODB_URI;
+  const uri = process.env["MONGODB_URI"];
   if (!uri || uri.trim() === "") {
     throw new Error("MONGODB_URI is not configured in the server environment.");
   }
@@ -376,9 +375,9 @@ export async function pingDatabase(dbName: string = "Wazen"): Promise<{
 }> {
   try {
     const db = await getMongoDb(dbName);
-    const result = await db.command({ ping: 1 });
+    const result = (await db.command({ ping: 1 })) as any;
     return {
-      success: result.ok === 1,
+      success: result?.ok === 1,
       database: dbName,
     };
   } catch (err) {

@@ -20,7 +20,7 @@ import {
  * Handles both MongoDB Atlas field conventions (plan_id, billing_cycle) and
  * Supabase field conventions (plan, subscription_type, billing_period).
  */
-export function mapMongoSubDocToSubscription(doc: Record<string, unknown>): Subscription {
+export function mapMongoSubDocToSubscription(doc: any): Subscription {
   const isPremium =
     doc.plan === "premium" || doc.plan_id === "individual" || doc.plan_id === "family";
   const plan: SubscriptionPlan = isPremium ? "premium" : "free";
@@ -104,7 +104,7 @@ export async function loadEntitlements(
     const { getDatabase, COLLECTIONS } = await import("@/lib/mongodb.server");
     const db = await getDatabase();
     const mongoSub = await db.collection(COLLECTIONS.subscriptions).findOne({
-      $or: [{ user_id: userId }, { _id: userId }],
+      $or: [{ user_id: userId }, { _id: userId as any }],
     });
     if (mongoSub) {
       ownSubscription = mapMongoSubDocToSubscription(mongoSub);
@@ -121,7 +121,7 @@ export async function loadEntitlements(
   if (!ownSubscription || ownSubscription.plan !== "premium" || ownSubscription.status !== "active") {
     try {
       const { data: userData } = await supabase.auth.getUser();
-      const metaSub = userData?.user?.user_metadata?.subscription;
+      const metaSub = userData?.user?.user_metadata?.["subscription"] as any;
       if (metaSub && (metaSub.plan === "premium" || metaSub.status === "active")) {
         const isExpired =
           metaSub.current_period_end && new Date(metaSub.current_period_end) <= new Date();
@@ -326,7 +326,7 @@ export async function activatePremium(
     const { getDatabase, COLLECTIONS } = await import("@/lib/mongodb.server");
     const db = await getDatabase();
     await db.collection(COLLECTIONS.subscriptions).updateOne(
-      { $or: [{ user_id: userId }, { _id: userId }] },
+      { $or: [{ user_id: userId }, { _id: userId as any }] },
       {
         $set: {
           plan_id: kind === "family" ? "family" : "individual",
@@ -384,7 +384,7 @@ export async function activatePremium(
   }
 
   // 3. Best-effort Supabase sync if SUPABASE_SERVICE_ROLE_KEY is present
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       await supabaseAdmin.from("subscriptions").upsert(
@@ -455,7 +455,7 @@ export async function cancelPremium(
     const { getDatabase, COLLECTIONS } = await import("@/lib/mongodb.server");
     const db = await getDatabase();
     await db.collection(COLLECTIONS.subscriptions).updateOne(
-      { $or: [{ user_id: userId }, { _id: userId }] },
+      { $or: [{ user_id: userId }, { _id: userId as any }] },
       {
         $set: {
           plan_id: "free",
@@ -491,7 +491,7 @@ export async function cancelPremium(
   } catch {}
 
   // 3. Best-effort Supabase sync if SUPABASE_SERVICE_ROLE_KEY is present
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       await supabaseAdmin

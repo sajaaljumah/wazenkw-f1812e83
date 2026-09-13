@@ -174,8 +174,8 @@ function AuthPage() {
 
     if (
       user &&
-      (user.user_metadata?.is_deleted === true ||
-        user.user_metadata?.account_status === "deleted" ||
+      (user.user_metadata?.["is_deleted"] === true ||
+        user.user_metadata?.["account_status"] === "deleted" ||
         isServerDeleted ||
         user.email?.toLowerCase().includes("deleted.wazen") ||
         user.email?.toLowerCase().startsWith("deleted-"))

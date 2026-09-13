@@ -15,8 +15,8 @@ export function useSession() {
       if (!u) return false;
       const email = u.email?.toLowerCase();
       return (
-        u.user_metadata?.is_deleted === true ||
-        u.user_metadata?.account_status === "deleted" ||
+        u.user_metadata?.["is_deleted"] === true ||
+        u.user_metadata?.["account_status"] === "deleted" ||
         email?.includes("deleted.wazen") ||
         email?.startsWith("deleted-")
       );

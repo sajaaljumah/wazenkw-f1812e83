@@ -30,7 +30,7 @@ export type CheckoutSessionOptions = {
  * Checks whether Stripe is configured in server environment.
  */
 export function isStripeConfigured(): boolean {
-  const key = process.env.STRIPE_SECRET_KEY;
+  const key = process.env["STRIPE_SECRET_KEY"];
   return Boolean(key && key.trim().length > 0);
 }
 
@@ -39,7 +39,7 @@ export function isStripeConfigured(): boolean {
  * Strictly verifies and refuses live mode keys to prevent charging real money.
  */
 export function getStripeClient(): Stripe {
-  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const secretKey = process.env["STRIPE_SECRET_KEY"];
   if (!secretKey || secretKey.trim() === "") {
     throw new Error("STRIPE_SECRET_KEY is not configured in the server environment.");
   }
@@ -111,21 +111,25 @@ export async function getOrCreateStripeCustomer(
     const search = await stripe.customers.search({
       query: `metadata['userId']:'${userId}'`,
     });
-    if (search.data.length > 0 && !search.data[0].deleted) {
-      return search.data[0].id;
+    const firstCust = search.data[0];
+    if (firstCust && !firstCust.deleted) {
+      return firstCust.id;
     }
   } catch {
     // If search is not enabled or index pending, continue
   }
 
   // 4. Create new customer with Wazen userId in metadata
-  const customer = await stripe.customers.create({
-    email: userEmail || undefined,
+  const createData: Stripe.CustomerCreateParams = {
     metadata: {
       userId,
       app: "Wazen",
     },
-  });
+  };
+  if (userEmail) {
+    createData.email = userEmail;
+  }
+  const customer = await stripe.customers.create(createData);
 
   return customer.id;
 }
@@ -141,9 +145,9 @@ export async function createCheckoutSession(
   const customerId = await getOrCreateStripeCustomer(options.userId, options.userEmail);
 
   // Validate Price IDs from environment variables
-  const premiumPriceId = process.env.STRIPE_PREMIUM_PRICE_ID;
-  const familyPriceId = process.env.STRIPE_FAMILY_PRICE_ID;
-  const additionalChildPriceId = process.env.STRIPE_FAMILY_ADDITIONAL_CHILD_PRICE_ID;
+  const premiumPriceId = process.env["STRIPE_PREMIUM_PRICE_ID"];
+  const familyPriceId = process.env["STRIPE_FAMILY_PRICE_ID"];
+  const additionalChildPriceId = process.env["STRIPE_FAMILY_ADDITIONAL_CHILD_PRICE_ID"];
 
   const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
@@ -218,7 +222,7 @@ export async function createCheckoutSession(
     }
   }
 
-  let baseUrl = process.env.APP_URL || "https://wazenkw-f1812e83.onrender.com";
+  let baseUrl = process.env["APP_URL"] || "https://wazenkw-f1812e83.onrender.com";
   if (baseUrl.includes("wazen.onrender.com") && !baseUrl.includes("wazenkw-f1812e83")) {
     baseUrl = "https://wazenkw-f1812e83.onrender.com";
   }
@@ -318,11 +322,12 @@ export async function cancelSubscription(
   }
 
   // Synchronize cancellation state to databases
-  const userId = subscription.metadata?.userId;
+  const sub = subscription as any;
+  const userId = sub?.metadata?.["userId"];
   if (userId) {
     const now = new Date().toISOString();
-    const periodEnd = subscription.current_period_end
-      ? new Date(subscription.current_period_end * 1000).toISOString()
+    const periodEnd = sub.current_period_end
+      ? new Date(sub.current_period_end * 1000).toISOString()
       : now;
 
     // MongoDB
@@ -337,7 +342,7 @@ export async function cancelSubscription(
             current_period_end: periodEnd,
             status: cancelAtPeriodEnd ? "active" : "canceled",
             plan_id: cancelAtPeriodEnd
-              ? subscription.metadata?.kind === "family"
+              ? sub.metadata?.["kind"] === "family"
                 ? "family"
                 : "individual"
               : "free",
@@ -378,7 +383,7 @@ export async function constructWebhookEvent(
   signature: string,
 ): Promise<Stripe.Event> {
   const stripe = getStripeClient();
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const webhookSecret = process.env["STRIPE_WEBHOOK_SECRET"];
 
   if (!webhookSecret || webhookSecret.trim() === "") {
     throw new Error("STRIPE_WEBHOOK_SECRET is not configured in the server environment.");
@@ -418,7 +423,7 @@ export async function syncSubscriptionState(params: {
   try {
     const subCol = await getCollection("subscriptions");
     await subCol.updateOne(
-      { $or: [{ user_id: params.userId }, { _id: params.userId }] },
+      { $or: [{ user_id: params.userId }, { _id: params.userId as any }] },
       {
         $set: {
           plan_id: params.plan,
@@ -457,7 +462,7 @@ export async function syncSubscriptionState(params: {
   }
 
   // 2. Best-effort Supabase sync when SUPABASE_SERVICE_ROLE_KEY is present
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       await supabaseAdmin.from("subscriptions").upsert(
@@ -528,8 +533,8 @@ export async function handleStripeWebhook(event: Stripe.Event): Promise<{
 
   switch (event.type) {
     case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const userId = session.client_reference_id || session.metadata?.userId;
+      const session = event.data.object as any;
+      const userId = session.client_reference_id || session.metadata?.["userId"];
       if (!userId) break;
 
       const subscriptionId =
@@ -540,9 +545,9 @@ export async function handleStripeWebhook(event: Stripe.Event): Promise<{
       const customerId =
         typeof session.customer === "string" ? session.customer : session.customer?.id || null;
 
-      const kind = session.metadata?.kind === "family" ? "family" : "individual";
-      const familyId = session.metadata?.familyId || null;
-      const additionalChildren = parseInt(session.metadata?.additionalChildren || "0", 10) || 0;
+      const kind = session.metadata?.["kind"] === "family" ? "family" : "individual";
+      const familyId = session.metadata?.["familyId"] || null;
+      const additionalChildren = parseInt(session.metadata?.["additionalChildren"] || "0", 10) || 0;
 
       let periodStart = new Date().toISOString();
       let periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -550,7 +555,7 @@ export async function handleStripeWebhook(event: Stripe.Event): Promise<{
 
       if (subscriptionId) {
         try {
-          const sub = await stripe.subscriptions.retrieve(subscriptionId);
+          const sub = (await stripe.subscriptions.retrieve(subscriptionId)) as any;
           if (sub.current_period_start) {
             periodStart = new Date(sub.current_period_start * 1000).toISOString();
           }
@@ -582,8 +587,8 @@ export async function handleStripeWebhook(event: Stripe.Event): Promise<{
 
     case "customer.subscription.created":
     case "customer.subscription.updated": {
-      const sub = event.data.object as Stripe.Subscription;
-      const userId = sub.metadata?.userId;
+      const sub = event.data.object as any;
+      const userId = sub.metadata?.["userId"];
       const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer?.id || null;
 
       // Find user if not on subscription metadata
@@ -602,9 +607,9 @@ export async function handleStripeWebhook(event: Stripe.Event): Promise<{
 
       if (!resolvedUserId) break;
 
-      const kind = sub.metadata?.kind === "family" ? "family" : "individual";
-      const familyId = sub.metadata?.familyId || null;
-      const additionalChildren = parseInt(sub.metadata?.additionalChildren || "0", 10) || 0;
+      const kind = sub.metadata?.["kind"] === "family" ? "family" : "individual";
+      const familyId = sub.metadata?.["familyId"] || null;
+      const additionalChildren = parseInt(sub.metadata?.["additionalChildren"] || "0", 10) || 0;
       const priceId = sub.items?.data?.[0]?.price?.id || null;
 
       const isActive = sub.status === "active" || sub.status === "trialing";
@@ -636,10 +641,10 @@ export async function handleStripeWebhook(event: Stripe.Event): Promise<{
     }
 
     case "customer.subscription.deleted": {
-      const sub = event.data.object as Stripe.Subscription;
+      const sub = event.data.object as any;
       const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer?.id || null;
 
-      let resolvedUserId = sub.metadata?.userId;
+      let resolvedUserId = sub.metadata?.["userId"];
       if (!resolvedUserId) {
         try {
           const subCol = await getCollection("subscriptions");

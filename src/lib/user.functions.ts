@@ -16,8 +16,8 @@ export async function purgeUserByEmail(targetEmail: string) {
   // 1. Attempt RPC purge_deleted_user_by_email
   try {
     const { createClient } = await import("@supabase/supabase-js");
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
-    const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
+    const supabaseUrl = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
+    const supabaseKey = process.env["SUPABASE_PUBLISHABLE_KEY"] || process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
     const authClient = createClient(supabaseUrl, supabaseKey);
     await (authClient.rpc as any)("purge_deleted_user_by_email", { target_email: cleanEmail });
   } catch (rpcErr) {
@@ -25,7 +25,7 @@ export async function purgeUserByEmail(targetEmail: string) {
   }
 
   // 2. If Supabase admin client is available
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: usersData, error: listError } = await supabaseAdmin.auth.admin.listUsers();
@@ -36,7 +36,7 @@ export async function purgeUserByEmail(targetEmail: string) {
         if (found) {
           const userId = found.id;
           await Promise.allSettled([
-            supabaseAdmin.from("documents").delete().eq("user_id", userId),
+            (supabaseAdmin.from("documents" as any)).delete().eq("user_id", userId),
             supabaseAdmin.from("transactions").delete().eq("user_id", userId),
             supabaseAdmin.from("goals").delete().eq("user_id", userId),
             supabaseAdmin.from("budgets").delete().eq("user_id", userId),
@@ -64,11 +64,11 @@ export async function purgeUserByEmail(targetEmail: string) {
     if (isMongoConfigured()) {
       const db = await getDatabase();
       const profile = await db.collection("profiles").findOne({ email: cleanEmail });
-      const userId = (profile?.user_id || profile?._id) as string | undefined;
+          const userId = (profile?.["user_id"] || profile?._id) as string | undefined;
       if (userId) {
         await Promise.allSettled([
-          db.collection("profiles").deleteOne({ _id: userId }),
-          db.collection("subscriptions").deleteOne({ $or: [{ user_id: userId }, { _id: userId }] }),
+          db.collection("profiles").deleteOne({ _id: userId as any }),
+          db.collection("subscriptions").deleteOne({ $or: [{ user_id: userId }, { _id: userId as any }] }),
           db.collection("documents").deleteMany({ user_id: userId }),
           db.collection("transactions").deleteMany({ user_id: userId }),
           db.collection("family_relationships").deleteMany({ $or: [{ child_user_id: userId }, { parent_user_id: userId }] }),
@@ -123,7 +123,7 @@ export async function isAccountDeleted(
       const db = await getDatabase();
       if (cleanId) {
         const found = await db.collection("deleted_accounts").findOne({
-          $or: [{ user_id: cleanId }, { _id: cleanId }],
+          $or: [{ user_id: cleanId }, { _id: cleanId as any }],
         });
         if (found) {
           DELETED_USER_IDS_SET.add(cleanId);
@@ -165,18 +165,18 @@ export const prepareEmailForSignUpFn = createServerFn({ method: "POST" })
     // 3. Purge marked-deleted account in Supabase Auth if any
     try {
       const { createClient } = await import("@supabase/supabase-js");
-      const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
-      const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
+      const supabaseUrl = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
+      const supabaseKey = process.env["SUPABASE_PUBLISHABLE_KEY"] || process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
       const client = createClient(supabaseUrl, supabaseKey);
       await (client.rpc as any)("purge_deleted_user_by_email", { target_email: cleanEmail });
     } catch {}
 
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: usersData } = await supabaseAdmin.auth.admin.listUsers();
         const existing = usersData?.users.find((u) => u.email?.toLowerCase() === cleanEmail);
-        if (existing && (existing.user_metadata?.is_deleted || existing.user_metadata?.account_status === "deleted")) {
+        if (existing && (existing.user_metadata?.["is_deleted"] || existing.user_metadata?.["account_status"] === "deleted")) {
           await supabaseAdmin.from("profiles").delete().eq("id", existing.id);
           await supabaseAdmin.auth.admin.deleteUser(existing.id);
         }
@@ -282,11 +282,11 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
             { upsert: true },
           ),
           db.collection("subscriptions").deleteOne({
-            $or: [{ user_id: context.userId }, { _id: context.userId }],
+            $or: [{ user_id: context.userId }, { _id: context.userId as any }],
           }),
           db.collection("documents").deleteMany({ user_id: context.userId }),
           db.collection("transactions").deleteMany({ user_id: context.userId }),
-          db.collection("profiles").deleteOne({ _id: context.userId }),
+          db.collection("profiles").deleteOne({ _id: context.userId as any }),
           db.collection("family_relationships").deleteMany({
             $or: [{ child_user_id: context.userId }, { parent_user_id: context.userId }],
           }),
@@ -299,7 +299,7 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
     // 2. Delete all records from Supabase tables
     try {
       await Promise.allSettled([
-        context.supabase.from("documents").delete().eq("user_id", context.userId),
+        (context.supabase.from("documents" as any)).delete().eq("user_id", context.userId),
         context.supabase.from("transactions").delete().eq("user_id", context.userId),
         context.supabase.from("goals").delete().eq("user_id", context.userId),
         context.supabase.from("budgets").delete().eq("user_id", context.userId),
@@ -333,13 +333,13 @@ export const deleteMyAccountFn = createServerFn({ method: "POST" })
 
     // 4. Attempt to delete from Supabase Auth via RPC if available
     try {
-      await context.supabase.rpc("delete_current_user");
+      await (context.supabase.rpc as any)("delete_current_user");
     } catch (rpcErr) {
       console.warn("RPC delete_current_user notice:", rpcErr);
     }
 
     // 5. Delete from Supabase Auth if admin key is present
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         await supabaseAdmin.auth.admin.deleteUser(context.userId);
@@ -403,8 +403,8 @@ export const registerChildWithGuardianFn = createServerFn({ method: "POST" })
 
     // 1. Authenticate Guardian to verify identity and adult status
     const { createClient } = await import("@supabase/supabase-js");
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
-    const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
+    const supabaseUrl = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
+    const supabaseKey = process.env["SUPABASE_PUBLISHABLE_KEY"] || process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
     const authClient = createClient(supabaseUrl, supabaseKey);
 
     let guardianId = "";
@@ -468,7 +468,7 @@ export const registerChildWithGuardianFn = createServerFn({ method: "POST" })
     // 2. Create the child account (clear any stale deleted record first)
     await prepareEmailForSignUpFn({ data: { email: cleanChildEmail } }).catch(() => {});
     let childUserId = "";
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: createdUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: cleanChildEmail,
@@ -522,14 +522,14 @@ export const registerChildWithGuardianFn = createServerFn({ method: "POST" })
       date_of_birth: data.child_dob,
       gender: data.child_gender,
       life_stage: "child",
-      account_type: "child",
+      account_type: "dependent" as const,
       language: "ar",
       base_currency: "KWD",
     };
 
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.from("profiles").upsert(childProfileData);
+      await (supabaseAdmin.from("profiles") as any).upsert(childProfileData);
 
       // 4. Link in family_relationships
       await supabaseAdmin.from("family_relationships").upsert(
@@ -563,7 +563,7 @@ export const registerChildWithGuardianFn = createServerFn({ method: "POST" })
         );
       }
     } else {
-      await authClient.from("profiles").upsert(childProfileData);
+      await (authClient.from("profiles") as any).upsert(childProfileData);
     }
 
     // 6. MongoDB Atlas sync (if configured)
@@ -574,7 +574,7 @@ export const registerChildWithGuardianFn = createServerFn({ method: "POST" })
         const now = new Date().toISOString();
         await Promise.allSettled([
           db.collection(COLLECTIONS.profiles).updateOne(
-            { _id: childUserId },
+            { _id: childUserId as any },
             {
               $set: {
                 _id: childUserId,
@@ -678,7 +678,7 @@ export const parentAddChildFn = createServerFn({ method: "POST" })
     // 2. Create child in Supabase (clear any stale deleted record first)
     await prepareEmailForSignUpFn({ data: { email: cleanChildEmail } }).catch(() => {});
     let childUserId = "";
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: createdUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: cleanChildEmail,
@@ -700,8 +700,8 @@ export const parentAddChildFn = createServerFn({ method: "POST" })
       childUserId = createdUser.user.id;
     } else {
       const { createClient } = await import("@supabase/supabase-js");
-      const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
-      const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
+      const supabaseUrl = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || "https://pdgdqlqjwvwbgrgziuvt.supabase.co";
+      const supabaseKey = process.env["SUPABASE_PUBLISHABLE_KEY"] || process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || "sb_publishable_wsia1nTheJe6eXdXmxSFkw_VTt1FP_j";
       const authClient = createClient(supabaseUrl, supabaseKey);
       const { data: signUpRes, error: signUpError } = await authClient.auth.signUp({
         email: cleanChildEmail,
@@ -729,14 +729,14 @@ export const parentAddChildFn = createServerFn({ method: "POST" })
       date_of_birth: data.child_dob,
       gender: data.child_gender,
       life_stage: "child",
-      account_type: "child",
+      account_type: "dependent" as const,
       language: "ar",
       base_currency: "KWD",
     };
 
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.from("profiles").upsert(childProfileData);
+      await (supabaseAdmin.from("profiles") as any).upsert(childProfileData);
 
       // 4. Link in family_relationships
       await supabaseAdmin.from("family_relationships").upsert(
@@ -770,7 +770,7 @@ export const parentAddChildFn = createServerFn({ method: "POST" })
         );
       }
     } else {
-      await context.supabase.from("profiles").upsert(childProfileData);
+      await (context.supabase.from("profiles") as any).upsert(childProfileData);
       await context.supabase.from("family_relationships").upsert(
         {
           parent_user_id: guardianId,
@@ -791,7 +791,7 @@ export const parentAddChildFn = createServerFn({ method: "POST" })
         const now = new Date().toISOString();
         await Promise.allSettled([
           db.collection(COLLECTIONS.profiles).updateOne(
-            { _id: childUserId },
+            { _id: childUserId as any },
             {
               $set: {
                 _id: childUserId,

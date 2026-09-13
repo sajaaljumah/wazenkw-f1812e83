@@ -238,10 +238,10 @@ export const verifyCheckoutSessionFn = createServerFn({ method: "POST" })
     );
     const { loadEntitlements } = await import("@/lib/subscription.server");
 
-    const session = await retrieveCheckoutSession(data.sessionId);
+    const session = (await retrieveCheckoutSession(data.sessionId)) as any;
 
     // Verify ownership
-    const sessionUserId = session.client_reference_id || session.metadata?.userId;
+    const sessionUserId = session.client_reference_id || session.metadata?.["userId"];
     if (sessionUserId && sessionUserId !== context.userId) {
       throw new Error("Unauthorized session verification.");
     }
@@ -251,9 +251,9 @@ export const verifyCheckoutSessionFn = createServerFn({ method: "POST" })
       return { success: false };
     }
 
-    const kind = session.metadata?.kind === "family" ? "family" : "individual";
-    const familyId = session.metadata?.familyId || null;
-    const additionalChildren = parseInt(session.metadata?.additionalChildren || "0", 10) || 0;
+    const kind = session.metadata?.["kind"] === "family" ? "family" : "individual";
+    const familyId = session.metadata?.["familyId"] || null;
+    const additionalChildren = parseInt(session.metadata?.["additionalChildren"] || "0", 10) || 0;
     const customerId =
       typeof session.customer === "string" ? session.customer : session.customer?.id || null;
     const subscriptionId =
@@ -268,7 +268,7 @@ export const verifyCheckoutSessionFn = createServerFn({ method: "POST" })
     if (subscriptionId) {
       try {
         const stripe = getStripeClient();
-        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        const sub = (await stripe.subscriptions.retrieve(subscriptionId)) as any;
         if (sub.current_period_start) {
           periodStart = new Date(sub.current_period_start * 1000).toISOString();
         }
