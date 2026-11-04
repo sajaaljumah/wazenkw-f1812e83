@@ -524,7 +524,7 @@ function ChildManager({
                     className={cn(
                       "shrink-0 text-sm tabular-nums",
                       tx.kind === "income" || tx.kind === "refund"
-                        ? "text-success"
+                        ? "text-positive"
                         : "text-foreground",
                     )}
                     dir="ltr"
