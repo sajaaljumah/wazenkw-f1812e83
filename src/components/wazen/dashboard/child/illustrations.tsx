@@ -142,6 +142,25 @@ export function StarBadgeIllustration({ className }: IllustrationProps) {
   );
 }
 
+/** "Wazen Buddy" — the friendly coin companion of the Learn chat. */
+export function BuddyMascotIllustration({ className }: IllustrationProps) {
+  return (
+    <Frame className={className}>
+      <circle cx="60" cy="60" r="52" fill={soft} opacity="0.55" />
+      <circle cx="60" cy="62" r="32" fill={champagne} />
+      <circle cx="60" cy="62" r="25" fill={ivory} opacity="0.55" />
+      <circle cx="50" cy="58" r="4" fill={deep} />
+      <circle cx="70" cy="58" r="4" fill={deep} />
+      <circle cx="51.5" cy="56.5" r="1.3" fill={ivory} />
+      <circle cx="71.5" cy="56.5" r="1.3" fill={ivory} />
+      <path d="M50 70c5 5 15 5 20 0" stroke={deep} strokeWidth="3" fill="none" strokeLinecap="round" />
+      <circle cx="43" cy="67" r="3.5" fill={mid} opacity="0.5" />
+      <circle cx="77" cy="67" r="3.5" fill={mid} opacity="0.5" />
+      <path d="M92 30c2 4 6 5 6 5s-4 1-6 5c-2-4-6-5-6-5s4-1 6-5z" fill={champagne} />
+    </Frame>
+  );
+}
+
 export type GoalIllustration = (props: IllustrationProps) => ReactElement;
 
 /** Picks a friendly illustration from the goal's own name — no new data needed. */
