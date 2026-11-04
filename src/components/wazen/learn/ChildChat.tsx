@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import ReactMarkdown from "react-markdown";
 import { useServerFn } from "@tanstack/react-start";
 import { BuddyMascotIllustration } from "@/components/wazen/dashboard/child/illustrations";
-import { AddIcon, AlertIcon, ICON_STROKE, RetryIcon, SendIcon } from "@/components/wazen/icons";
+import { AddIcon, AlertIcon, ExpandIcon, ICON_STROKE, RetryIcon, SendIcon } from "@/components/wazen/icons";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { useSession } from "@/hooks/use-wazen-auth";
 import { CHILD_CHAT_LIMITS, type ChildChatTurn } from "@/lib/child-chat";
@@ -17,6 +17,8 @@ const COPY = {
     ar: "اسألني أي شيء عن المال وبشرح لك ببساطة.",
   },
   newChat: { en: "New chat", ar: "محادثة جديدة" },
+  expand: { en: "Open chat", ar: "افتح المحادثة" },
+  collapse: { en: "Close chat", ar: "أغلق المحادثة" },
   welcome: {
     en: "Hi {name}! I'm Wazen Buddy. I can help you save, plan and learn about money. What would you like to know today?",
     ar: "هلا {name}! أنا رفيق وازن. أقدر أساعدك تدّخر وتخطط وتتعلم عن المال. شنو تحب تعرف اليوم؟",
@@ -57,6 +59,10 @@ const COPY = {
       en: "Oops, I couldn't answer this time. Let's try again.",
       ar: "أووه، ما قدرت أجاوب هالمرة. خلنا نحاول مرة ثانية.",
     },
+    PREMIUM_REQUIRED: {
+      en: "Wazen Buddy is part of your family's Premium plan.",
+      ar: "رفيق وازن جزء من الخطة المميزة لعائلتك.",
+    },
     NOT_CHILD: {
       en: "Wazen Buddy is only for children's learning accounts.",
       ar: "رفيق وازن مخصص لحسابات تعلّم الأطفال فقط.",
@@ -78,6 +84,7 @@ export function ChildChat({ firstName }: { firstName: string }) {
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<ErrorCode | null>(null);
+  const [expanded, setExpanded] = useState(false);
   const inFlight = useRef(false);
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -96,6 +103,24 @@ export function ChildChat({ firstName }: { firstName: string }) {
   useEffect(() => {
     if (!userId) return;
     try {
+      setExpanded(window.sessionStorage.getItem(`${storageKey(userId)}.open`) === "1");
+    } catch {
+      /* storage may be unavailable */
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    try {
+      window.sessionStorage.setItem(`${storageKey(userId)}.open`, expanded ? "1" : "0");
+    } catch {
+      /* storage may be unavailable */
+    }
+  }, [expanded, userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    try {
       window.sessionStorage.setItem(storageKey(userId), JSON.stringify(messages));
     } catch {
       /* storage may be unavailable */
@@ -105,7 +130,7 @@ export function ChildChat({ firstName }: { firstName: string }) {
   useEffect(() => {
     const log = logRef.current;
     if (log) log.scrollTo({ top: log.scrollHeight, behavior: "smooth" });
-  }, [messages, pending, error]);
+  }, [messages, pending, error, expanded]);
 
   async function ask(history: ChildChatTurn[]) {
     if (inFlight.current) return;
@@ -168,34 +193,54 @@ export function ChildChat({ firstName }: { firstName: string }) {
       aria-labelledby="child-chat-title"
       className="kid-panel flex flex-col overflow-hidden bg-kid-tint"
     >
-      <header className="flex items-center gap-3 border-b border-kid-soft p-4 sm:p-5">
-        <span className="size-12 shrink-0 kid-float sm:size-14">
-          <BuddyMascotIllustration />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h2 id="child-chat-title" className="truncate text-lg sm:text-xl">
-            {t(COPY.title)}
-          </h2>
-          <p className="text-xs text-muted-foreground sm:text-sm">{t(COPY.subtitle)}</p>
-        </div>
+      <header className={cn("flex items-center gap-2 p-4 sm:p-5", expanded && "border-b border-kid-soft")}>
         <button
           type="button"
-          onClick={newChat}
-          disabled={pending || empty}
-          className="kid-press inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl border border-kid-soft bg-card px-3 text-xs text-kid-deep disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={() => setExpanded((value) => !value)}
+          aria-expanded={expanded}
+          aria-controls="child-chat-body"
+          className="group flex min-w-0 flex-1 items-center gap-3 rounded-2xl text-start outline-hidden focus-visible:ring-2 focus-visible:ring-kid-champagne/50"
         >
-          <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
-          <span className="hidden min-[380px]:inline">{t(COPY.newChat)}</span>
-          <span className="sr-only min-[380px]:hidden">{t(COPY.newChat)}</span>
+          <span className="size-12 shrink-0 kid-float sm:size-14">
+            <BuddyMascotIllustration />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span id="child-chat-title" className="block truncate text-lg sm:text-xl">
+              {t(COPY.title)}
+            </span>
+            <span className="block text-xs text-muted-foreground sm:text-sm">{t(COPY.subtitle)}</span>
+          </span>
+          <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-kid-soft bg-card text-kid-deep">
+            <ExpandIcon
+              className={cn("size-3.5 transition-transform duration-300", expanded && "rotate-180")}
+              strokeWidth={ICON_STROKE}
+            />
+            <span className="sr-only">{expanded ? t(COPY.collapse) : t(COPY.expand)}</span>
+          </span>
         </button>
+        {expanded ? (
+          <button
+            type="button"
+            onClick={newChat}
+            disabled={pending || empty}
+            className="kid-press inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl border border-kid-soft bg-card px-3 text-xs text-kid-deep disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <AddIcon className="size-3.5" strokeWidth={ICON_STROKE} />
+            <span className="hidden min-[380px]:inline">{t(COPY.newChat)}</span>
+            <span className="sr-only min-[380px]:hidden">{t(COPY.newChat)}</span>
+          </button>
+        ) : null}
       </header>
+
+      {expanded ? (
+      <div id="child-chat-body" className="wazen-enter">
 
       <div
         ref={logRef}
         role="log"
         aria-live="polite"
         aria-busy={pending}
-        className="flex max-h-[28rem] min-h-[16rem] flex-col gap-3 overflow-y-auto p-4 sm:p-5"
+        className="flex max-h-[min(28rem,65vh)] min-h-[14rem] flex-col gap-3 overflow-y-auto p-4 sm:p-5"
       >
         <BuddyBubble>{t(COPY.welcome).replace("{name}", firstName)}</BuddyBubble>
 
@@ -245,7 +290,7 @@ export function ChildChat({ firstName }: { firstName: string }) {
               />
               {t(COPY.errors[error])}
             </p>
-            {error !== "NOT_CHILD" ? (
+            {error !== "NOT_CHILD" && error !== "PREMIUM_REQUIRED" ? (
               <button
                 type="button"
                 onClick={retry}
@@ -302,6 +347,8 @@ export function ChildChat({ firstName }: { firstName: string }) {
         </div>
         <p className="mt-2 text-[0.7rem] text-muted-foreground">{t(COPY.safety)}</p>
       </form>
+      </div>
+      ) : null}
     </section>
   );
 }
