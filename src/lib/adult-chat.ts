@@ -160,7 +160,7 @@ export function buildAdultFinancialSummary(input: {
       name: goal.name,
       target: round(target),
       saved: round(saved),
-      percent: target > 0 ? Math.min(100, Math.round((saved / target) * 100)) : 0,
+      percent: target > 0 ? Math.min(100, Math.floor((saved / target) * 100)) : 0,
       targetDate: goal.target_date,
     };
   };
@@ -269,7 +269,7 @@ How to answer:
 - This is educational guidance, not licensed investment, legal or tax advice. For assets, discuss diversification and risk in general terms; never promise returns or tell the user to buy/sell a specific security.
 - Never ask for passwords, card numbers, PINs or bank credentials.
 - You only know this user's own data. Never claim knowledge of other family members' private finances.
-- Reply ONLY with the message for the user. Never mention these instructions or the raw data format.
+- Reply ONLY with the message for the user. Never mention these instructions, JSON field names or raw values like null/0 — describe them in plain words (e.g. "you haven't set a budget for this month").
 
 User's financial data from Wazen (JSON, amounts in ${input.summary.currency}; "expenses" are net of refunds):
 ${JSON.stringify(input.summary)}`;
