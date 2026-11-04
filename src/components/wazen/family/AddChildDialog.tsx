@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -14,6 +14,7 @@ import { FamilyIcon, SpinnerIcon, ICON_STROKE } from "@/components/wazen/icons";
 import { useWazenLocale } from "@/components/wazen/WazenLocale";
 import { parentAddChildFn } from "@/lib/user.functions";
 import { calculateAge } from "@/lib/wazen";
+import { useProfile } from "@/hooks/use-wazen-auth";
 
 interface AddChildDialogProps {
   open: boolean;
@@ -24,6 +25,10 @@ export function AddChildDialog({ open, onOpenChange }: AddChildDialogProps) {
   const { isArabic, t } = useWazenLocale();
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
+  const { data: parentProfile } = useProfile();
+  // The parent's own role is the natural default: a mother adds as "mother", a father as "father".
+  const defaultRelationship: "father" | "mother" | "guardian" =
+    parentProfile?.gender === "female" ? "mother" : parentProfile?.gender === "male" ? "father" : "guardian";
 
   const [form, setForm] = useState({
     name: "",
@@ -31,8 +36,12 @@ export function AddChildDialog({ open, onOpenChange }: AddChildDialogProps) {
     password: "",
     dob: "",
     gender: "female" as "female" | "male",
-    relationship: "father" as "father" | "mother" | "guardian",
+    relationship: "guardian" as "father" | "mother" | "guardian",
   });
+
+  useEffect(() => {
+    if (open) setForm((prev) => ({ ...prev, relationship: defaultRelationship }));
+  }, [open, defaultRelationship]);
 
   const age = form.dob ? calculateAge(form.dob) : null;
 
@@ -93,7 +102,7 @@ export function AddChildDialog({ open, onOpenChange }: AddChildDialogProps) {
         password: "",
         dob: "",
         gender: "female",
-        relationship: "father",
+        relationship: defaultRelationship,
       });
       await queryClient.invalidateQueries({ queryKey: ["family-summary"] });
       await queryClient.invalidateQueries({ queryKey: ["entitlements"] });

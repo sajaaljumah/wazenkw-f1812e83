@@ -111,7 +111,7 @@ function AuthPage() {
   const [guardian, setGuardian] = useState({
     email: "",
     password: "",
-    relationship: "father" as "father" | "mother" | "guardian",
+    relationship: "guardian" as "father" | "mother" | "guardian",
     hasAccount: true,
   });
 
