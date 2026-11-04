@@ -520,9 +520,11 @@ function SettingsPage() {
                     ? calculateAge(member.profile.date_of_birth)
                     : null;
                   return (
-                    <div
+                    <Link
                       key={member.profile.id}
-                      className="flex items-center justify-between rounded-xl border border-border bg-secondary/40 p-4 transition-all hover:bg-secondary/60"
+                      to="/family/$childId"
+                      params={{ childId: member.profile.id }}
+                      className="flex items-center justify-between rounded-xl border border-border bg-secondary/40 p-4 transition-all hover:border-primary/40 hover:bg-secondary/60 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring/40"
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">
@@ -539,9 +541,9 @@ function SettingsPage() {
                         </div>
                       </div>
                       <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                        {isArabic ? "مرتبط كولي أمر" : "Linked"}
+                        {isArabic ? "إدارة الحساب" : "Manage"}
                       </span>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
