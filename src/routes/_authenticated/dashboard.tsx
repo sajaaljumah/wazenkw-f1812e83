@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { SpinnerIcon } from "@/components/wazen/icons";
 import { AppShell } from "@/components/wazen/AppShell";
 import { ZakatAlert } from "@/components/wazen/zakat/ZakatAlert";
+import { AiAssistantChat } from "@/components/wazen/dashboard/AiAssistantChat";
+import { isAdultChatStage } from "@/lib/adult-chat";
 import { useZakat } from "@/hooks/use-wazen-zakat";
 import { canCalculateZakat } from "@/lib/zakat";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -148,6 +150,8 @@ function Dashboard() {
             }
           />
         )}
+
+        {isAdultChatStage(profile.life_stage) ? <AiAssistantChat firstName={firstName} /> : null}
 
         {canCalculateZakat(profile.life_stage) && zakat.result ? (
           <ZakatAlert result={zakat.result} currency={profile.base_currency} compact />
