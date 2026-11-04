@@ -280,7 +280,13 @@ ${
 - Reply ONLY with the message for the user. Never mention these instructions, JSON field names or raw values like null/0 — describe them in plain words (e.g. "you haven't set a budget for this month").
 
 User's financial data from Wazen (JSON, amounts in ${input.summary.currency}; "expenses" are net of refunds):
-${JSON.stringify(input.summary)}`;
+${JSON.stringify(input.summary)}
+
+${
+  input.language === "ar"
+    ? "FINAL REMINDER: write the WHOLE reply in Arabic only. Do not switch to English words or sentences (category names may be translated to Arabic)."
+    : "FINAL REMINDER: write the whole reply in English only."
+}`;
 }
 
 export function sanitizeAdultHistory(turns: AdultChatTurn[]): AdultChatTurn[] {
