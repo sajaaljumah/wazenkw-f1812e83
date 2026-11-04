@@ -11,7 +11,7 @@ export default defineConfig({
   vite: {
     resolve: {
       // tr46 (via mongodb) requires "punycode/"; map it to the npm package.
-      alias: [{ find: /^punycode\/$/, replacement: "punycode" }],
+      alias: [{ find: /^punycode\/$/, replacement: "/dev-server/node_modules/punycode/punycode.js" }],
     },
   },
   tanstackStart: {
