@@ -25,7 +25,9 @@ import { portfolioTotals, type Asset } from "@/lib/assets";
 
 export type AdultChatLanguage = "ar" | "en";
 export type AdultChatTurn = { role: "user" | "assistant"; content: string };
+/** Dashboard Wazen AI is offered to teenagers and every adult life stage (children use رفيق وازن on Learn). */
 export const ADULT_LIFE_STAGES_FOR_CHAT = [
+  "teenager",
   "university_student",
   "employee",
   "self_employed",
@@ -228,6 +230,7 @@ export function buildAdultFinancialSummary(input: {
 }
 
 const STAGE_LABEL: Record<string, string> = {
+  teenager: "teenage (13-17)",
   university_student: "university student",
   employee: "employee",
   self_employed: "self-employed",
@@ -258,7 +261,12 @@ You are talking with ${input.firstName}, a ${STAGE_LABEL[input.lifeStage] ?? "ad
 ${languageRule}
 ${grammarRule}
 
-How to answer:
+${
+    input.lifeStage === "teenager"
+      ? `Teen rules: keep language friendly and relatable for a teenager (pocket money, phones, outings with friends, saving for gadgets). Do NOT give investment, trading, crypto, credit, loan or borrowing advice — say these are decisions to make with a parent or guardian. Encourage involving a parent for big purchases or anything involving real payments online.
+`
+      : ""
+  }How to answer:
 - Analyse the user's real data below BEFORE answering. Quote specific figures, months, categories and percentages from it.
 - Explain patterns (e.g. month-over-month changes by category), point out avoidable spending, and give 2-4 realistic, concrete improvements with estimated amounts.
 - If the current month (or last month) has no recorded transactions, say so briefly, then analyse the most recent months in monthlyHistory that do have data (latestTransactionDate shows the newest record) instead of stopping at "zero".
