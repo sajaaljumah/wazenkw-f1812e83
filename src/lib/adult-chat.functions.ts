@@ -29,7 +29,7 @@ import { canOwnAssets, type Asset } from "@/lib/assets";
 
 export type AdultChatResult =
   | { ok: true; reply: string }
-  | { ok: false; code: "NOT_ALLOWED" | "NOT_CONFIGURED" | "BUSY" | "UNAVAILABLE" };
+  | { ok: false; code: "NOT_ALLOWED" | "PREMIUM_REQUIRED" | "NOT_CONFIGURED" | "BUSY" | "UNAVAILABLE" };
 
 const inputSchema = z.object({
   language: z.enum(["ar", "en"]),
@@ -67,6 +67,9 @@ export const sendAdultFinanceChatFn = createServerFn({ method: "POST" })
     if (profileError) throw new Error("Could not load profile.");
     if (!profile || !isAdultChatStage(profile.life_stage))
       return { ok: false, code: "NOT_ALLOWED" };
+
+    const { hasAiChatAccess, sendChatWithRetry } = await import("@/lib/ai-chat.server");
+    if (!(await hasAiChatAccess(supabase, userId))) return { ok: false, code: "PREMIUM_REQUIRED" };
 
     const now = new Date();
     const since = new Date(now.getFullYear(), now.getMonth() - 12, 1).toISOString().slice(0, 10);
@@ -115,8 +118,7 @@ export const sendAdultFinanceChatFn = createServerFn({ method: "POST" })
       now,
     });
 
-    const { sendChatCompletion } = await import("@/lib/openrouter.server");
-    const result = await sendChatCompletion(
+    const result = await sendChatWithRetry(
       [
         {
           role: "system",
