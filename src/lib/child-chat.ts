@@ -210,7 +210,13 @@ ${facts}
 Wazen catalogue you may suggest:
 Lessons: ${catalogue.lessons.join(" | ")}
 Games: ${catalogue.games.join(" | ")}
-Challenges: ${catalogue.challenges.join(" | ")}`;
+Challenges: ${catalogue.challenges.join(" | ")}
+
+${
+  context.language === "ar"
+    ? "FINAL REMINDER: write the WHOLE reply in Arabic only, never mixing in English sentences."
+    : "FINAL REMINDER: write the whole reply in English only."
+}`;
 }
 
 /** Keeps only valid recent turns, trimmed to the allowed size. */
