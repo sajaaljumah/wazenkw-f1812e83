@@ -165,7 +165,7 @@ function Dashboard() {
           />
         )}
 
-        {isAdultChatStage(profile.life_stage) ? <AiAssistantChat firstName={firstName} /> : null}
+        {isAdultChatStage(profile.life_stage) && canUseAi ? <AiAssistantChat firstName={firstName} /> : null}
 
         {canCalculateZakat(profile.life_stage) && zakat.result ? (
           <ZakatAlert result={zakat.result} currency={profile.base_currency} compact />
