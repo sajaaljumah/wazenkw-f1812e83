@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Rules
+- Child Learn chat calls the existing OpenRouter service only through the authenticated `sendChildLearningChatFn`, which builds the child's context server-side from their own rows; why: the browser must never supply the system prompt or another person's data.

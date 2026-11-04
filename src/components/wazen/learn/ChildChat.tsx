@@ -71,6 +71,7 @@ export function ChildChat({ firstName }: { firstName: string }) {
   const { language } = useWazenLocale();
   const t = (text: Text) => text[language];
   const { user } = useSession();
+  const userId = user?.id ?? null;
   const sendChat = useServerFn(sendChildLearningChatFn);
 
   const [messages, setMessages] = useState<ChildChatTurn[]>([]);
@@ -83,23 +84,23 @@ export function ChildChat({ firstName }: { firstName: string }) {
 
   // Keep the conversation for this browser session only (per account).
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     try {
-      const raw = window.sessionStorage.getItem(storageKey(user.id));
+      const raw = window.sessionStorage.getItem(storageKey(userId));
       if (raw) setMessages(JSON.parse(raw) as ChildChatTurn[]);
     } catch {
       /* ignore broken session data */
     }
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     try {
-      window.sessionStorage.setItem(storageKey(user.id), JSON.stringify(messages));
+      window.sessionStorage.setItem(storageKey(userId), JSON.stringify(messages));
     } catch {
       /* storage may be unavailable */
     }
-  }, [messages, user]);
+  }, [messages, userId]);
 
   useEffect(() => {
     const log = logRef.current;
