@@ -32,7 +32,11 @@ const inputSchema = z.object({
     .array(
       z.object({
         role: z.enum(["user", "assistant"]),
-        content: z.string().trim().min(1).max(CHILD_CHAT_LIMITS.maxMessageChars * 4),
+        content: z
+          .string()
+          .trim()
+          .min(1)
+          .max(CHILD_CHAT_LIMITS.maxMessageChars * 4),
       }),
     )
     .min(1)
@@ -59,13 +63,24 @@ export const sendChildLearningChatFn = createServerFn({ method: "POST" })
     if (!profile || profile.life_stage !== "child") return { ok: false, code: "NOT_CHILD" };
 
     const [learning, progress, challenges, goals, transactions] = await Promise.all([
-      supabase.from("learning_profiles").select("xp, current_streak").eq("user_id", userId).maybeSingle(),
+      supabase
+        .from("learning_profiles")
+        .select("xp, current_streak")
+        .eq("user_id", userId)
+        .maybeSingle(),
       supabase.from("learning_progress").select("*").eq("user_id", userId),
       supabase.from("learning_challenges").select("*").eq("user_id", userId),
-      supabase.from("goals").select("id, name, kind, target_amount").eq("user_id", userId).eq("kind", "goal").limit(1),
+      supabase
+        .from("goals")
+        .select("id, name, kind, target_amount")
+        .eq("user_id", userId)
+        .eq("kind", "goal")
+        .limit(1),
       supabase
         .from("transactions")
-        .select("id, user_id, kind, category, merchant, amount, currency, occurred_on, note, goal_id, created_at")
+        .select(
+          "id, user_id, kind, category, merchant, amount, currency, occurred_on, note, goal_id, created_at",
+        )
         .eq("user_id", userId)
         .limit(1000),
     ]);

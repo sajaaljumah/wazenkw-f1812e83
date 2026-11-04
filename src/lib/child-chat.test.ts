@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { CHILD_CHAT_LIMITS, buildChildChatContext, buildChildSystemPrompt, sanitizeChildHistory } from "./child-chat";
+import {
+  CHILD_CHAT_LIMITS,
+  buildChildChatContext,
+  buildChildSystemPrompt,
+  sanitizeChildHistory,
+} from "./child-chat";
 
 const baseContext = buildChildChatContext({
   firstName: "Layan",
@@ -13,7 +18,10 @@ const baseContext = buildChildChatContext({
 
 describe("child learning chat rules", () => {
   it("keeps only the last 16 turns of history", () => {
-    const turns = Array.from({ length: 30 }, (_, i) => ({ role: "user" as const, content: `q${i}` }));
+    const turns = Array.from({ length: 30 }, (_, i) => ({
+      role: "user" as const,
+      content: `q${i}`,
+    }));
     const kept = sanitizeChildHistory(turns);
     expect(kept).toHaveLength(16);
     expect(kept[0]?.content).toBe("q14");

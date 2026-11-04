@@ -60,7 +60,8 @@ export const Route = createFileRoute("/_authenticated/learn")({
       { title: "Learn — Wazen" },
       {
         name: "description",
-        content: "Wazen's child money school: short lessons, playable games, quizzes, challenges and badges.",
+        content:
+          "Wazen's child money school: short lessons, playable games, quizzes, challenges and badges.",
       },
       { property: "og:title", content: "Learn — Wazen" },
       {
@@ -113,7 +114,11 @@ function LearnPage() {
   }, [rows, challengeRows, transactions.data, goals.data]);
 
   const loading =
-    profileLoading || progress.isLoading || learning.isLoading || challenges.isLoading || transactions.isLoading;
+    profileLoading ||
+    progress.isLoading ||
+    learning.isLoading ||
+    challenges.isLoading ||
+    transactions.isLoading;
 
   if (loading) {
     return (
@@ -125,7 +130,9 @@ function LearnPage() {
     );
   }
 
-  const doneLessons = rows.filter((row) => row.activity_type === "lesson" && row.status === "completed");
+  const doneLessons = rows.filter(
+    (row) => row.activity_type === "lesson" && row.status === "completed",
+  );
   const lessonPercent = Math.round((doneLessons.length / LESSONS.length) * 100);
   const xp = learning.data?.xp ?? 0;
   const level = levelFor(xp);
@@ -153,7 +160,9 @@ function LearnPage() {
       if (meta) startChallenge.mutate({ key: meta.key, targetDays: meta.targetDays });
       return;
     }
-    document.getElementById("learn-achievements")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document
+      .getElementById("learn-achievements")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -197,7 +206,11 @@ function LearnPage() {
         <ChildChat firstName={profile ? firstNameOf(profile.full_name) : ""} />
 
         {/* A. Learning progress */}
-        <LearnSection title={lc("progressTitle")} caption={lc("progressCaption")} icon={<LearnIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection
+          title={lc("progressTitle")}
+          caption={lc("progressCaption")}
+          icon={<LearnIcon className="size-4" strokeWidth={ICON_STROKE} />}
+        >
           <div className="kid-panel space-y-4 p-5 sm:p-6">
             <div>
               <div className="flex items-center justify-between text-sm">
@@ -212,11 +225,11 @@ function LearnPage() {
                 value={`${doneLessons.length}/${LESSONS.length}`}
               />
               <LearnStat label={lc("level")} value={s(level.label)} hint={`${xp} XP`} />
+              <LearnStat label={lc("streak")} value={String(learning.data?.current_streak ?? 0)} />
               <LearnStat
-                label={lc("streak")}
-                value={String(learning.data?.current_streak ?? 0)}
+                label={lc("badgesEarned")}
+                value={`${earnedBadges.length}/${BADGES.length}`}
               />
-              <LearnStat label={lc("badgesEarned")} value={`${earnedBadges.length}/${BADGES.length}`} />
             </div>
             {level.nextAt ? (
               <div>
@@ -230,7 +243,11 @@ function LearnPage() {
         </LearnSection>
 
         {/* B. Lessons */}
-        <LearnSection title={lc("lessons")} caption={lc("lessonsCaption")} icon={<LearnIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection
+          title={lc("lessons")}
+          caption={lc("lessonsCaption")}
+          icon={<LearnIcon className="size-4" strokeWidth={ICON_STROKE} />}
+        >
           <ul className="grid gap-4 min-[560px]:grid-cols-2 xl:grid-cols-3">
             {LESSONS.map((item) => {
               const done = doneLessons.some((row) => row.activity_key === item.key);
@@ -265,10 +282,18 @@ function LearnPage() {
         </LearnSection>
 
         {/* C. Games */}
-        <LearnSection collapsible defaultOpen title={lc("games")} caption={lc("gamesCaption")} icon={<GameIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection
+          collapsible
+          defaultOpen
+          title={lc("games")}
+          caption={lc("gamesCaption")}
+          icon={<GameIcon className="size-4" strokeWidth={ICON_STROKE} />}
+        >
           <ul className="grid gap-4 min-[560px]:grid-cols-2 xl:grid-cols-3">
             {GAMES.map((item) => {
-              const row = rows.find((entry) => entry.activity_type === "game" && entry.activity_key === item.key);
+              const row = rows.find(
+                (entry) => entry.activity_type === "game" && entry.activity_key === item.key,
+              );
               return (
                 <li key={item.key}>
                   <button
@@ -297,7 +322,13 @@ function LearnPage() {
         </LearnSection>
 
         {/* D. Quiz */}
-        <LearnSection collapsible defaultOpen title={lc("quiz")} caption={lc("quizCaption")} icon={<QuizIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection
+          collapsible
+          defaultOpen
+          title={lc("quiz")}
+          caption={lc("quizCaption")}
+          icon={<QuizIcon className="size-4" strokeWidth={ICON_STROKE} />}
+        >
           <div className="kid-panel grid gap-4 p-5 sm:p-6 min-[420px]:grid-cols-[minmax(0,1fr)_auto] min-[420px]:items-center">
             <div className="min-w-0">
               <p className="text-sm">{lc("quizIntro")}</p>
@@ -310,7 +341,13 @@ function LearnPage() {
         </LearnSection>
 
         {/* E. Challenges */}
-        <LearnSection collapsible defaultOpen title={lc("challenges")} caption={lc("challengesCaption")} icon={<ChallengesIcon className="size-4" strokeWidth={ICON_STROKE} />}>
+        <LearnSection
+          collapsible
+          defaultOpen
+          title={lc("challenges")}
+          caption={lc("challengesCaption")}
+          icon={<ChallengesIcon className="size-4" strokeWidth={ICON_STROKE} />}
+        >
           <ul className="grid gap-4 min-[560px]:grid-cols-2 xl:grid-cols-3">
             {CHALLENGES.map((meta) => {
               const row = challengeRows.find((entry) => entry.challenge_key === meta.key);
@@ -325,7 +362,11 @@ function LearnPage() {
                     <span
                       className={cn(
                         "shrink-0 rounded-full px-3 py-1 text-[0.7rem]",
-                        done ? "bg-kid-soft/70 text-kid-deep" : row ? "bg-secondary/70" : "bg-kid-tint text-kid-deep",
+                        done
+                          ? "bg-kid-soft/70 text-kid-deep"
+                          : row
+                            ? "bg-secondary/70"
+                            : "bg-kid-tint text-kid-deep",
                       )}
                     >
                       {done ? lc("challengeComplete") : row ? lc("active") : lc("startChallenge")}
@@ -344,7 +385,9 @@ function LearnPage() {
                     {!row ? (
                       <LearnButton
                         variant="soft"
-                        onClick={() => startChallenge.mutate({ key: meta.key, targetDays: meta.targetDays })}
+                        onClick={() =>
+                          startChallenge.mutate({ key: meta.key, targetDays: meta.targetDays })
+                        }
                         disabled={startChallenge.isPending}
                       >
                         {lc("startChallenge")}
@@ -387,7 +430,9 @@ function LearnPage() {
                     key={badge.key}
                     className={cn(
                       "flex flex-col items-center gap-2 rounded-3xl border p-4 text-center transition-[border-color,box-shadow,transform] duration-200",
-                      earned ? "kid-earned border-kid-soft bg-kid-soft/50 kid-pop" : "border-border bg-card",
+                      earned
+                        ? "kid-earned border-kid-soft bg-kid-soft/50 kid-pop"
+                        : "border-border bg-card",
                     )}
                   >
                     <span className={cn("size-12", earned ? "" : "opacity-45")}>

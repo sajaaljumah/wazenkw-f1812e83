@@ -90,11 +90,15 @@ export function buildChildChatContext(input: {
     xp: input.xp,
     streak: input.streak,
     levelLabel: levelFor(input.xp).label[language],
-    completedLessons: LESSONS.filter((l) => doneLessonKeys.has(l.key)).map((l) => l.title[language]),
-    remainingLessons: LESSONS.filter((l) => !doneLessonKeys.has(l.key)).map((l) => l.title[language]),
-    playedGames: GAMES.filter((g) => badgeContext.progress.some((r) => r.activity_type === "game" && r.activity_key === g.key)).map(
-      (g) => g.title[language],
+    completedLessons: LESSONS.filter((l) => doneLessonKeys.has(l.key)).map(
+      (l) => l.title[language],
     ),
+    remainingLessons: LESSONS.filter((l) => !doneLessonKeys.has(l.key)).map(
+      (l) => l.title[language],
+    ),
+    playedGames: GAMES.filter((g) =>
+      badgeContext.progress.some((r) => r.activity_type === "game" && r.activity_key === g.key),
+    ).map((g) => g.title[language]),
     quizScores,
     weakTopics: quizScores.filter((item) => item.percent < 60).map((item) => item.topic),
     activeChallenges: badgeContext.challenges
@@ -109,9 +113,17 @@ export function buildChildChatContext(input: {
       }),
     completedChallenges: badgeContext.challenges
       .filter((row) => row.status === "completed")
-      .map((row) => CHALLENGES.find((c) => c.key === row.challenge_key)?.title[language] ?? row.challenge_key),
-    earnedBadges: BADGES.filter((badge) => badge.earned(badgeContext)).map((badge) => badge.label[language]),
-    goal: badgeContext.hasGoal && input.goalName ? { name: input.goalName, percent: badgeContext.goalPercent } : null,
+      .map(
+        (row) =>
+          CHALLENGES.find((c) => c.key === row.challenge_key)?.title[language] ?? row.challenge_key,
+      ),
+    earnedBadges: BADGES.filter((badge) => badge.earned(badgeContext)).map(
+      (badge) => badge.label[language],
+    ),
+    goal:
+      badgeContext.hasGoal && input.goalName
+        ? { name: input.goalName, percent: badgeContext.goalPercent }
+        : null,
     nextStep: `${recommendation.title[language]}`,
   };
 }
@@ -136,12 +148,16 @@ export function buildChildSystemPrompt(context: ChildChatContext): string {
     `Lessons not finished yet: ${list(context.remainingLessons, none)}`,
     `Games played: ${list(context.playedGames, none)}`,
     `Quiz/game scores by topic: ${
-      context.quizScores.length ? context.quizScores.map((q) => `${q.topic} ${q.percent}%`).join(", ") : none
+      context.quizScores.length
+        ? context.quizScores.map((q) => `${q.topic} ${q.percent}%`).join(", ")
+        : none
     }`,
     `Topics to practise more: ${list(context.weakTopics, none)}`,
     `Active challenges: ${
       context.activeChallenges.length
-        ? context.activeChallenges.map((c) => `${c.title} (${c.daysDone}/${c.targetDays} days)`).join(", ")
+        ? context.activeChallenges
+            .map((c) => `${c.title} (${c.daysDone}/${c.targetDays} days)`)
+            .join(", ")
         : none
     }`,
     `Completed challenges: ${list(context.completedChallenges, none)}`,
@@ -188,7 +204,13 @@ Challenges: ${catalogue.challenges.join(" | ")}`;
 /** Keeps only valid recent turns, trimmed to the allowed size. */
 export function sanitizeChildHistory(turns: ChildChatTurn[]): ChildChatTurn[] {
   return turns
-    .filter((turn) => (turn.role === "user" || turn.role === "assistant") && turn.content.trim().length > 0)
+    .filter(
+      (turn) =>
+        (turn.role === "user" || turn.role === "assistant") && turn.content.trim().length > 0,
+    )
     .slice(-CHILD_CHAT_LIMITS.maxHistoryTurns)
-    .map((turn) => ({ role: turn.role, content: turn.content.trim().slice(0, CHILD_CHAT_LIMITS.maxMessageChars * 4) }));
+    .map((turn) => ({
+      role: turn.role,
+      content: turn.content.trim().slice(0, CHILD_CHAT_LIMITS.maxMessageChars * 4),
+    }));
 }

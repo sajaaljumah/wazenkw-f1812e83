@@ -233,9 +233,15 @@ export function ChildChat({ firstName }: { firstName: string }) {
         ) : null}
 
         {error ? (
-          <div className="kid-pop flex flex-col items-start gap-2 rounded-2xl border border-border bg-card p-4 text-sm" role="alert">
+          <div
+            className="kid-pop flex flex-col items-start gap-2 rounded-2xl border border-border bg-card p-4 text-sm"
+            role="alert"
+          >
             <p className="flex items-start gap-2">
-              <AlertIcon className="mt-0.5 size-4 shrink-0 text-kid-deep" strokeWidth={ICON_STROKE} />
+              <AlertIcon
+                className="mt-0.5 size-4 shrink-0 text-kid-deep"
+                strokeWidth={ICON_STROKE}
+              />
               {t(COPY.errors[error])}
             </p>
             {error !== "NOT_CHILD" ? (
