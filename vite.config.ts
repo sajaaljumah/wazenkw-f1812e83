@@ -4,14 +4,10 @@ export default defineConfig({
   // Build as a Node.js server for Render deployment
   nitro: {
     preset: "node-server",
+    // tr46 (via mongodb) requires "punycode/"; map it to the npm package.
+    alias: { "punycode/": "/dev-server/node_modules/punycode/punycode.js" },
     output: {
       dir: ".output",
-    },
-  },
-  vite: {
-    resolve: {
-      // tr46 (via mongodb) requires "punycode/"; map it to the npm package.
-      alias: [{ find: /^punycode\/$/, replacement: "/dev-server/node_modules/punycode/punycode.js" }],
     },
   },
   tanstackStart: {
