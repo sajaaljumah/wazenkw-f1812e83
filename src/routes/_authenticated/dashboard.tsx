@@ -35,9 +35,17 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard — Wazen" },
-      { name: "description", content: "Your Wazen money overview: available money, budget, savings goals and upcoming cash flow." },
+      {
+        name: "description",
+        content:
+          "Your Wazen money overview: available money, budget, savings goals and upcoming cash flow.",
+      },
       { property: "og:title", content: "Dashboard — Wazen" },
-      { property: "og:description", content: "Your Wazen money overview: available money, budget, savings goals and upcoming cash flow." },
+      {
+        property: "og:description",
+        content:
+          "Your Wazen money overview: available money, budget, savings goals and upcoming cash flow.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -83,7 +91,11 @@ function Dashboard() {
   }, [profile, navigate]);
 
   const loading =
-    profileLoading || transactions.isLoading || goals.isLoading || budget.isLoading || recurring.isLoading;
+    profileLoading ||
+    transactions.isLoading ||
+    goals.isLoading ||
+    budget.isLoading ||
+    recurring.isLoading;
 
   if (loading) {
     return (
@@ -126,7 +138,9 @@ function Dashboard() {
         isDemo={isDemoAccount(user.email)}
         lifeStage={profile.life_stage}
       />
-      <div className={`space-y-8 wazen-enter ${profile.life_stage === "teenager" ? "stage-teen" : profile.life_stage === "university_student" ? "stage-university" : ""}`}>
+      <div
+        className={`space-y-8 wazen-enter ${profile.life_stage === "teenager" ? "stage-teen" : profile.life_stage === "university_student" ? "stage-university" : ""}`}
+      >
         {profile.life_stage === "child" ? null : (
           <DashboardHeader
             name={firstName}

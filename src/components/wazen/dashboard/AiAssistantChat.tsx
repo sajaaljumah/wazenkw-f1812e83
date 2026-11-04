@@ -258,9 +258,15 @@ export function AiAssistantChat({ firstName }: { firstName: string }) {
         ) : null}
 
         {error ? (
-          <div role="alert" className="flex flex-col items-start gap-2 rounded-2xl border border-border bg-secondary/50 p-4 text-sm">
+          <div
+            role="alert"
+            className="flex flex-col items-start gap-2 rounded-2xl border border-border bg-secondary/50 p-4 text-sm"
+          >
             <p className="flex items-start gap-2">
-              <AlertIcon className="mt-0.5 size-4 shrink-0 text-primary" strokeWidth={ICON_STROKE} />
+              <AlertIcon
+                className="mt-0.5 size-4 shrink-0 text-primary"
+                strokeWidth={ICON_STROKE}
+              />
               {t(COPY.errors[error])}
             </p>
             {error !== "NOT_ALLOWED" ? (
