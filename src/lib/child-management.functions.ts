@@ -36,6 +36,7 @@ export type ManagedChild = {
   currency: string;
   locked: boolean;
   canFund: boolean;
+  relationship: string;
   transactions: ManagedChildTransaction[];
   goals: { id: string; name: string; kind: string; target_amount: number }[];
 };
@@ -45,14 +46,14 @@ const childIdSchema = z.string().uuid();
 async function requireGuardian(supabase: SupabaseClient, parentId: string, childId: string) {
   const { data, error } = await supabase
     .from("family_relationships")
-    .select("child_user_id, permissions, status")
+    .select("child_user_id, permissions, status, relationship_type")
     .eq("parent_user_id", parentId)
     .eq("child_user_id", childId)
     .eq("status", "active")
     .maybeSingle();
   if (error || !data) throw new Error("You can only manage children linked to your account.");
   const permissions = (data.permissions ?? {}) as Record<string, unknown>;
-  return { canFund: permissions["can_fund"] === true };
+  return { canFund: permissions["can_fund"] === true, relationship: data.relationship_type as string };
 }
 
 async function childEmailOf(childId: string): Promise<string | null> {
@@ -79,7 +80,7 @@ export const getManagedChildFn = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ childId: childIdSchema }).parse(data))
   .handler(async ({ data, context }): Promise<ManagedChild> => {
     const { supabase, userId, claims } = context;
-    const { canFund } = await requireGuardian(supabase, userId, data.childId);
+    const { canFund, relationship } = await requireGuardian(supabase, userId, data.childId);
 
     const [profile, transactions, goals, email] = await Promise.all([
       supabase
@@ -111,6 +112,7 @@ export const getManagedChildFn = createServerFn({ method: "POST" })
       locked:
         isDemoAccount(parentEmailOf(claims as Record<string, unknown>)) || isDemoAccount(email),
       canFund,
+      relationship,
       transactions: ((transactions.data ?? []) as ManagedChildTransaction[]).map((row) => ({
         ...row,
         amount: Number(row.amount),

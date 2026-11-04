@@ -52,6 +52,9 @@ type Text = { en: string; ar: string };
 const C = {
   back: { en: "Back to Settings", ar: "العودة إلى الإعدادات" },
   linked: { en: "Linked to you", ar: "مرتبط بحسابك" },
+  asMother: { en: "You are the mother", ar: "أنتِ الأم" },
+  asFather: { en: "You are the father", ar: "أنت الأب" },
+  asGuardian: { en: "You are the guardian", ar: "ولي الأمر" },
   demoTitle: { en: "Demo account — view only", ar: "حساب تجريبي — للعرض فقط" },
   demoBody: {
     en: "Demo accounts are shared for presentations, so their details can't be changed. Create your own account and add your children to manage everything.",
@@ -314,7 +317,13 @@ function ChildManager({
             {t(C.years)}
             <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-[11px]">
               <FamilyIcon className="size-3" strokeWidth={ICON_STROKE} />
-              {t(C.linked)}
+              {child.relationship === "mother"
+                ? t(C.asMother)
+                : child.relationship === "father"
+                  ? t(C.asFather)
+                  : child.relationship === "guardian"
+                    ? t(C.asGuardian)
+                    : t(C.linked)}
             </span>
           </p>
         </div>
