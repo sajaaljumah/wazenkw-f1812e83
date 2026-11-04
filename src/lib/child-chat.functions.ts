@@ -112,7 +112,7 @@ export const sendChildLearningChatFn = createServerFn({ method: "POST" })
         { role: "system", content: buildChildSystemPrompt(chatContext) },
         ...sanitizeChildHistory(data.messages),
       ],
-      { temperature: 0.6, max_tokens: 700 },
+      { temperature: 0.6, max_tokens: 2500, contentOnly: true },
     );
 
     if (result.success) return { ok: true, reply: result.content };

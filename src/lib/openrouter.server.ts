@@ -26,6 +26,8 @@ export type ChatCompletionOptions = {
   temperature?: number | undefined;
   max_tokens?: number | undefined;
   timeoutMs?: number | undefined;
+  /** When true, never fall back to the model's internal reasoning text as the reply. */
+  contentOnly?: boolean | undefined;
 };
 
 export type LifeStage =
@@ -295,7 +297,11 @@ export async function sendChatCompletion(
 
     const choice = data.choices?.[0];
     const msg = choice?.message;
-    const content = (msg?.content || msg?.reasoning || choice?.text || "")?.trim();
+    const content = (
+      options.contentOnly
+        ? msg?.content || choice?.text || ""
+        : msg?.content || msg?.reasoning || choice?.text || ""
+    )?.trim();
 
     if (!content) {
       return {
