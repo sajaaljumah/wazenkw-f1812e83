@@ -168,6 +168,9 @@ function LearnPage() {
   return (
     <AppShell>
       <div className="kid-theme space-y-8 wazen-enter">
+        {/* AI learning buddy */}
+        <ChildChat firstName={profile ? firstNameOf(profile.full_name) : ""} />
+
         {/* Hero + recommendation */}
         <section className="kid-panel relative overflow-hidden bg-kid-tint p-6 sm:p-9">
           <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
@@ -201,9 +204,6 @@ function LearnPage() {
             </div>
           </div>
         </section>
-
-        {/* AI learning buddy */}
-        <ChildChat firstName={profile ? firstNameOf(profile.full_name) : ""} />
 
         {/* A. Learning progress */}
         <LearnSection
