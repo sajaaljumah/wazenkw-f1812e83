@@ -49,7 +49,8 @@ import {
   type GameKey,
   type Lesson,
 } from "@/lib/learning";
-import { calculateAge } from "@/lib/wazen";
+import { calculateAge, firstNameOf } from "@/lib/wazen";
+import { ChildChat } from "@/components/wazen/learn/ChildChat";
 import { savedForGoal, totalsFor } from "@/lib/finance";
 import { cn } from "@/lib/utils";
 
@@ -191,6 +192,9 @@ function LearnPage() {
             </div>
           </div>
         </section>
+
+        {/* AI learning buddy */}
+        <ChildChat firstName={profile ? firstNameOf(profile.full_name) : ""} />
 
         {/* A. Learning progress */}
         <LearnSection title={lc("progressTitle")} caption={lc("progressCaption")} icon={<LearnIcon className="size-4" strokeWidth={ICON_STROKE} />}>
