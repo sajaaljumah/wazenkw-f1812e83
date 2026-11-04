@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { SpinnerIcon } from "@/components/wazen/icons";
 import { AppShell } from "@/components/wazen/AppShell";
 import { ZakatAlert } from "@/components/wazen/zakat/ZakatAlert";
+import { AiAssistantChat } from "@/components/wazen/dashboard/AiAssistantChat";
+import { isAdultChatStage } from "@/lib/adult-chat";
 import { useZakat } from "@/hooks/use-wazen-zakat";
 import { canCalculateZakat } from "@/lib/zakat";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -33,9 +35,17 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard — Wazen" },
-      { name: "description", content: "Your Wazen money overview: available money, budget, savings goals and upcoming cash flow." },
+      {
+        name: "description",
+        content:
+          "Your Wazen money overview: available money, budget, savings goals and upcoming cash flow.",
+      },
       { property: "og:title", content: "Dashboard — Wazen" },
-      { property: "og:description", content: "Your Wazen money overview: available money, budget, savings goals and upcoming cash flow." },
+      {
+        property: "og:description",
+        content:
+          "Your Wazen money overview: available money, budget, savings goals and upcoming cash flow.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -81,7 +91,11 @@ function Dashboard() {
   }, [profile, navigate]);
 
   const loading =
-    profileLoading || transactions.isLoading || goals.isLoading || budget.isLoading || recurring.isLoading;
+    profileLoading ||
+    transactions.isLoading ||
+    goals.isLoading ||
+    budget.isLoading ||
+    recurring.isLoading;
 
   if (loading) {
     return (
@@ -124,7 +138,9 @@ function Dashboard() {
         isDemo={isDemoAccount(user.email)}
         lifeStage={profile.life_stage}
       />
-      <div className={`space-y-8 wazen-enter ${profile.life_stage === "teenager" ? "stage-teen" : profile.life_stage === "university_student" ? "stage-university" : ""}`}>
+      <div
+        className={`space-y-8 wazen-enter ${profile.life_stage === "teenager" ? "stage-teen" : profile.life_stage === "university_student" ? "stage-university" : ""}`}
+      >
         {profile.life_stage === "child" ? null : (
           <DashboardHeader
             name={firstName}
@@ -148,6 +164,8 @@ function Dashboard() {
             }
           />
         )}
+
+        {isAdultChatStage(profile.life_stage) ? <AiAssistantChat firstName={firstName} /> : null}
 
         {canCalculateZakat(profile.life_stage) && zakat.result ? (
           <ZakatAlert result={zakat.result} currency={profile.base_currency} compact />
