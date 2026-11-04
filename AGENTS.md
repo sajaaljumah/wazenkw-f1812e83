@@ -10,4 +10,4 @@
 <!-- LOVABLE:END -->
 
 ## Rules
-- Child Learn chat calls the existing OpenRouter service only through the authenticated `sendChildLearningChatFn`, which builds the child's context server-side from their own rows; why: the browser must never supply the system prompt or another person's data.
+- AI chats (child Learn `sendChildLearningChatFn`, adult dashboard `sendAdultFinanceChatFn`) call the existing OpenRouter service only through authenticated server functions that build context server-side from the caller's own rows; why: the browser must never supply the system prompt or another person's data.
