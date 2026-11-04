@@ -10,4 +10,4 @@
 <!-- LOVABLE:END -->
 
 ## Rules
-- AI chats (child Learn `sendChildLearningChatFn`, adult dashboard `sendAdultFinanceChatFn`) call the existing OpenRouter service only through authenticated server functions that build context server-side from the caller's own rows; why: the browser must never supply the system prompt or another person's data.
+- AI chats (child Learn `sendChildLearningChatFn`, adult dashboard `sendAdultFinanceChatFn`) call the existing OpenRouter service only through authenticated server functions that build context server-side from the caller's own rows and require the `ai_advisor` Premium entitlement (family plans cover children/teens) via `src/lib/ai-chat.server.ts`; why: the browser must never supply the system prompt or another person's data.
