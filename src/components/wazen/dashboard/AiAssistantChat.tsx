@@ -70,6 +70,10 @@ const COPY = {
       en: "Couldn't get an answer this time. Please try again.",
       ar: "تعذّر الحصول على إجابة هذه المرة. حاول مرة أخرى.",
     },
+    PREMIUM_REQUIRED: {
+      en: "Wazen AI is a Premium feature. Upgrade to Premium to use it.",
+      ar: "Wazen AI ميزة ضمن الخطة المميزة. قم بالترقية لاستخدامه.",
+    },
     NOT_ALLOWED: {
       en: "Wazen AI is available for adult accounts only.",
       ar: "Wazen AI متاح للحسابات البالغة فقط.",
@@ -106,6 +110,24 @@ export function AiAssistantChat({ firstName }: { firstName: string }) {
       /* ignore broken session data */
     }
   }, [userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    try {
+      setExpanded(window.sessionStorage.getItem(`${storageKey(userId)}.open`) === "1");
+    } catch {
+      /* storage may be unavailable */
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    try {
+      window.sessionStorage.setItem(`${storageKey(userId)}.open`, expanded ? "1" : "0");
+    } catch {
+      /* storage may be unavailable */
+    }
+  }, [expanded, userId]);
 
   useEffect(() => {
     if (!userId) return;
@@ -176,156 +198,170 @@ export function AiAssistantChat({ firstName }: { firstName: string }) {
 
   return (
     <section aria-labelledby="wazen-ai-title" className="wazen-card min-w-0 overflow-hidden p-0">
-      <header className="flex items-center gap-3 border-b border-border/70 px-4 py-4 sm:px-6">
-        <span className="gloss-red flex size-11 shrink-0 items-center justify-center rounded-2xl text-primary-foreground">
-          <AiIcon className="size-5" strokeWidth={ICON_STROKE} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h2 id="wazen-ai-title" className="truncate text-lg sm:text-xl">
-            {t(COPY.title)}
-          </h2>
-          <p className="truncate text-xs text-muted-foreground sm:text-sm">{t(COPY.subtitle)}</p>
-        </div>
-        <div className="flex shrink-0 items-center gap-1.5">
+      <header
+        className={cn(
+          "flex items-center gap-2 px-4 py-4 sm:px-6",
+          expanded && "border-b border-border/70",
+        )}
+      >
+        <button
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          aria-expanded={expanded}
+          aria-controls="wazen-ai-body"
+          className="group flex min-w-0 flex-1 items-center gap-3 rounded-2xl text-start outline-hidden focus-visible:ring-2 focus-visible:ring-ring/40"
+        >
+          <span className="gloss-red flex size-11 shrink-0 items-center justify-center rounded-2xl text-primary-foreground">
+            <AiIcon className="size-5" strokeWidth={ICON_STROKE} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span id="wazen-ai-title" className="block truncate text-lg sm:text-xl">
+              {t(COPY.title)}
+            </span>
+            <span className="block truncate text-xs text-muted-foreground sm:text-sm">
+              {t(COPY.subtitle)}
+            </span>
+          </span>
+          <span
+            className="inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors group-hover:bg-secondary"
+            title={expanded ? t(COPY.collapse) : t(COPY.expand)}
+          >
+            <ExpandIcon
+              className={cn("size-3.5 transition-transform duration-300", expanded && "rotate-180")}
+              strokeWidth={ICON_STROKE}
+            />
+            <span className="sr-only">{expanded ? t(COPY.collapse) : t(COPY.expand)}</span>
+          </span>
+        </button>
+        {expanded ? (
           <button
             type="button"
             onClick={newChat}
             disabled={pending || empty}
             title={t(COPY.newChat)}
-            className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
+            <AddIcon className="size-3.5" strokeWidth={ICON_STROKE} />
             <span className="hidden sm:inline">{t(COPY.newChat)}</span>
             <span className="sr-only sm:hidden">{t(COPY.newChat)}</span>
           </button>
-          <button
-            type="button"
-            onClick={() => setExpanded((value) => !value)}
-            aria-expanded={expanded}
-            aria-controls="wazen-ai-log"
-            title={expanded ? t(COPY.collapse) : t(COPY.expand)}
-            className="inline-flex size-9 items-center justify-center rounded-full border border-border bg-card transition-colors hover:bg-secondary"
-          >
-            <ExpandIcon
-              className={cn("size-4 transition-transform duration-300", expanded && "rotate-180")}
-              strokeWidth={ICON_STROKE}
-            />
-            <span className="sr-only">{expanded ? t(COPY.collapse) : t(COPY.expand)}</span>
-          </button>
-        </div>
+        ) : null}
       </header>
 
-      <div
-        id="wazen-ai-log"
-        ref={logRef}
-        role="log"
-        aria-live="polite"
-        aria-busy={pending}
-        className={cn(
-          "flex flex-col gap-3 overflow-y-auto px-4 py-4 transition-[max-height] duration-300 ease-out sm:px-6",
-          expanded ? "max-h-[70vh]" : "max-h-[22rem]",
-        )}
-      >
-        <AssistantBubble>{t(COPY.welcome).replace("{name}", firstName)}</AssistantBubble>
-
-        {messages.map((message, index) =>
-          message.role === "assistant" ? (
-            <AssistantBubble key={index} markdown>
-              {message.content}
-            </AssistantBubble>
-          ) : (
-            <div key={index} className="flex justify-end">
-              <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-ee-md bg-foreground px-4 py-2.5 text-sm text-background">
-                {message.content}
-              </p>
-            </div>
-          ),
-        )}
-
-        {pending ? (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground" role="status">
-            <span className="inline-flex items-center gap-1 rounded-2xl rounded-es-md border border-border bg-secondary/60 px-4 py-3">
-              {[0, 1, 2].map((dot) => (
-                <span
-                  key={dot}
-                  className="size-1.5 rounded-full bg-primary motion-safe:animate-bounce"
-                  style={{ animationDelay: `${dot * 140}ms` }}
-                />
-              ))}
-            </span>
-            {t(COPY.thinking)}
-          </div>
-        ) : null}
-
-        {error ? (
+      {expanded ? (
+        <div id="wazen-ai-body" className="wazen-enter">
           <div
-            role="alert"
-            className="flex flex-col items-start gap-2 rounded-2xl border border-border bg-secondary/50 p-4 text-sm"
+            id="wazen-ai-log"
+            ref={logRef}
+            role="log"
+            aria-live="polite"
+            aria-busy={pending}
+            className={cn(
+              "flex max-h-[min(32rem,65vh)] flex-col gap-3 overflow-y-auto px-4 py-4 sm:px-6",
+            )}
           >
-            <p className="flex items-start gap-2">
-              <AlertIcon
-                className="mt-0.5 size-4 shrink-0 text-primary"
-                strokeWidth={ICON_STROKE}
-              />
-              {t(COPY.errors[error])}
-            </p>
-            {error !== "NOT_ALLOWED" ? (
-              <button
-                type="button"
-                onClick={retry}
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-foreground px-4 text-xs text-background transition-opacity hover:opacity-90"
+            <AssistantBubble>{t(COPY.welcome).replace("{name}", firstName)}</AssistantBubble>
+
+            {messages.map((message, index) =>
+              message.role === "assistant" ? (
+                <AssistantBubble key={index} markdown>
+                  {message.content}
+                </AssistantBubble>
+              ) : (
+                <div key={index} className="flex justify-end">
+                  <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-ee-md bg-foreground px-4 py-2.5 text-sm text-background">
+                    {message.content}
+                  </p>
+                </div>
+              ),
+            )}
+
+            {pending ? (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground" role="status">
+                <span className="inline-flex items-center gap-1 rounded-2xl rounded-es-md border border-border bg-secondary/60 px-4 py-3">
+                  {[0, 1, 2].map((dot) => (
+                    <span
+                      key={dot}
+                      className="size-1.5 rounded-full bg-primary motion-safe:animate-bounce"
+                      style={{ animationDelay: `${dot * 140}ms` }}
+                    />
+                  ))}
+                </span>
+                {t(COPY.thinking)}
+              </div>
+            ) : null}
+
+            {error ? (
+              <div
+                role="alert"
+                className="flex flex-col items-start gap-2 rounded-2xl border border-border bg-secondary/50 p-4 text-sm"
               >
-                <RetryIcon className="size-4" strokeWidth={ICON_STROKE} />
-                {t(COPY.retry)}
-              </button>
+                <p className="flex items-start gap-2">
+                  <AlertIcon
+                    className="mt-0.5 size-4 shrink-0 text-primary"
+                    strokeWidth={ICON_STROKE}
+                  />
+                  {t(COPY.errors[error])}
+                </p>
+                {error !== "NOT_ALLOWED" && error !== "PREMIUM_REQUIRED" ? (
+                  <button
+                    type="button"
+                    onClick={retry}
+                    className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-foreground px-4 text-xs text-background transition-opacity hover:opacity-90"
+                  >
+                    <RetryIcon className="size-4" strokeWidth={ICON_STROKE} />
+                    {t(COPY.retry)}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+
+            {empty && !pending ? (
+              <ul className="mt-1 flex flex-wrap gap-2">
+                {COPY.starters[language].map((starter) => (
+                  <li key={starter}>
+                    <button
+                      type="button"
+                      onClick={() => submit(starter)}
+                      className="rounded-full border border-border bg-card px-3.5 py-2 text-start text-xs transition-colors hover:border-primary/40 hover:bg-secondary sm:text-sm"
+                    >
+                      {starter}
+                    </button>
+                  </li>
+                ))}
+              </ul>
             ) : null}
           </div>
-        ) : null}
 
-        {empty && !pending ? (
-          <ul className="mt-1 flex flex-wrap gap-2">
-            {COPY.starters[language].map((starter) => (
-              <li key={starter}>
-                <button
-                  type="button"
-                  onClick={() => submit(starter)}
-                  className="rounded-full border border-border bg-card px-3.5 py-2 text-start text-xs transition-colors hover:border-primary/40 hover:bg-secondary sm:text-sm"
-                >
-                  {starter}
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
-
-      <form onSubmit={onSubmit} className="border-t border-border/70 px-4 py-3 sm:px-6 sm:py-4">
-        <div className="flex items-end gap-2">
-          <label htmlFor="wazen-ai-input" className="sr-only">
-            {t(COPY.placeholder)}
-          </label>
-          <textarea
-            id="wazen-ai-input"
-            ref={inputRef}
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            onKeyDown={onKeyDown}
-            placeholder={t(COPY.placeholder)}
-            maxLength={ADULT_CHAT_LIMITS.maxMessageChars}
-            rows={1}
-            className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-input bg-background px-4 py-2.5 text-sm outline-hidden placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
-          />
-          <button
-            type="submit"
-            disabled={pending || !draft.trim()}
-            aria-label={t(COPY.send)}
-            className="gloss-red inline-flex size-11 shrink-0 items-center justify-center rounded-2xl text-primary-foreground transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <SendIcon className="size-5 rtl:rotate-180" strokeWidth={ICON_STROKE} />
-          </button>
+          <form onSubmit={onSubmit} className="border-t border-border/70 px-4 py-3 sm:px-6 sm:py-4">
+            <div className="flex items-end gap-2">
+              <label htmlFor="wazen-ai-input" className="sr-only">
+                {t(COPY.placeholder)}
+              </label>
+              <textarea
+                id="wazen-ai-input"
+                ref={inputRef}
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={onKeyDown}
+                placeholder={t(COPY.placeholder)}
+                maxLength={ADULT_CHAT_LIMITS.maxMessageChars}
+                rows={1}
+                className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-input bg-background px-4 py-2.5 text-sm outline-hidden placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+              />
+              <button
+                type="submit"
+                disabled={pending || !draft.trim()}
+                aria-label={t(COPY.send)}
+                className="gloss-red inline-flex size-11 shrink-0 items-center justify-center rounded-2xl text-primary-foreground transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <SendIcon className="size-5 rtl:rotate-180" strokeWidth={ICON_STROKE} />
+              </button>
+            </div>
+            <p className="mt-2 text-[0.7rem] text-muted-foreground">{t(COPY.note)}</p>
+          </form>
         </div>
-        <p className="mt-2 text-[0.7rem] text-muted-foreground">{t(COPY.note)}</p>
-      </form>
+      ) : null}
     </section>
   );
 }

@@ -51,6 +51,7 @@ import {
 } from "@/lib/learning";
 import { calculateAge, firstNameOf } from "@/lib/wazen";
 import { ChildChat } from "@/components/wazen/learn/ChildChat";
+import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { savedForGoal, totalsFor } from "@/lib/finance";
 import { cn } from "@/lib/utils";
 
@@ -79,6 +80,8 @@ function LearnPage() {
   const navigate = useNavigate();
   const { lc, s } = useLearnCopy();
   const { data: profile, isLoading: profileLoading } = useProfile();
+  const { can: canAccess, isLoading: planLoading } = useSubscriptionAccess();
+  const canUseAi = !planLoading && canAccess("ai_advisor");
   const progress = useLearningProgress();
   const learning = useLearningProfile();
   const challenges = useLearningChallenges();
@@ -169,7 +172,7 @@ function LearnPage() {
     <AppShell>
       <div className="kid-theme space-y-8 wazen-enter">
         {/* AI learning buddy */}
-        <ChildChat firstName={profile ? firstNameOf(profile.full_name) : ""} />
+        {canUseAi ? <ChildChat firstName={profile ? firstNameOf(profile.full_name) : ""} /> : null}
 
         {/* Hero + recommendation */}
         <section className="kid-panel relative overflow-hidden bg-kid-tint p-6 sm:p-9">

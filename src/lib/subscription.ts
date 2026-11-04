@@ -154,7 +154,7 @@ export type PremiumFeature = (typeof PREMIUM_FEATURES)[number];
 
 export const FEATURE_LABELS: Record<PremiumFeature, string> = {
   advanced_analytics: "Advanced analytics",
-  ai_advisor: "AI financial advisor",
+  ai_advisor: "Wazen AI personal financial assistant",
   investments: "Investments tracking",
   zakat_planner: "Zakat & Sadaqah planner",
   unlimited_goals: "Unlimited savings goals",

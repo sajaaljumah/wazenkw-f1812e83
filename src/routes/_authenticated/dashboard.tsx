@@ -5,6 +5,7 @@ import { AppShell } from "@/components/wazen/AppShell";
 import { ZakatAlert } from "@/components/wazen/zakat/ZakatAlert";
 import { AiAssistantChat } from "@/components/wazen/dashboard/AiAssistantChat";
 import { isAdultChatStage } from "@/lib/adult-chat";
+import { useSubscriptionAccess } from "@/hooks/use-subscription";
 import { useZakat } from "@/hooks/use-wazen-zakat";
 import { canCalculateZakat } from "@/lib/zakat";
 import { WazenAvatar } from "@/components/wazen/WazenAvatar";
@@ -74,6 +75,8 @@ const WELCOME_KEY = {
 function Dashboard() {
   const navigate = useNavigate();
   const { t, locale } = useWazenLocale();
+  const { can: canAccess, isLoading: planLoading } = useSubscriptionAccess();
+  const canUseAi = !planLoading && canAccess("ai_advisor");
   const { user } = useSession();
   const { data: profile, isLoading: profileLoading } = useProfile();
   const transactions = useTransactions();
@@ -165,7 +168,9 @@ function Dashboard() {
           />
         )}
 
-        {isAdultChatStage(profile.life_stage) ? <AiAssistantChat firstName={firstName} /> : null}
+        {isAdultChatStage(profile.life_stage) && canUseAi ? (
+          <AiAssistantChat firstName={firstName} />
+        ) : null}
 
         {canCalculateZakat(profile.life_stage) && zakat.result ? (
           <ZakatAlert result={zakat.result} currency={profile.base_currency} compact />

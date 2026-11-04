@@ -23,7 +23,7 @@ export type ChildChatResult =
   | { ok: true; reply: string }
   | {
       ok: false;
-      code: "NOT_CHILD" | "NOT_CONFIGURED" | "BUSY" | "UNAVAILABLE";
+      code: "NOT_CHILD" | "PREMIUM_REQUIRED" | "NOT_CONFIGURED" | "BUSY" | "UNAVAILABLE";
     };
 
 const inputSchema = z.object({
@@ -61,6 +61,9 @@ export const sendChildLearningChatFn = createServerFn({ method: "POST" })
       .maybeSingle();
     if (profileError) throw new Error("Could not load profile.");
     if (!profile || profile.life_stage !== "child") return { ok: false, code: "NOT_CHILD" };
+
+    const { hasAiChatAccess, sendChatWithRetry } = await import("@/lib/ai-chat.server");
+    if (!(await hasAiChatAccess(supabase, userId))) return { ok: false, code: "PREMIUM_REQUIRED" };
 
     const [learning, progress, challenges, goals, transactions] = await Promise.all([
       supabase
@@ -107,8 +110,7 @@ export const sendChildLearningChatFn = createServerFn({ method: "POST" })
       },
     });
 
-    const { sendChatCompletion } = await import("@/lib/openrouter.server");
-    const result = await sendChatCompletion(
+    const result = await sendChatWithRetry(
       [
         { role: "system", content: buildChildSystemPrompt(chatContext) },
         ...sanitizeChildHistory(data.messages),

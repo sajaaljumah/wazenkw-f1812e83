@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 import { buildAdultFinancialSummary, buildAdultSystemPrompt, isAdultChatStage } from "./adult-chat";
 import type { Transaction } from "./finance";
 
-const tx = (kind: Transaction["kind"], amount: number, category: string, occurred_on: string): Transaction => ({
+const tx = (
+  kind: Transaction["kind"],
+  amount: number,
+  category: string,
+  occurred_on: string,
+): Transaction => ({
   id: `${kind}-${amount}-${occurred_on}`,
   user_id: "u1",
   kind,
@@ -17,16 +22,40 @@ const tx = (kind: Transaction["kind"], amount: number, category: string, occurre
 });
 
 describe("adult AI assistant rules", () => {
-  it("is offered to university students, employees, self-employed and parents only", () => {
-    expect(["university_student", "employee", "self_employed", "parent"].every(isAdultChatStage)).toBe(true);
+  it("is offered to teenagers and every adult stage, but not children", () => {
+    const stages = ["teenager", "university_student", "employee", "self_employed", "parent"];
+    expect(stages.every(isAdultChatStage)).toBe(true);
     expect(isAdultChatStage("child")).toBe(false);
-    expect(isAdultChatStage("teenager")).toBe(false);
+  });
+
+  it("forbids investment and borrowing advice for teenagers", () => {
+    const summary = buildAdultFinancialSummary({
+      currency: "KWD",
+      transactions: [],
+      goals: [],
+      budget: null,
+      recurring: [],
+      assets: null,
+    });
+    const prompt = buildAdultSystemPrompt({
+      firstName: "Fahad",
+      lifeStage: "teenager",
+      language: "en",
+      summary,
+    });
+    expect(prompt).toContain(
+      "Do NOT give investment, trading, crypto, credit, loan or borrowing advice",
+    );
   });
 
   it("counts refunds as lower spending, not income", () => {
     const summary = buildAdultFinancialSummary({
       currency: "KWD",
-      transactions: [tx("income", 1000, "salary", "2026-11-02"), tx("expense", 300, "food", "2026-11-03"), tx("refund", 50, "food", "2026-11-04")],
+      transactions: [
+        tx("income", 1000, "salary", "2026-11-02"),
+        tx("expense", 300, "food", "2026-11-03"),
+        tx("refund", 50, "food", "2026-11-04"),
+      ],
       goals: [],
       budget: null,
       recurring: [],
@@ -51,8 +80,20 @@ describe("adult AI assistant rules", () => {
   });
 
   it("forbids the AI from moving money or changing records", () => {
-    const summary = buildAdultFinancialSummary({ currency: "KWD", transactions: [], goals: [], budget: null, recurring: [], assets: null });
-    const prompt = buildAdultSystemPrompt({ firstName: "Mariam", lifeStage: "employee", language: "en", summary });
+    const summary = buildAdultFinancialSummary({
+      currency: "KWD",
+      transactions: [],
+      goals: [],
+      budget: null,
+      recurring: [],
+      assets: null,
+    });
+    const prompt = buildAdultSystemPrompt({
+      firstName: "Mariam",
+      lifeStage: "employee",
+      language: "en",
+      summary,
+    });
     expect(prompt).toContain("You cannot perform transactions, move money or change any record");
     expect(prompt).toContain("Never invent numbers");
   });
