@@ -56,7 +56,7 @@ export const sendChildLearningChatFn = createServerFn({ method: "POST" })
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("full_name, date_of_birth, life_stage")
+      .select("full_name, date_of_birth, life_stage, gender")
       .eq("id", userId)
       .maybeSingle();
     if (profileError) throw new Error("Could not load profile.");
@@ -92,6 +92,7 @@ export const sendChildLearningChatFn = createServerFn({ method: "POST" })
 
     const chatContext = buildChildChatContext({
       firstName: firstNameOf(profile.full_name),
+      gender: profile.gender === "female" || profile.gender === "male" ? profile.gender : null,
       age: calculateAge(profile.date_of_birth),
       language: data.language,
       xp: learning.data?.xp ?? 0,
@@ -112,7 +113,7 @@ export const sendChildLearningChatFn = createServerFn({ method: "POST" })
         { role: "system", content: buildChildSystemPrompt(chatContext) },
         ...sanitizeChildHistory(data.messages),
       ],
-      { temperature: 0.6, max_tokens: 700 },
+      { temperature: 0.6, max_tokens: 2500, contentOnly: true },
     );
 
     if (result.success) return { ok: true, reply: result.content };
