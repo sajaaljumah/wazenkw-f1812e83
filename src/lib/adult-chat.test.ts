@@ -17,10 +17,16 @@ const tx = (kind: Transaction["kind"], amount: number, category: string, occurre
 });
 
 describe("adult AI assistant rules", () => {
-  it("is offered to university students, employees, self-employed and parents only", () => {
-    expect(["university_student", "employee", "self_employed", "parent"].every(isAdultChatStage)).toBe(true);
+  it("is offered to teenagers and every adult stage, but not children", () => {
+    const stages = ["teenager", "university_student", "employee", "self_employed", "parent"];
+    expect(stages.every(isAdultChatStage)).toBe(true);
     expect(isAdultChatStage("child")).toBe(false);
-    expect(isAdultChatStage("teenager")).toBe(false);
+  });
+
+  it("forbids investment and borrowing advice for teenagers", () => {
+    const summary = buildAdultFinancialSummary({ currency: "KWD", transactions: [], goals: [], budget: null, recurring: [], assets: null });
+    const prompt = buildAdultSystemPrompt({ firstName: "Fahad", lifeStage: "teenager", language: "en", summary });
+    expect(prompt).toContain("Do NOT give investment, trading, crypto, credit, loan or borrowing advice");
   });
 
   it("counts refunds as lower spending, not income", () => {
