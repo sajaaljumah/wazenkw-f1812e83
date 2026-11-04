@@ -7,6 +7,8 @@
  * in Wazen feature code.
  */
 import {
+  SendHorizontal,
+  MessageCircleHeart,
   ArrowDownToLine,
   ArrowUpRight,
   ArrowDownRight,
@@ -133,6 +135,8 @@ export const FamilyIcon = Users;
 export const StudentIcon = GraduationCap;
 export const LockedIcon = Lock;
 export const AiIcon = Bot;
+export const ChatIcon = MessageCircleHeart;
+export const SendIcon = SendHorizontal;
 
 // Utility
 export const CheckIcon = Check;
