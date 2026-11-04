@@ -46,6 +46,10 @@ describe("child learning chat rules", () => {
     expect(prompt).toContain("borrowing");
   });
 
+  it("never lets the buddy mention piggy banks", () => {
+    expect(buildChildSystemPrompt(baseContext)).toContain("Never mention pigs or piggy banks");
+  });
+
   it("forbids asking for passwords and addresses", () => {
     const prompt = buildChildSystemPrompt(baseContext);
     expect(prompt).toContain("Never ask for or repeat passwords");

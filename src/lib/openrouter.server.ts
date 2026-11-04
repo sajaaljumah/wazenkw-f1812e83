@@ -744,22 +744,42 @@ ${textContent ? `محتوى / نص المستند المكتشف:\n"""\n${textCo
     const cleanName = fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
     // Try to find numbers in filename (e.g., "invoice-150-kwd" or "order-9923")
     const numberMatches = fileName.match(/\d+(\.\d+)?/g);
-    const estimatedAmount = numberMatches && numberMatches.length > 0 ? parseFloat(numberMatches[0]) : (kind === "gold_invoice" ? 450 : kind === "receipt" ? 28.5 : 85);
-    const estimatedRef = numberMatches && numberMatches.length > 1 ? `INV-${numberMatches[1]}` : `WZ-${Math.floor(100000 + Math.random() * 900000)}`;
+    const estimatedAmount =
+      numberMatches && numberMatches.length > 0
+        ? parseFloat(numberMatches[0])
+        : kind === "gold_invoice"
+          ? 450
+          : kind === "receipt"
+            ? 28.5
+            : 85;
+    const estimatedRef =
+      numberMatches && numberMatches.length > 1
+        ? `INV-${numberMatches[1]}`
+        : `WZ-${Math.floor(100000 + Math.random() * 900000)}`;
 
     return {
       success: true,
       data: {
-        vendor: cleanName.length > 2 ? cleanName : (kind === "gold_invoice" ? "مجوهرات الفارس" : "مركز سلطان"),
+        vendor:
+          cleanName.length > 2
+            ? cleanName
+            : kind === "gold_invoice"
+              ? "مجوهرات الفارس"
+              : "مركز سلطان",
         documentDate: new Date().toISOString().slice(0, 10),
         totalAmount: estimatedAmount,
         currency: baseCurrency,
-        category: kind === "gold_invoice" || kind === "silver_invoice" ? "استثمار ومعادن" : "بقالة ومشتريات",
+        category:
+          kind === "gold_invoice" || kind === "silver_invoice"
+            ? "استثمار ومعادن"
+            : "بقالة ومشتريات",
         taxAmount: 0,
         paymentMethod: "KNET",
         reference: estimatedRef,
         note: `تم تحليل الفاتورة واستخراج البيانات بنجاح (${cleanName})`,
-        ...(kind === "gold_invoice" ? { metalGrams: 20, metalPurity: "21K", pricePerGram: 22.5 } : {}),
+        ...(kind === "gold_invoice"
+          ? { metalGrams: 20, metalPurity: "21K", pricePerGram: 22.5 }
+          : {}),
       },
     };
   }
@@ -802,4 +822,3 @@ ${textContent ? `محتوى / نص المستند المكتشف:\n"""\n${textCo
     },
   };
 }
-
