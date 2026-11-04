@@ -116,7 +116,7 @@ export function buildChildChatContext(input: {
   };
 }
 
-const list = (items: string[], empty: string) => (items.length ? items.join("، ") : empty);
+const list = (items: string[], empty: string) => (items.length ? items.join(", ") : empty);
 
 /** System prompt with the child-safety rules and the child's own learning context. */
 export function buildChildSystemPrompt(context: ChildChatContext): string {
