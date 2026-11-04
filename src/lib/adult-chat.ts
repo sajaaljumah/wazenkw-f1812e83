@@ -25,7 +25,12 @@ import { portfolioTotals, type Asset } from "@/lib/assets";
 
 export type AdultChatLanguage = "ar" | "en";
 export type AdultChatTurn = { role: "user" | "assistant"; content: string };
-export const ADULT_LIFE_STAGES_FOR_CHAT = ["university_student", "employee", "self_employed", "parent"] as const;
+export const ADULT_LIFE_STAGES_FOR_CHAT = [
+  "university_student",
+  "employee",
+  "self_employed",
+  "parent",
+] as const;
 
 export const ADULT_CHAT_LIMITS = {
   maxMessageChars: 1000,
@@ -47,6 +52,7 @@ type MonthSummary = {
 
 export type AdultFinancialSummary = {
   today: string;
+  latestTransactionDate: string | null;
   currency: string;
   availableMoney: number;
   thisMonth: MonthSummary & { topCategories: { category: string; amount: number }[] };
@@ -55,7 +61,13 @@ export type AdultFinancialSummary = {
   incomeSourcesLast3Months: { category: string; amount: number }[];
   topMerchantsThisMonth: { merchant: string; amount: number }[];
   budget: { amount: number; spent: number; remaining: number; percentUsed: number } | null;
-  goals: { name: string; target: number; saved: number; percent: number; targetDate: string | null }[];
+  goals: {
+    name: string;
+    target: number;
+    saved: number;
+    percent: number;
+    targetDate: string | null;
+  }[];
   emergencyFunds: { name: string; target: number; saved: number; percent: number }[];
   recurring: {
     monthlyExpenses: number;
@@ -63,7 +75,14 @@ export type AdultFinancialSummary = {
     monthlySavings: number;
     items: { name: string; kind: string; category: string; monthly: number }[];
   };
-  assets: { value: number; cost: number; gain: number; gainPercent: number; annualRent: number; byKind: { kind: string; value: number; count: number }[] } | null;
+  assets: {
+    value: number;
+    cost: number;
+    gain: number;
+    gainPercent: number;
+    annualRent: number;
+    byKind: { kind: string; value: number; count: number }[];
+  } | null;
 };
 
 function summarizeMonth(list: Transaction[], key: string): MonthSummary {
@@ -100,10 +119,14 @@ export function buildAdultFinancialSummary(input: {
 
   const history: MonthSummary[] = [];
   for (let i = 11; i >= 0; i -= 1) {
-    history.push(summarizeMonth(list, monthKey(new Date(now.getFullYear(), now.getMonth() - i, 1))));
+    history.push(
+      summarizeMonth(list, monthKey(new Date(now.getFullYear(), now.getMonth() - i, 1))),
+    );
   }
 
-  const recentKeys = new Set([0, 1, 2].map((i) => monthKey(new Date(now.getFullYear(), now.getMonth() - i, 1))));
+  const recentKeys = new Set(
+    [0, 1, 2].map((i) => monthKey(new Date(now.getFullYear(), now.getMonth() - i, 1))),
+  );
   const incomeMap = new Map<string, number>();
   for (const t of list) {
     if (t.kind !== "income" || !recentKeys.has(t.occurred_on.slice(0, 7))) continue;
@@ -148,10 +171,20 @@ export function buildAdultFinancialSummary(input: {
 
   return {
     today: now.toISOString().slice(0, 10),
+    latestTransactionDate: list.reduce<string | null>(
+      (latest, t) => (!latest || t.occurred_on > latest ? t.occurred_on : latest),
+      null,
+    ),
     currency: input.currency,
     availableMoney: round(totalsFor(list).net),
-    thisMonth: { ...summarizeMonth(list, thisKey), topCategories: topCategories(inMonth(list, thisKey)) },
-    lastMonth: { ...summarizeMonth(list, lastKey), topCategories: topCategories(inMonth(list, lastKey)) },
+    thisMonth: {
+      ...summarizeMonth(list, thisKey),
+      topCategories: topCategories(inMonth(list, thisKey)),
+    },
+    lastMonth: {
+      ...summarizeMonth(list, lastKey),
+      topCategories: topCategories(inMonth(list, lastKey)),
+    },
     monthlyHistory: history,
     incomeSourcesLast3Months: [...incomeMap.entries()]
       .map(([category, amount]) => ({ category, amount: round(amount) }))
@@ -206,20 +239,29 @@ export function buildAdultSystemPrompt(input: {
   firstName: string;
   lifeStage: string;
   language: AdultChatLanguage;
+  gender?: "female" | "male" | null;
   summary: AdultFinancialSummary;
 }): string {
+  const grammarRule =
+    input.gender === "female"
+      ? "Address the user with feminine grammar."
+      : input.gender === "male"
+        ? "Address the user with masculine grammar."
+        : "Use gender-neutral wording.";
   const languageRule =
     input.language === "ar"
       ? "Always reply in clear, professional Arabic (light Gulf tone is fine). Keep numbers in Western digits with the currency code."
       : "Always reply in clear, professional English.";
 
   return `You are "Wazen AI", the personal finance assistant inside the Wazen app (Kuwait). Base currency: ${input.summary.currency}.
-You are talking with ${input.firstName}, a ${STAGE_LABEL[input.lifeStage] ?? "adult"} user.
+You are talking with ${input.firstName}, a ${STAGE_LABEL[input.lifeStage] ?? "adult"} user. Write the name exactly as "${input.firstName}" and do not use terms of endearment.
 ${languageRule}
+${grammarRule}
 
 How to answer:
 - Analyse the user's real data below BEFORE answering. Quote specific figures, months, categories and percentages from it.
 - Explain patterns (e.g. month-over-month changes by category), point out avoidable spending, and give 2-4 realistic, concrete improvements with estimated amounts.
+- If the current month (or last month) has no recorded transactions, say so briefly, then analyse the most recent months in monthlyHistory that do have data (latestTransactionDate shows the newest record) instead of stopping at "zero".
 - Refunds reduce net spending; savings and assets are not available money.
 - If the data needed is missing, say so plainly and suggest what to record in Wazen. Never invent numbers, transactions, merchants or dates.
 - Be concise: short paragraphs or bullet lists, use **bold** for key figures. Aim for under 220 words unless the user asks for detail.
@@ -235,7 +277,13 @@ ${JSON.stringify(input.summary)}`;
 
 export function sanitizeAdultHistory(turns: AdultChatTurn[]): AdultChatTurn[] {
   return turns
-    .filter((turn) => (turn.role === "user" || turn.role === "assistant") && turn.content.trim().length > 0)
+    .filter(
+      (turn) =>
+        (turn.role === "user" || turn.role === "assistant") && turn.content.trim().length > 0,
+    )
     .slice(-ADULT_CHAT_LIMITS.maxHistoryTurns)
-    .map((turn) => ({ role: turn.role, content: turn.content.trim().slice(0, ADULT_CHAT_LIMITS.maxMessageChars * 6) }));
+    .map((turn) => ({
+      role: turn.role,
+      content: turn.content.trim().slice(0, ADULT_CHAT_LIMITS.maxMessageChars * 6),
+    }));
 }

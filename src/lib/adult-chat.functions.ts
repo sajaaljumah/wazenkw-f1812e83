@@ -18,7 +18,13 @@ import {
   sanitizeAdultHistory,
 } from "@/lib/adult-chat";
 import { firstNameOf } from "@/lib/wazen";
-import { firstOfMonth, type Budget, type Goal, type RecurringItem, type Transaction } from "@/lib/finance";
+import {
+  firstOfMonth,
+  type Budget,
+  type Goal,
+  type RecurringItem,
+  type Transaction,
+} from "@/lib/finance";
 import { canOwnAssets, type Asset } from "@/lib/assets";
 
 export type AdultChatResult =
@@ -55,18 +61,24 @@ export const sendAdultFinanceChatFn = createServerFn({ method: "POST" })
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("full_name, life_stage, base_currency")
+      .select("full_name, life_stage, base_currency, gender")
       .eq("id", userId)
       .maybeSingle();
     if (profileError) throw new Error("Could not load profile.");
-    if (!profile || !isAdultChatStage(profile.life_stage)) return { ok: false, code: "NOT_ALLOWED" };
+    if (!profile || !isAdultChatStage(profile.life_stage))
+      return { ok: false, code: "NOT_ALLOWED" };
 
     const now = new Date();
     const since = new Date(now.getFullYear(), now.getMonth() - 12, 1).toISOString().slice(0, 10);
     const includeAssets = canOwnAssets(profile.life_stage);
 
     const [transactions, goals, budget, recurring, assets] = await Promise.all([
-      supabase.from("transactions").select("*").eq("user_id", userId).gte("occurred_on", since).limit(5000),
+      supabase
+        .from("transactions")
+        .select("*")
+        .eq("user_id", userId)
+        .gte("occurred_on", since)
+        .limit(5000),
       supabase.from("goals").select("*").eq("user_id", userId),
       supabase
         .from("budgets")
@@ -79,7 +91,8 @@ export const sendAdultFinanceChatFn = createServerFn({ method: "POST" })
         ? supabase.from("assets").select("*").eq("user_id", userId)
         : Promise.resolve({ data: null, error: null }),
     ]);
-    if (transactions.error || goals.error || recurring.error) throw new Error("Could not load financial data.");
+    if (transactions.error || goals.error || recurring.error)
+      throw new Error("Could not load financial data.");
 
     // Lifetime available money needs every transaction, not just the last year.
     const { data: allTx } = await supabase
@@ -111,6 +124,8 @@ export const sendAdultFinanceChatFn = createServerFn({ method: "POST" })
             firstName: firstNameOf(profile.full_name),
             lifeStage: profile.life_stage,
             language: data.language,
+            gender:
+              profile.gender === "female" || profile.gender === "male" ? profile.gender : null,
             summary,
           }),
         },
