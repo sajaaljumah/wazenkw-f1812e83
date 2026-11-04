@@ -60,9 +60,15 @@ export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
       { title: "Settings — Wazen" },
-      { name: "description", content: "Manage Wazen language, appearance, security and account controls." },
+      {
+        name: "description",
+        content: "Manage Wazen language, appearance, security and account controls.",
+      },
       { property: "og:title", content: "Settings — Wazen" },
-      { property: "og:description", content: "Manage Wazen language, appearance, security and account controls." },
+      {
+        property: "og:description",
+        content: "Manage Wazen language, appearance, security and account controls.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -142,10 +148,16 @@ function SettingsPage() {
             }
             const relLabel =
               r.relationship_type === "mother"
-                ? (isArabic ? "الأم" : "Mother")
+                ? isArabic
+                  ? "الأم"
+                  : "Mother"
                 : r.relationship_type === "father"
-                ? (isArabic ? "الأب" : "Father")
-                : (isArabic ? "ولي الأمر" : "Guardian");
+                  ? isArabic
+                    ? "الأب"
+                    : "Father"
+                  : isArabic
+                    ? "ولي الأمر"
+                    : "Guardian";
             return name ? `${name} (${relLabel})` : relLabel;
           })
           .join(" / ");
@@ -192,10 +204,7 @@ function SettingsPage() {
     applyTheme(next);
     if (user?.id) cacheTheme(user.id, next);
     if (!profile) return;
-    const { error } = await supabase
-      .from("profiles")
-      .update({ theme: next })
-      .eq("id", profile.id);
+    const { error } = await supabase.from("profiles").update({ theme: next }).eq("id", profile.id);
     if (error) {
       toast.error(error.message);
       return;
@@ -207,7 +216,10 @@ function SettingsPage() {
   async function chooseLanguage(next: string) {
     setLanguage(next);
     if (!profile) return;
-    const { error } = await supabase.from("profiles").update({ language: next }).eq("id", profile.id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ language: next })
+      .eq("id", profile.id);
     if (error) {
       toast.error(error.message);
       return;
@@ -217,7 +229,9 @@ function SettingsPage() {
 
   async function save() {
     if (isMinor) {
-      toast.error(isArabic ? "لا يمكن تعديل الإعدادات لحسابات الأطفال" : "Minors cannot edit settings");
+      toast.error(
+        isArabic ? "لا يمكن تعديل الإعدادات لحسابات الأطفال" : "Minors cannot edit settings",
+      );
       return;
     }
     if (!profile) return;
@@ -249,7 +263,9 @@ function SettingsPage() {
 
   async function changePassword() {
     if (isMinor) {
-      toast.error(isArabic ? "تتم إدارة كلمة المرور عبر ولي الأمر" : "Password is managed by guardian");
+      toast.error(
+        isArabic ? "تتم إدارة كلمة المرور عبر ولي الأمر" : "Password is managed by guardian",
+      );
       return;
     }
     if (newPassword.length < 8) {
@@ -275,11 +291,15 @@ function SettingsPage() {
     if (isMinor) return;
     const trimmed = newEmail.trim().toLowerCase();
     if (!trimmed || !trimmed.includes("@")) {
-      toast.error(isArabic ? "الرجاء إدخال بريد إلكتروني صحيح" : "Please enter a valid email address");
+      toast.error(
+        isArabic ? "الرجاء إدخال بريد إلكتروني صحيح" : "Please enter a valid email address",
+      );
       return;
     }
     if (trimmed === user?.email?.toLowerCase()) {
-      toast.error(isArabic ? "هذا هو بريدك الإلكتروني الحالي بالفعل" : "This is already your current email");
+      toast.error(
+        isArabic ? "هذا هو بريدك الإلكتروني الحالي بالفعل" : "This is already your current email",
+      );
       return;
     }
     setEmailBusy(true);
@@ -304,7 +324,11 @@ function SettingsPage() {
       return;
     }
     if (isMinor && !isOrphanedMinor) {
-      toast.error(isArabic ? "لا يمكن للأطفال أو المراهقين حذف الحساب — يتم ذلك عبر ولي الأمر" : "Minors cannot delete accounts");
+      toast.error(
+        isArabic
+          ? "لا يمكن للأطفال أو المراهقين حذف الحساب — يتم ذلك عبر ولي الأمر"
+          : "Minors cannot delete accounts",
+      );
       return;
     }
     setDeleteBusy(true);
@@ -332,7 +356,9 @@ function SettingsPage() {
         await (supabase.rpc as any)("delete_current_user");
       } catch {}
       if (res?.success) {
-        toast.success(isArabic ? "تم حذف حسابك نهائياً" : "Your account has been deleted permanently");
+        toast.success(
+          isArabic ? "تم حذف حسابك نهائياً" : "Your account has been deleted permanently",
+        );
         setDeleteDialogOpen(false);
         try {
           localStorage.clear();
@@ -448,7 +474,9 @@ function SettingsPage() {
               ) : null}
             </div>
             <div className="mt-2 flex items-center justify-between rounded-lg border border-input bg-secondary/60 px-4 py-3 text-sm text-muted-foreground">
-              <span className="font-mono text-xs sm:text-sm text-foreground">{user?.email ?? ""}</span>
+              <span className="font-mono text-xs sm:text-sm text-foreground">
+                {user?.email ?? ""}
+              </span>
               <span className="rounded bg-background/80 px-2 py-0.5 text-[11px] text-muted-foreground border border-border/40">
                 {isArabic ? "معرّف الدخول الأساسي" : "Sign-in ID"}
               </span>
@@ -490,7 +518,9 @@ function SettingsPage() {
             <div>
               <div className="flex items-center gap-2">
                 <FamilyIcon className="size-5 text-primary" strokeWidth={ICON_STROKE} />
-                <h2 className="text-xl font-semibold">{isArabic ? "العائلة والأبناء" : "Family & Children"}</h2>
+                <h2 className="text-xl font-semibold">
+                  {isArabic ? "العائلة والأبناء" : "Family & Children"}
+                </h2>
               </div>
               <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                 {isArabic
@@ -632,11 +662,7 @@ function SettingsPage() {
         </div>
 
         {!isMinor ? (
-          <Button
-            onClick={save}
-            disabled={busy}
-            className="mt-7"
-          >
+          <Button onClick={save} disabled={busy} className="mt-7">
             {busy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
             {t("saveSettings")}
           </Button>
@@ -648,7 +674,10 @@ function SettingsPage() {
         <h2 className="text-xl">{t("security")}</h2>
         {isMinor ? (
           <div className="mt-4 rounded-lg border border-input bg-secondary/60 p-4 text-sm text-muted-foreground flex items-center gap-3">
-            <LockedIcon className="size-4 shrink-0 text-muted-foreground" strokeWidth={ICON_STROKE} />
+            <LockedIcon
+              className="size-4 shrink-0 text-muted-foreground"
+              strokeWidth={ICON_STROKE}
+            />
             <span>
               {isArabic
                 ? "تتم إدارة الأمان وكلمة المرور من قبل ولي الأمر لحماية حسابك حتى بلوغ سن ١٨ عاماً."
@@ -680,10 +709,7 @@ function SettingsPage() {
               </label>
             </div>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Button
-                onClick={changePassword}
-                disabled={pwBusy}
-              >
+              <Button onClick={changePassword} disabled={pwBusy}>
                 {pwBusy ? <SpinnerIcon className="size-4 animate-spin" /> : null}
                 {t("changePassword")}
               </Button>
@@ -692,10 +718,7 @@ function SettingsPage() {
         )}
 
         <div className="mt-7 border-t border-border/50 pt-5">
-          <Button
-            onClick={signOut}
-            variant="outline"
-          >
+          <Button onClick={signOut} variant="outline">
             <SignOutIcon className="size-4" strokeWidth={ICON_STROKE} />
             {t("signOut")}
           </Button>
@@ -776,7 +799,9 @@ function SettingsPage() {
         <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>{isArabic ? "تغيير البريد الإلكتروني" : "Change Email Address"}</DialogTitle>
+              <DialogTitle>
+                {isArabic ? "تغيير البريد الإلكتروني" : "Change Email Address"}
+              </DialogTitle>
               <DialogDescription>
                 {isArabic
                   ? "أدخل عنوان بريدك الإلكتروني الجديد. لأسباب أمنية، سيتم إرسال رابط تأكيد إلى البريد الجديد لتأكيد الملكية."
@@ -794,7 +819,9 @@ function SettingsPage() {
 
               <div>
                 <label className="block">
-                  <span className="wazen-label">{isArabic ? "البريد الإلكتروني الجديد" : "New Email"}</span>
+                  <span className="wazen-label">
+                    {isArabic ? "البريد الإلكتروني الجديد" : "New Email"}
+                  </span>
                   <input
                     type="email"
                     className={cn(inputClass, "mt-1.5")}
@@ -837,9 +864,7 @@ function SettingsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="sm:justify-center gap-2 mt-4">
-            <AlertDialogCancel disabled={deleteBusy}>
-              {t("cancel")}
-            </AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteBusy}>{t("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAccount}
               disabled={deleteBusy}

@@ -108,7 +108,8 @@ export const getManagedChildFn = createServerFn({ method: "POST" })
       lifeStage: p.life_stage,
       language: p.language,
       currency: p.base_currency,
-      locked: isDemoAccount(parentEmailOf(claims as Record<string, unknown>)) || isDemoAccount(email),
+      locked:
+        isDemoAccount(parentEmailOf(claims as Record<string, unknown>)) || isDemoAccount(email),
       canFund,
       transactions: ((transactions.data ?? []) as ManagedChildTransaction[]).map((row) => ({
         ...row,

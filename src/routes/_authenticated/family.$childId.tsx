@@ -32,9 +32,15 @@ export const Route = createFileRoute("/_authenticated/family/$childId")({
   head: () => ({
     meta: [
       { title: "Manage child account — Wazen" },
-      { name: "description", content: "Parents manage a linked child's account details and money in Wazen." },
+      {
+        name: "description",
+        content: "Parents manage a linked child's account details and money in Wazen.",
+      },
       { property: "og:title", content: "Manage child account — Wazen" },
-      { property: "og:description", content: "Edit a linked child's login details and manage their spending." },
+      {
+        property: "og:description",
+        content: "Edit a linked child's login details and manage their spending.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -59,7 +65,10 @@ const C = {
   name: { en: "Name", ar: "الاسم" },
   email: { en: "Login email", ar: "بريد الدخول" },
   password: { en: "New password", ar: "كلمة مرور جديدة" },
-  passwordHint: { en: "Leave empty to keep the current password. At least 8 characters.", ar: "اتركها فارغة للإبقاء على كلمة المرور الحالية. 8 أحرف على الأقل." },
+  passwordHint: {
+    en: "Leave empty to keep the current password. At least 8 characters.",
+    ar: "اتركها فارغة للإبقاء على كلمة المرور الحالية. 8 أحرف على الأقل.",
+  },
   language: { en: "App language", ar: "لغة التطبيق" },
   dob: { en: "Date of birth", ar: "تاريخ الميلاد" },
   gender: { en: "Gender", ar: "الجنس" },
@@ -86,7 +95,10 @@ const C = {
   goals: { en: "Goals", ar: "الأهداف" },
   noGoals: { en: "No goals yet.", ar: "لا توجد أهداف بعد." },
   failed: { en: "Something went wrong. Please try again.", ar: "حدث خطأ. حاول مرة أخرى." },
-  emailTaken: { en: "This email is already used by another account.", ar: "هذا البريد مستخدم في حساب آخر." },
+  emailTaken: {
+    en: "This email is already used by another account.",
+    ar: "هذا البريد مستخدم في حساب آخر.",
+  },
   locked: { en: "Demo accounts can't be changed.", ar: "لا يمكن تعديل الحسابات التجريبية." },
   notFound: { en: "This child isn't linked to your account.", ar: "هذا الطفل غير مرتبط بحسابك." },
   female: { en: "Female", ar: "أنثى" },
@@ -94,7 +106,20 @@ const C = {
   years: { en: "yrs", ar: "سنة" },
 } satisfies Record<string, Text>;
 
-const CHILD_CATEGORIES = ["snacks", "school", "toys", "games", "books", "clothes", "gifts", "transport", "allowance", "pocket money", "charity", "other"];
+const CHILD_CATEGORIES = [
+  "snacks",
+  "school",
+  "toys",
+  "games",
+  "books",
+  "clothes",
+  "gifts",
+  "transport",
+  "allowance",
+  "pocket money",
+  "charity",
+  "other",
+];
 
 function ManageChildPage() {
   const { childId } = Route.useParams();
@@ -143,7 +168,9 @@ function ManageChildPage() {
             <SpinnerIcon className="size-6 animate-spin text-muted-foreground" />
           </div>
         ) : query.isError || !query.data ? (
-          <p className="rounded-2xl border border-border bg-secondary/40 p-6 text-sm">{t(C.notFound)}</p>
+          <p className="rounded-2xl border border-border bg-secondary/40 p-6 text-sm">
+            {t(C.notFound)}
+          </p>
         ) : (
           <ChildManager
             child={query.data}
@@ -200,7 +227,12 @@ function ChildManager({
   child: ManagedChild;
   t: (text: Text) => string;
   labels: Labels;
-  onSave: (values: { fullName: string; email: string; language: "ar" | "en"; password?: string }) => Promise<boolean>;
+  onSave: (values: {
+    fullName: string;
+    email: string;
+    language: "ar" | "en";
+    password?: string;
+  }) => Promise<boolean>;
   onAdd: (values: {
     kind: "expense" | "income";
     amount: number;
@@ -278,7 +310,8 @@ function ChildManager({
         <div className="min-w-0">
           <h1 className="truncate text-2xl sm:text-3xl">{child.fullName}</h1>
           <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            {labels.lifeStage(child.lifeStage as Parameters<Labels["lifeStage"]>[0])} · {age} {t(C.years)}
+            {labels.lifeStage(child.lifeStage as Parameters<Labels["lifeStage"]>[0])} · {age}{" "}
+            {t(C.years)}
             <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-[11px]">
               <FamilyIcon className="size-3" strokeWidth={ICON_STROKE} />
               {t(C.linked)}
@@ -288,7 +321,10 @@ function ChildManager({
       </header>
 
       {locked ? (
-        <div role="note" className="flex items-start gap-3 rounded-2xl border border-border bg-secondary/50 p-4">
+        <div
+          role="note"
+          className="flex items-start gap-3 rounded-2xl border border-border bg-secondary/50 p-4"
+        >
           <LockedIcon className="mt-0.5 size-5 shrink-0 text-primary" strokeWidth={ICON_STROKE} />
           <div>
             <p className="text-sm font-semibold">{t(C.demoTitle)}</p>
@@ -308,11 +344,27 @@ function ChildManager({
         <form onSubmit={save} className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-1.5 text-sm">
             <span>{t(C.name)}</span>
-            <input className={fieldClass} value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={locked} required minLength={2} maxLength={80} />
+            <input
+              className={fieldClass}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              disabled={locked}
+              required
+              minLength={2}
+              maxLength={80}
+            />
           </label>
           <label className="space-y-1.5 text-sm">
             <span>{t(C.email)}</span>
-            <input className={fieldClass} type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} disabled={locked} required />
+            <input
+              className={fieldClass}
+              type="email"
+              dir="ltr"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={locked}
+              required
+            />
           </label>
           <label className="space-y-1.5 text-sm">
             <span>{t(C.password)}</span>
@@ -331,7 +383,12 @@ function ChildManager({
           </label>
           <label className="space-y-1.5 text-sm">
             <span>{t(C.language)}</span>
-            <select className={fieldClass} value={lang} onChange={(e) => setLang(e.target.value as "ar" | "en")} disabled={locked}>
+            <select
+              className={fieldClass}
+              value={lang}
+              onChange={(e) => setLang(e.target.value as "ar" | "en")}
+              disabled={locked}
+            >
               <option value="ar">العربية</option>
               <option value="en">English</option>
             </select>
@@ -343,12 +400,18 @@ function ChildManager({
           </div>
           <div className="space-y-1.5 text-sm">
             <span>{t(C.gender)}</span>
-            <p className="wazen-field w-full opacity-60">{child.gender === "female" ? t(C.female) : t(C.male)}</p>
+            <p className="wazen-field w-full opacity-60">
+              {child.gender === "female" ? t(C.female) : t(C.male)}
+            </p>
             <span className="block text-[11px] text-muted-foreground">{t(C.fixed)}</span>
           </div>
           <div className="sm:col-span-2">
             <Button type="submit" disabled={locked || saving} className="gap-2">
-              {saving ? <SpinnerIcon className="size-4 animate-spin" /> : locked ? <LockedIcon className="size-4" strokeWidth={ICON_STROKE} /> : null}
+              {saving ? (
+                <SpinnerIcon className="size-4 animate-spin" />
+              ) : locked ? (
+                <LockedIcon className="size-4" strokeWidth={ICON_STROKE} />
+              ) : null}
               {t(C.save)}
             </Button>
           </div>
@@ -364,18 +427,41 @@ function ChildManager({
         <form onSubmit={add} className="grid gap-3 sm:grid-cols-6 sm:items-end">
           <label className="space-y-1.5 text-sm sm:col-span-2">
             <span>{t(C.kind)}</span>
-            <select className={fieldClass} value={kind} onChange={(e) => setKind(e.target.value as "expense" | "income")} disabled={locked}>
+            <select
+              className={fieldClass}
+              value={kind}
+              onChange={(e) => setKind(e.target.value as "expense" | "income")}
+              disabled={locked}
+            >
               <option value="expense">{t(C.expense)}</option>
               <option value="income">{t(C.income)}</option>
             </select>
           </label>
           <label className="space-y-1.5 text-sm sm:col-span-2">
-            <span>{t(C.amount)} ({child.currency})</span>
-            <input className={fieldClass} type="number" inputMode="decimal" min="0.001" step="0.001" dir="ltr" value={amount} onChange={(e) => setAmount(e.target.value)} disabled={locked} required />
+            <span>
+              {t(C.amount)} ({child.currency})
+            </span>
+            <input
+              className={fieldClass}
+              type="number"
+              inputMode="decimal"
+              min="0.001"
+              step="0.001"
+              dir="ltr"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              disabled={locked}
+              required
+            />
           </label>
           <label className="space-y-1.5 text-sm sm:col-span-2">
             <span>{t(C.category)}</span>
-            <select className={fieldClass} value={category} onChange={(e) => setCategory(e.target.value)} disabled={locked}>
+            <select
+              className={fieldClass}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              disabled={locked}
+            >
               {CHILD_CATEGORIES.map((item) => (
                 <option key={item} value={item}>
                   {labels.category(item)}
@@ -385,14 +471,31 @@ function ChildManager({
           </label>
           <label className="space-y-1.5 text-sm sm:col-span-3">
             <span>{t(C.merchant)}</span>
-            <input className={fieldClass} value={merchant} onChange={(e) => setMerchant(e.target.value)} disabled={locked} maxLength={80} />
+            <input
+              className={fieldClass}
+              value={merchant}
+              onChange={(e) => setMerchant(e.target.value)}
+              disabled={locked}
+              maxLength={80}
+            />
           </label>
           <label className="space-y-1.5 text-sm sm:col-span-2">
             <span>{t(C.date)}</span>
-            <input className={fieldClass} type="date" value={date} onChange={(e) => setDate(e.target.value)} disabled={locked} required />
+            <input
+              className={fieldClass}
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              disabled={locked}
+              required
+            />
           </label>
           <Button type="submit" disabled={locked || adding} className="gap-1.5 sm:col-span-1">
-            {adding ? <SpinnerIcon className="size-4 animate-spin" /> : <AddIcon className="size-4" strokeWidth={ICON_STROKE} />}
+            {adding ? (
+              <SpinnerIcon className="size-4 animate-spin" />
+            ) : (
+              <AddIcon className="size-4" strokeWidth={ICON_STROKE} />
+            )}
             {t(C.add)}
           </Button>
         </form>
@@ -408,16 +511,21 @@ function ChildManager({
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm">
                       {labels.category(tx.category)}
-                      {tx.merchant ? <span className="text-muted-foreground"> · {tx.merchant}</span> : null}
+                      {tx.merchant ? (
+                        <span className="text-muted-foreground"> · {tx.merchant}</span>
+                      ) : null}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDate(tx.occurred_on)} · {labels.transactionKind(tx.kind as Parameters<Labels["transactionKind"]>[0])}
+                      {formatDate(tx.occurred_on)} ·{" "}
+                      {labels.transactionKind(tx.kind as Parameters<Labels["transactionKind"]>[0])}
                     </p>
                   </div>
                   <span
                     className={cn(
                       "shrink-0 text-sm tabular-nums",
-                      tx.kind === "income" || tx.kind === "refund" ? "text-success" : "text-foreground",
+                      tx.kind === "income" || tx.kind === "refund"
+                        ? "text-success"
+                        : "text-foreground",
                     )}
                     dir="ltr"
                   >
@@ -436,7 +544,11 @@ function ChildManager({
                       aria-label={`${t(C.removed)}: ${labels.category(tx.category)}`}
                       className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
                     >
-                      {deleting === tx.id ? <SpinnerIcon className="size-4 animate-spin" /> : <DeleteIcon className="size-4" strokeWidth={ICON_STROKE} />}
+                      {deleting === tx.id ? (
+                        <SpinnerIcon className="size-4 animate-spin" />
+                      ) : (
+                        <DeleteIcon className="size-4" strokeWidth={ICON_STROKE} />
+                      )}
                     </button>
                   ) : null}
                 </li>
@@ -453,7 +565,8 @@ function ChildManager({
             <ul className="mt-3 flex flex-wrap gap-2">
               {child.goals.map((goal) => (
                 <li key={goal.id} className="rounded-full border border-border px-3 py-1.5 text-xs">
-                  {goal.name} · <span dir="ltr">{formatMoney(goal.target_amount, child.currency)}</span>
+                  {goal.name} ·{" "}
+                  <span dir="ltr">{formatMoney(goal.target_amount, child.currency)}</span>
                 </li>
               ))}
             </ul>

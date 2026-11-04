@@ -24,6 +24,7 @@ import { Route as AuthenticatedRecurringRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSubscriptionRouteImport } from './routes/_authenticated/subscription'
 import { Route as AuthenticatedZakatRouteImport } from './routes/_authenticated/zakat'
+import { Route as AuthenticatedFamilyChildIdRouteImport } from './routes/_authenticated/family.$childId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -100,6 +101,12 @@ const AuthenticatedZakatRoute = AuthenticatedZakatRouteImport.update({
   path: '/zakat',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFamilyChildIdRoute =
+  AuthenticatedFamilyChildIdRouteImport.update({
+    id: '/family/$childId',
+    path: '/family/$childId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/subscription': typeof AuthenticatedSubscriptionRoute
   '/zakat': typeof AuthenticatedZakatRoute
+  '/family/$childId': typeof AuthenticatedFamilyChildIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,6 +140,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/subscription': typeof AuthenticatedSubscriptionRoute
   '/zakat': typeof AuthenticatedZakatRoute
+  '/family/$childId': typeof AuthenticatedFamilyChildIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,6 +159,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/subscription': typeof AuthenticatedSubscriptionRoute
   '/_authenticated/zakat': typeof AuthenticatedZakatRoute
+  '/_authenticated/family/$childId': typeof AuthenticatedFamilyChildIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/subscription'
     | '/zakat'
+    | '/family/$childId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/subscription'
     | '/zakat'
+    | '/family/$childId'
   id:
     | '__root__'
     | '/'
@@ -201,6 +213,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/subscription'
     | '/_authenticated/zakat'
+    | '/_authenticated/family/$childId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -318,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedZakatRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/family/$childId': {
+      id: '/_authenticated/family/$childId'
+      path: '/family/$childId'
+      fullPath: '/family/$childId'
+      preLoaderRoute: typeof AuthenticatedFamilyChildIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -332,6 +352,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSubscriptionRoute: typeof AuthenticatedSubscriptionRoute
   AuthenticatedZakatRoute: typeof AuthenticatedZakatRoute
+  AuthenticatedFamilyChildIdRoute: typeof AuthenticatedFamilyChildIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -345,6 +366,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSubscriptionRoute: AuthenticatedSubscriptionRoute,
   AuthenticatedZakatRoute: AuthenticatedZakatRoute,
+  AuthenticatedFamilyChildIdRoute: AuthenticatedFamilyChildIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
