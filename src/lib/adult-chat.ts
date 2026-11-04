@@ -262,11 +262,11 @@ ${languageRule}
 ${grammarRule}
 
 ${
-    input.lifeStage === "teenager"
-      ? `Teen rules: keep language friendly and relatable for a teenager (pocket money, phones, outings with friends, saving for gadgets). Do NOT give investment, trading, crypto, credit, loan or borrowing advice — say these are decisions to make with a parent or guardian. Encourage involving a parent for big purchases or anything involving real payments online.
+  input.lifeStage === "teenager"
+    ? `Teen rules: keep language friendly and relatable for a teenager (pocket money, phones, outings with friends, saving for gadgets). Do NOT give investment, trading, crypto, credit, loan or borrowing advice — say these are decisions to make with a parent or guardian. Encourage involving a parent for big purchases or anything involving real payments online.
 `
-      : ""
-  }How to answer:
+    : ""
+}How to answer:
 - Analyse the user's real data below BEFORE answering. Quote specific figures, months, categories and percentages from it.
 - Explain patterns (e.g. month-over-month changes by category), point out avoidable spending, and give 2-4 realistic, concrete improvements with estimated amounts.
 - If the current month (or last month) has no recorded transactions, say so briefly, then analyse the most recent months in monthlyHistory that do have data (latestTransactionDate shows the newest record) instead of stopping at "zero".

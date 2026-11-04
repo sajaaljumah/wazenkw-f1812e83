@@ -29,7 +29,10 @@ import { canOwnAssets, type Asset } from "@/lib/assets";
 
 export type AdultChatResult =
   | { ok: true; reply: string }
-  | { ok: false; code: "NOT_ALLOWED" | "PREMIUM_REQUIRED" | "NOT_CONFIGURED" | "BUSY" | "UNAVAILABLE" };
+  | {
+      ok: false;
+      code: "NOT_ALLOWED" | "PREMIUM_REQUIRED" | "NOT_CONFIGURED" | "BUSY" | "UNAVAILABLE";
+    };
 
 const inputSchema = z.object({
   language: z.enum(["ar", "en"]),
