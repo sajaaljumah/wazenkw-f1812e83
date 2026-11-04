@@ -77,6 +77,7 @@ function parentEmailOf(claims: Record<string, unknown>): string | null {
 /** Refuses changes for demo accounts (presentation data must stay intact). */
 async function assertEditable(claims: Record<string, unknown>, childId: string) {
   const childEmail = await childEmailOf(childId);
+  if (!childEmail) throw new Error("Could not verify the child's account. Please try again.");
   if (isDemoAccount(parentEmailOf(claims)) || isDemoAccount(childEmail)) {
     throw new Error("DEMO_LOCKED");
   }
