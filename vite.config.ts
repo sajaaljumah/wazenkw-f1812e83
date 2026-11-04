@@ -8,6 +8,12 @@ export default defineConfig({
       dir: ".output",
     },
   },
+  vite: {
+    resolve: {
+      // tr46 (via mongodb) requires "punycode/"; map it to the npm package.
+      alias: [{ find: /^punycode\/$/, replacement: "punycode" }],
+    },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
