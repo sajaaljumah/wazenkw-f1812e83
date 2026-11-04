@@ -80,7 +80,7 @@ export function buildChildChatContext(input: {
   }
   const quizScores = [...byTopic.entries()].map(([topic, value]) => ({
     topic: topicLabel(topic, language),
-    percent: Math.round((value.best / value.max) * 100),
+    percent: Math.min(100, Math.round((value.best / value.max) * 100)),
   }));
 
   const recommendation = recommendNext(badgeContext);
