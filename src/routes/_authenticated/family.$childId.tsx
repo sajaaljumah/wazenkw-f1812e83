@@ -98,6 +98,10 @@ const C = {
   goals: { en: "Goals", ar: "الأهداف" },
   noGoals: { en: "No goals yet.", ar: "لا توجد أهداف بعد." },
   failed: { en: "Something went wrong. Please try again.", ar: "حدث خطأ. حاول مرة أخرى." },
+  loginUnavailable: {
+    en: "Changing the login email or password isn't available on this copy of the site. Use wazenkw.lovable.app.",
+    ar: "تغيير بريد الدخول أو كلمة المرور غير متاح في هذه النسخة من الموقع. استخدم wazenkw.lovable.app.",
+  },
   emailTaken: {
     en: "This email is already used by another account.",
     ar: "هذا البريد مستخدم في حساب آخر.",
@@ -145,6 +149,7 @@ function ManageChildPage() {
     const message = err instanceof Error ? err.message : "";
     if (message.includes("DEMO_LOCKED")) return t(C.locked);
     if (message.includes("EMAIL_TAKEN")) return t(C.emailTaken);
+    if (message.includes("LOGIN_CHANGE_UNAVAILABLE")) return t(C.loginUnavailable);
     return t(C.failed);
   };
 
