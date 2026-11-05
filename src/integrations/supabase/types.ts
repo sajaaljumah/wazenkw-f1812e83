@@ -1054,6 +1054,32 @@ export type Database = {
         Args: { _child: string; _parent: string }
         Returns: boolean
       }
+      wazen_add_managed_child_transaction: {
+        Args: {
+          _amount: number
+          _category: string
+          _child: string
+          _kind: string
+          _merchant: string
+          _note: string
+          _occurred_on: string
+        }
+        Returns: string
+      }
+      wazen_assert_child_editable: {
+        Args: { _child: string }
+        Returns: undefined
+      }
+      wazen_delete_managed_child_transaction: {
+        Args: { _child: string; _transaction: string }
+        Returns: undefined
+      }
+      wazen_is_demo_email: { Args: { _email: string }; Returns: boolean }
+      wazen_managed_child_email: { Args: { _child: string }; Returns: string }
+      wazen_update_managed_child: {
+        Args: { _child: string; _full_name: string; _language: string }
+        Returns: undefined
+      }
     }
     Enums: {
       account_type: "independent" | "dependent" | "parent"
