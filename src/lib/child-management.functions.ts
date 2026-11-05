@@ -51,15 +51,23 @@ async function requireGuardian(supabase: SupabaseClient, parentId: string, child
     .eq("child_user_id", childId)
     .eq("status", "active")
     .maybeSingle();
-  if (error || !data) throw new Error("You can only manage children linked to your account.");
+  if (error) throw new Error("Could not check the family link. Please try again.");
+  if (!data) throw new Error("NOT_LINKED: You can only manage children linked to your account.");
   const permissions = (data.permissions ?? {}) as Record<string, unknown>;
   return { canFund: permissions["can_fund"] === true, relationship: data.relationship_type as string };
 }
 
 async function childEmailOf(childId: string): Promise<string | null> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin.auth.admin.getUserById(childId);
-  return data.user?.email ?? null;
+  // Viewing must keep working on hosts where the private server key is missing;
+  // only the email field is left empty in that case.
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin.auth.admin.getUserById(childId);
+    return data.user?.email ?? null;
+  } catch (err) {
+    console.error("[child-management] could not read child login email", err);
+    return null;
+  }
 }
 
 function parentEmailOf(claims: Record<string, unknown>): string | null {
@@ -69,6 +77,7 @@ function parentEmailOf(claims: Record<string, unknown>): string | null {
 /** Refuses changes for demo accounts (presentation data must stay intact). */
 async function assertEditable(claims: Record<string, unknown>, childId: string) {
   const childEmail = await childEmailOf(childId);
+  if (!childEmail) throw new Error("Could not verify the child's account. Please try again.");
   if (isDemoAccount(parentEmailOf(claims)) || isDemoAccount(childEmail)) {
     throw new Error("DEMO_LOCKED");
   }

@@ -172,7 +172,9 @@ function ManageChildPage() {
           </div>
         ) : query.isError || !query.data ? (
           <p className="rounded-2xl border border-border bg-secondary/40 p-6 text-sm">
-            {t(C.notFound)}
+            {query.error instanceof Error && !query.error.message.includes("NOT_LINKED")
+              ? t(C.failed)
+              : t(C.notFound)}
           </p>
         ) : (
           <ChildManager
