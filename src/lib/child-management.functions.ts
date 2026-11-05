@@ -57,31 +57,24 @@ async function requireGuardian(supabase: SupabaseClient, parentId: string, child
   return { canFund: permissions["can_fund"] === true, relationship: data.relationship_type as string };
 }
 
-async function childEmailOf(childId: string): Promise<string | null> {
-  // Viewing must keep working on hosts where the private server key is missing;
-  // only the email field is left empty in that case.
-  try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin.auth.admin.getUserById(childId);
-    return data.user?.email ?? null;
-  } catch (err) {
-    console.error("[child-management] could not read child login email", err);
+/** Child's login email via a guardian-checked database function (no private key needed). */
+async function childEmailOf(supabase: SupabaseClient, childId: string): Promise<string | null> {
+  const { data, error } = await supabase.rpc("wazen_managed_child_email", { _child: childId });
+  if (error) {
+    console.error("[child-management] could not read child login email", error.message);
     return null;
   }
+  return (data as string | null) ?? null;
 }
 
 function parentEmailOf(claims: Record<string, unknown>): string | null {
   return typeof claims["email"] === "string" ? (claims["email"] as string) : null;
 }
 
-/** Refuses changes for demo accounts (presentation data must stay intact). */
-async function assertEditable(claims: Record<string, unknown>, childId: string) {
-  const childEmail = await childEmailOf(childId);
-  if (!childEmail) throw new Error("Could not verify the child's account. Please try again.");
-  if (isDemoAccount(parentEmailOf(claims)) || isDemoAccount(childEmail)) {
-    throw new Error("DEMO_LOCKED");
-  }
-  return childEmail;
+function rpcError(message: string, fallback: string): Error {
+  if (message.includes("DEMO_LOCKED")) return new Error("DEMO_LOCKED");
+  if (message.includes("NOT_LINKED")) return new Error("NOT_LINKED");
+  return new Error(fallback);
 }
 
 export const getManagedChildFn = createServerFn({ method: "POST" })
@@ -104,7 +97,7 @@ export const getManagedChildFn = createServerFn({ method: "POST" })
         .order("occurred_on", { ascending: false })
         .limit(60),
       supabase.from("goals").select("id, name, kind, target_amount").eq("user_id", data.childId),
-      childEmailOf(data.childId),
+      childEmailOf(supabase, data.childId),
     ]);
     if (profile.error || !profile.data) throw new Error("Child profile not found.");
 
@@ -149,18 +142,26 @@ export const updateManagedChildFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { supabase, userId, claims } = context;
     await requireGuardian(supabase, userId, data.childId);
-    const currentEmail = await assertEditable(claims as Record<string, unknown>, data.childId);
+    if (isDemoAccount(parentEmailOf(claims as Record<string, unknown>))) throw new Error("DEMO_LOCKED");
+    const currentEmail = await childEmailOf(supabase, data.childId);
+    if (!currentEmail) throw new Error("Could not verify the child's account. Please try again.");
+    if (isDemoAccount(currentEmail)) throw new Error("DEMO_LOCKED");
     if (isDemoAccount(data.email)) throw new Error("This email is reserved.");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
+    // Login email/password changes need the private server key (only on Lovable hosting).
     const authChanges: { email?: string; password?: string; email_confirm?: boolean } = {};
-    if (data.email !== (currentEmail ?? "").toLowerCase()) {
+    if (data.email !== currentEmail.toLowerCase()) {
       authChanges.email = data.email;
       authChanges.email_confirm = true;
     }
     if (data.password) authChanges.password = data.password;
     if (Object.keys(authChanges).length > 0) {
+      let supabaseAdmin;
+      try {
+        ({ supabaseAdmin } = await import("@/integrations/supabase/client.server"));
+      } catch {
+        throw new Error("LOGIN_CHANGE_UNAVAILABLE");
+      }
       const { error } = await supabaseAdmin.auth.admin.updateUserById(data.childId, authChanges);
       if (error) {
         throw new Error(
@@ -171,11 +172,12 @@ export const updateManagedChildFn = createServerFn({ method: "POST" })
       }
     }
 
-    const { error: profileError } = await supabaseAdmin
-      .from("profiles")
-      .update({ full_name: data.fullName, language: data.language })
-      .eq("id", data.childId);
-    if (profileError) throw new Error("Could not update the child's profile.");
+    const { error: profileError } = await supabase.rpc("wazen_update_managed_child", {
+      _child: data.childId,
+      _full_name: data.fullName,
+      _language: data.language,
+    });
+    if (profileError) throw rpcError(profileError.message, "Could not update the child's profile.");
 
     return { ok: true };
   });
@@ -196,30 +198,18 @@ export const addManagedChildTransactionFn = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
-    const { supabase, userId, claims } = context;
+    const { supabase, userId } = context;
     await requireGuardian(supabase, userId, data.childId);
-    await assertEditable(claims as Record<string, unknown>, data.childId);
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("base_currency")
-      .eq("id", data.childId)
-      .maybeSingle();
-
-    const { error } = await supabaseAdmin.from("transactions").insert({
-      user_id: data.childId,
-      kind: data.kind,
-      category: data.category,
-      merchant: data.merchant || null,
-      note: data.note || null,
-      amount: data.amount,
-      currency: profile?.base_currency ?? "KWD",
-      occurred_on: data.occurredOn,
-      paid_by_parent: false,
-      deducted_from_child: false,
+    const { error } = await supabase.rpc("wazen_add_managed_child_transaction", {
+      _child: data.childId,
+      _kind: data.kind,
+      _category: data.category,
+      _merchant: data.merchant ?? "",
+      _note: data.note ?? "",
+      _amount: data.amount,
+      _occurred_on: data.occurredOn,
     });
-    if (error) throw new Error("Could not save the transaction.");
+    if (error) throw rpcError(error.message, "Could not save the transaction.");
     return { ok: true };
   });
 
@@ -229,16 +219,12 @@ export const deleteManagedChildTransactionFn = createServerFn({ method: "POST" }
     z.object({ childId: childIdSchema, transactionId: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
-    const { supabase, userId, claims } = context;
+    const { supabase, userId } = context;
     await requireGuardian(supabase, userId, data.childId);
-    await assertEditable(claims as Record<string, unknown>, data.childId);
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
-      .from("transactions")
-      .delete()
-      .eq("id", data.transactionId)
-      .eq("user_id", data.childId);
-    if (error) throw new Error("Could not delete the transaction.");
+    const { error } = await supabase.rpc("wazen_delete_managed_child_transaction", {
+      _child: data.childId,
+      _transaction: data.transactionId,
+    });
+    if (error) throw rpcError(error.message, "Could not delete the transaction.");
     return { ok: true };
   });
