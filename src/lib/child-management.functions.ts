@@ -3,9 +3,10 @@
  *
  * Every call first proves, with the caller's own RLS-scoped client, that an
  * ACTIVE guardian link exists between the signed-in parent and the child.
- * Only then are privileged changes (login email, password, records) made with
- * the admin client. Demo accounts are view-only: the server refuses changes
- * when either the parent or the child is a demo account.
+ * Name, language and money records go through guardian-checked database
+ * functions, so they also work on self-hosted copies without the private key.
+ * Only login email/password changes need the admin client. Demo accounts are
+ * view-only: both the server and the database refuse changes to them.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -156,12 +157,8 @@ export const updateManagedChildFn = createServerFn({ method: "POST" })
     }
     if (data.password) authChanges.password = data.password;
     if (Object.keys(authChanges).length > 0) {
-      let supabaseAdmin;
-      try {
-        ({ supabaseAdmin } = await import("@/integrations/supabase/client.server"));
-      } catch {
-        throw new Error("LOGIN_CHANGE_UNAVAILABLE");
-      }
+      if (!process.env.SUPABASE_SERVICE_ROLE_KEY) throw new Error("LOGIN_CHANGE_UNAVAILABLE");
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { error } = await supabaseAdmin.auth.admin.updateUserById(data.childId, authChanges);
       if (error) {
         throw new Error(
