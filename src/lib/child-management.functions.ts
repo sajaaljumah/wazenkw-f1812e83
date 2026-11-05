@@ -157,7 +157,7 @@ export const updateManagedChildFn = createServerFn({ method: "POST" })
     }
     if (data.password) authChanges.password = data.password;
     if (Object.keys(authChanges).length > 0) {
-      if (!process.env.SUPABASE_SERVICE_ROLE_KEY) throw new Error("LOGIN_CHANGE_UNAVAILABLE");
+      if (!process.env["SUPABASE_SERVICE_ROLE_KEY"]) throw new Error("LOGIN_CHANGE_UNAVAILABLE");
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { error } = await supabaseAdmin.auth.admin.updateUserById(data.childId, authChanges);
       if (error) {
